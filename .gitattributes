@@ -1,0 +1,20 @@
+* text=auto
+
+# Dart language
+*.dart diff=dart
+
+# Gradle files
+.gradle diff=java
+gradlew diff=java
+gradlew.bat diff=java
+
+# iOS files
+*.xcworkspace/** diff=binary
+*.pbxproj diff=binary
+*.xcodeproj/** diff=binary
+
+# Generated files
+pubspec.lock diff=ignore
+.dart_tool/** diff=ignore
+.flutter-plugins diff=ignore
+.flutter-plugins-dependencies diff=ignore

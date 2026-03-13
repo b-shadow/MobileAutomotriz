@@ -1,0 +1,148 @@
+# ==========================================
+# FLUTTER & DART - GENERATED FILES
+# ==========================================
+
+# Build and compilation
+/build/
+/coverage/
+/lib/generated_plugin_registrant.dart
+/lib/generated_plugins.dart
+
+# Flutter
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+.pub-cache/
+.pub/
+*.lock
+pubspec.lock
+
+# Generated code
+*.g.dart
+*.freezed.dart
+*.config.dart
+
+# ==========================================
+# IDE & EDITOR - SPECIFIC CONFIGURATIONS
+# ==========================================
+
+# Android Studio / IntelliJ
+.idea/
+*.iml
+*.ipr
+*.iws
+out/
+
+# VS Code
+#.vscode/  # Uncomment if you want to exclude settings
+.vscode/**
+!.vscode/extensions.json
+!.vscode/launch.json
+!.vscode/settings.json
+
+# Sublime
+*.sublime-project
+*.sublime-workspace
+
+# Visual Studio Code
+.classpath
+.c9/
+*.launch
+.settings/
+*.sublime-workspace
+
+# ==========================================
+# OPERATING SYSTEM FILES
+# ==========================================
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+*.swp
+*.swo
+*~
+.env.local
+.env.*.local
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# Linux
+.Trash-*
+
+# ==========================================
+# ENVIRONMENT & CONFIG FILES (SENSITIVE)
+# ==========================================
+
+.env
+.env.local
+.env.*.local
+*.pem
+*.key
+*.p12
+
+# ==========================================
+# ANDROID SPECIFIC
+# ==========================================
+
+# Android build artifacts
+/android/.gradle/
+/android/captures/
+/android/gradlew
+/android/gradlew.bat
+/android/local.properties
+/android/.classpath
+/android/.project
+/android/.settings/
+/android/app/debug
+/android/app/profile
+/android/app/release
+/android/app/outputs/
+
+# ==========================================
+# iOS SPECIFIC
+# ==========================================
+
+# iOS build artifacts
+/ios/Flutter/Flutter.framework
+/ios/Flutter/Flutter.podspec
+/ios/Flutter/Flutter.xcframework
+/ios/Flutter/
+
+# CocoaPods
+/ios/Pods/
+/ios/Podfile.lock
+
+# Xcode
+*.pbxproj
+*.pbxuser
+*.mode1v3
+*.mode2v3
+*.perspectivev3
+xcuserdata/
+*.xcworkspace/xcuserdata/
+
+# ==========================================
+# WEB SPECIFIC (Opcional)
+# ==========================================
+
+/web/flutter_service_worker.js
+
+# ==========================================
+# TEMPORARY & CACHE FILES
+# ==========================================
+
+*.log
+*.log.*
+.history
+.svn/
+migrate_working_dir/
+.atom/
+.buildlog/
+.cache/
+.gradle
