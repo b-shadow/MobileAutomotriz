@@ -1,0 +1,46 @@
+name: mobile1_app
+description: "Professional Flutter App with Clean Architecture"
+publish_to: 'none'
+version: 0.1.0+1
+
+environment:
+  sdk: ^3.12.0-301.0.dev
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # State Management
+  flutter_bloc: ^8.1.0
+  equatable: ^2.0.5
+
+  # Dependency Injection
+  get_it: ^7.6.0
+
+  # Networking
+  dio: ^5.4.0
+  connectivity_plus: ^6.0.0
+
+  # Navigation
+  go_router: ^14.0.0
+
+  # UI/UX
+  google_fonts: ^6.1.0
+
+  # Local Storage
+  shared_preferences: ^2.2.0
+
+  # Utilities
+  intl: ^0.19.0
+
+  # Payments
+  flutter_stripe: ^11.1.0
+  flutter_stripe_web: ^6.5.1
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+
+flutter:
+  uses-material-design: true
