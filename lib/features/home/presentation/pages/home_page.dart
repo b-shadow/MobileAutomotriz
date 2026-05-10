@@ -382,6 +382,61 @@ class HomePage extends StatelessWidget {
               ),
             ),
           ),
+
+          const SizedBox(height: 12),
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton.icon(
+              onPressed: () => context.push('/appointment-management'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFF1E293B),
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  side: BorderSide(color: const Color(0xFF8B5CF6).withValues(alpha: 0.4)),
+                ),
+              ),
+              icon: const Icon(
+                Icons.calendar_today_rounded,
+                size: 20,
+                color: Color(0xFF8B5CF6),
+              ),
+              label: const Text(
+                'Gestionar Citas',
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              ),
+            ),
+          ),
+          const SizedBox(height: 12),
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton.icon(
+              onPressed: () => context.push('/reception-management'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFF1E293B),
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  side: BorderSide(color: const Color(0xFF10B981).withValues(alpha: 0.4)),
+                ),
+              ),
+              icon: const Icon(
+                Icons.car_repair_rounded,
+                size: 20,
+                color: Color(0xFF10B981),
+              ),
+              label: const Text(
+                'Recepción e Inspección',
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              ),
+            ),
+          ),
           
           const SizedBox(height: 32),
 

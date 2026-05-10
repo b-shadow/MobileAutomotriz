@@ -20,6 +20,10 @@ import '../../features/user_management/presentation/pages/user_management_page.d
 import '../../features/user_management/presentation/cubit/user_management_cubit.dart';
 import '../../features/vehicle_plan/presentation/pages/vehicle_plan_page.dart';
 import '../../features/vehicle_plan/presentation/cubit/vehicle_plan_cubit.dart';
+import '../../features/appointment/presentation/pages/appointment_page.dart';
+import '../../features/appointment/presentation/cubit/appointment_cubit.dart';
+import '../../features/reception/presentation/pages/reception_page.dart';
+import '../../features/reception/presentation/cubit/reception_cubit.dart';
 
 import '../../features/auth/presentation/pages/login_page.dart';
 import '../../features/auth/presentation/pages/register_page.dart';
@@ -170,6 +174,24 @@ class AppRouter {
         builder: (context, state) => BlocProvider(
           create: (context) => sl<VehiclePlanCubit>(),
           child: const VehiclePlanPage(),
+        ),
+      ),
+
+      GoRoute(
+        path: '/appointment-management',
+        name: 'appointment-management',
+        builder: (context, state) => BlocProvider(
+          create: (context) => sl<AppointmentCubit>(),
+          child: const AppointmentPage(),
+        ),
+      ),
+
+      GoRoute(
+        path: '/reception-management',
+        name: 'reception-management',
+        builder: (context, state) => BlocProvider(
+          create: (context) => sl<ReceptionCubit>(),
+          child: const ReceptionPage(),
         ),
       ),
     ],

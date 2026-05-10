@@ -95,6 +95,25 @@ import 'features/vehicle_plan/domain/usecases/update_vehicle_plan_detail_status.
 import 'features/vehicle_plan/domain/usecases/update_vehicle_plan_status.dart';
 import 'features/vehicle_plan/presentation/cubit/vehicle_plan_cubit.dart';
 
+import 'features/appointment/data/datasources/appointment_remote_data_source.dart';
+import 'features/appointment/data/repositories/appointment_repository_impl.dart';
+import 'features/appointment/domain/repositories/appointment_repository.dart';
+import 'features/appointment/domain/usecases/get_appointments.dart';
+import 'features/appointment/domain/usecases/get_appointment_detail.dart';
+import 'features/appointment/domain/usecases/create_appointment.dart';
+import 'features/appointment/domain/usecases/cancel_appointment.dart';
+import 'features/appointment/domain/usecases/reschedule_appointment.dart';
+import 'features/appointment/domain/usecases/mark_no_show_appointment.dart';
+import 'features/appointment/presentation/cubit/appointment_cubit.dart';
+
+import 'features/reception/data/datasources/reception_remote_data_source.dart';
+import 'features/reception/data/repositories/reception_repository_impl.dart';
+import 'features/reception/domain/repositories/reception_repository.dart';
+import 'features/reception/domain/usecases/create_reception.dart';
+import 'features/reception/domain/usecases/get_receptions.dart';
+import 'features/reception/domain/usecases/get_citas_pendientes.dart';
+import 'features/reception/presentation/cubit/reception_cubit.dart';
+
 final sl = GetIt.instance;
 
 /// Initialize all dependencies.
@@ -402,6 +421,64 @@ Future<void> initDependencies(SharedPreferences prefs) async {
       createVehiclePlanDetail: sl(),
       updateVehiclePlanDetail: sl(),
       updateVehiclePlanDetailStatus: sl(),
+    ),
+  );
+
+  // ── Appointment Feature ───────────────────────────────
+
+  sl.registerLazySingleton(() => GetAppointments(sl()));
+  sl.registerLazySingleton(() => GetAppointmentDetail(sl()));
+  sl.registerLazySingleton(() => CreateAppointment(sl()));
+  sl.registerLazySingleton(() => CancelAppointment(sl()));
+  sl.registerLazySingleton(() => RescheduleAppointment(sl()));
+  sl.registerLazySingleton(() => MarkNoShowAppointment(sl()));
+
+  sl.registerLazySingleton<AppointmentRepository>(
+    () => AppointmentRepositoryImpl(
+      remoteDataSource: sl(),
+      networkInfo: sl(),
+    ),
+  );
+
+  sl.registerLazySingleton<AppointmentRemoteDataSource>(
+    () => AppointmentRemoteDataSourceImpl(
+      apiClient: sl(),
+      sessionStorage: sl(),
+    ),
+  );
+
+  sl.registerFactory(
+    () => AppointmentCubit(
+      getAppointments: sl(),
+      getAppointmentDetail: sl(),
+      createAppointment: sl(),
+      cancelAppointment: sl(),
+      rescheduleAppointment: sl(),
+      markNoShow: sl(),
+    ),
+  );
+
+  // ── Reception ─────────────────────────────────────────
+  sl.registerLazySingleton<ReceptionRemoteDataSource>(
+    () => ReceptionRemoteDataSourceImpl(
+      apiClient: sl(),
+      sessionStorage: sl(),
+    ),
+  );
+  sl.registerLazySingleton<ReceptionRepository>(
+    () => ReceptionRepositoryImpl(
+      remoteDataSource: sl(),
+      networkInfo: sl(),
+    ),
+  );
+  sl.registerLazySingleton(() => GetReceptions(sl()));
+  sl.registerLazySingleton(() => GetCitasPendientesRecepcion(sl()));
+  sl.registerLazySingleton(() => CreateReception(sl()));
+  sl.registerFactory(
+    () => ReceptionCubit(
+      getReceptions: sl(),
+      getCitasPendientes: sl(),
+      createReception: sl(),
     ),
   );
 }
