@@ -24,6 +24,26 @@ import '../../features/appointment/presentation/pages/appointment_page.dart';
 import '../../features/appointment/presentation/cubit/appointment_cubit.dart';
 import '../../features/reception/presentation/pages/reception_page.dart';
 import '../../features/reception/presentation/cubit/reception_cubit.dart';
+import '../../features/budget/presentation/pages/budget_page.dart';
+import '../../features/budget/presentation/pages/budget_detail_page.dart';
+import '../../features/budget/presentation/cubit/budget_cubit.dart';
+import '../../features/work_order/presentation/pages/work_order_page.dart';
+import '../../features/work_order/presentation/pages/work_order_detail_page.dart';
+import '../../features/work_order/presentation/cubit/work_order_cubit.dart';
+import '../../features/workshop_progress/presentation/pages/workshop_progress_page.dart';
+import '../../features/workshop_progress/presentation/pages/workshop_progress_detail_page.dart';
+import '../../features/workshop_progress/presentation/cubit/workshop_progress_cubit.dart';
+import '../../features/vehicle_progress/presentation/pages/vehicle_progress_page.dart';
+import '../../features/vehicle_progress/presentation/pages/vehicle_progress_detail_page.dart';
+import '../../features/vehicle_progress/presentation/cubit/vehicle_progress_cubit.dart';
+
+import '../../features/ai_assistant/presentation/pages/ai_conversations_page.dart';
+import '../../features/ai_assistant/presentation/pages/ai_chat_page.dart';
+import '../../features/ai_assistant/presentation/cubit/ai_conversations_cubit.dart';
+import '../../features/ai_assistant/presentation/cubit/ai_chat_cubit.dart';
+
+import '../../features/reports/presentation/pages/vehicle_reports_page.dart';
+import '../../features/reports/presentation/cubit/vehicle_report_cubit.dart';
 
 import '../../features/auth/presentation/pages/login_page.dart';
 import '../../features/auth/presentation/pages/register_page.dart';
@@ -192,6 +212,122 @@ class AppRouter {
         builder: (context, state) => BlocProvider(
           create: (context) => sl<ReceptionCubit>(),
           child: const ReceptionPage(),
+        ),
+      ),
+
+      GoRoute(
+        path: '/budget-management',
+        name: 'budget-management',
+        builder: (context, state) => MultiBlocProvider(
+          providers: [
+            BlocProvider(create: (context) => sl<BudgetCubit>()),
+            BlocProvider(create: (context) => sl<AppointmentCubit>()),
+          ],
+          child: const BudgetPage(),
+        ),
+      ),
+
+      GoRoute(
+        path: '/budget-detail/:id',
+        name: 'budget-detail',
+        builder: (context, state) {
+          final budgetId = state.pathParameters['id']!;
+          return BlocProvider(
+            create: (context) => sl<BudgetCubit>(),
+            child: BudgetDetailPage(budgetId: budgetId),
+          );
+        },
+      ),
+
+      GoRoute(
+        path: '/work-orders',
+        name: 'work-orders',
+        builder: (context, state) => BlocProvider(
+          create: (context) => sl<WorkOrderCubit>(),
+          child: const WorkOrderPage(),
+        ),
+      ),
+
+      GoRoute(
+        path: '/work-order-detail/:id',
+        name: 'work-order-detail',
+        builder: (context, state) {
+          final workOrderId = state.pathParameters['id']!;
+          return BlocProvider(
+            create: (context) => sl<WorkOrderCubit>(),
+            child: WorkOrderDetailPage(workOrderId: workOrderId),
+          );
+        },
+      ),
+
+      GoRoute(
+        path: '/workshop-progress',
+        name: 'workshop-progress',
+        builder: (context, state) => BlocProvider(
+          create: (context) => sl<WorkshopProgressCubit>(),
+          child: const WorkshopProgressPage(),
+        ),
+      ),
+
+      GoRoute(
+        path: '/workshop-progress-detail/:id',
+        name: 'workshop-progress-detail',
+        builder: (context, state) {
+          final workOrderId = state.pathParameters['id']!;
+          return BlocProvider(
+            create: (context) => sl<WorkshopProgressCubit>(),
+            child: WorkshopProgressDetailPage(workOrderId: workOrderId),
+          );
+        },
+      ),
+
+      GoRoute(
+        path: '/vehicle-progress',
+        name: 'vehicle-progress',
+        builder: (context, state) => BlocProvider(
+          create: (context) => sl<VehicleProgressCubit>(),
+          child: const VehicleProgressPage(),
+        ),
+      ),
+
+      GoRoute(
+        path: '/vehicle-progress-detail/:id',
+        name: 'vehicle-progress-detail',
+        builder: (context, state) {
+          final citaId = state.pathParameters['id']!;
+          return BlocProvider(
+            create: (context) => sl<VehicleProgressCubit>(),
+            child: VehicleProgressDetailPage(citaId: citaId),
+          );
+        },
+      ),
+      GoRoute(
+        path: '/ai',
+        name: 'ai-conversations',
+        builder: (context, state) => BlocProvider(
+          create: (context) => sl<AiConversationsCubit>(),
+          child: const AiConversationsPage(),
+        ),
+      ),
+
+      GoRoute(
+        path: '/ai/chat/:id',
+        name: 'ai-chat',
+        builder: (context, state) {
+          final conversationId = state.pathParameters['id']!;
+          return BlocProvider(
+            create: (context) => sl<AiChatCubit>(),
+            child: AiChatPage(conversationId: conversationId),
+          );
+        },
+      ),
+
+      GoRoute(
+        path: '/reports/vehicle',
+        name: 'reports-vehicle',
+        builder: (context, state) => BlocProvider(
+          create: (context) => sl<VehicleReportCubit>(),
+          child: const VehicleReportsPage(),
         ),
       ),
     ],

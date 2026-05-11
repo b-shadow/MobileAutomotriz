@@ -114,6 +114,46 @@ import 'features/reception/domain/usecases/get_receptions.dart';
 import 'features/reception/domain/usecases/get_citas_pendientes.dart';
 import 'features/reception/presentation/cubit/reception_cubit.dart';
 
+import 'features/budget/data/datasources/budget_remote_data_source.dart';
+import 'features/budget/data/repositories/budget_repository_impl.dart';
+import 'features/budget/domain/repositories/budget_repository.dart';
+import 'features/budget/domain/usecases/create_budget.dart';
+import 'features/budget/domain/usecases/get_budgets.dart';
+import 'features/budget/domain/usecases/get_budget_detail.dart';
+import 'features/budget/domain/usecases/update_budget.dart';
+import 'features/budget/domain/usecases/change_budget_status.dart';
+import 'features/budget/presentation/cubit/budget_cubit.dart';
+
+import 'features/work_order/data/datasources/work_order_remote_data_source.dart';
+import 'features/work_order/data/repositories/work_order_repository_impl.dart';
+import 'features/work_order/domain/repositories/work_order_repository.dart';
+import 'features/work_order/domain/usecases/work_order_usecases.dart';
+import 'features/work_order/presentation/cubit/work_order_cubit.dart';
+
+import 'features/vehicle_progress/data/datasources/vehicle_progress_remote_data_source.dart';
+import 'features/vehicle_progress/data/repositories/vehicle_progress_repository_impl.dart';
+import 'features/vehicle_progress/domain/repositories/vehicle_progress_repository.dart';
+import 'features/vehicle_progress/domain/usecases/vehicle_progress_usecases.dart';
+import 'features/vehicle_progress/presentation/cubit/vehicle_progress_cubit.dart';
+import 'features/ai_assistant/data/datasources/ai_remote_data_source.dart';
+import 'features/ai_assistant/data/repositories/ai_repository_impl.dart';
+import 'features/ai_assistant/domain/repositories/ai_repository.dart';
+import 'features/ai_assistant/domain/usecases/ai_usecases.dart';
+import 'features/ai_assistant/presentation/cubit/ai_conversations_cubit.dart';
+import 'features/ai_assistant/presentation/cubit/ai_chat_cubit.dart';
+
+import 'features/workshop_progress/data/datasources/workshop_progress_remote_data_source.dart';
+import 'features/workshop_progress/data/repositories/workshop_progress_repository_impl.dart';
+import 'features/workshop_progress/domain/repositories/workshop_progress_repository.dart';
+import 'features/workshop_progress/domain/usecases/workshop_progress_usecases.dart';
+import 'features/workshop_progress/presentation/cubit/workshop_progress_cubit.dart';
+
+import 'features/reports/data/datasources/reports_remote_data_source.dart';
+import 'features/reports/data/repositories/reports_repository_impl.dart';
+import 'features/reports/domain/repositories/reports_repository.dart';
+import 'features/reports/domain/usecases/reports_usecases.dart';
+import 'features/reports/presentation/cubit/vehicle_report_cubit.dart';
+
 final sl = GetIt.instance;
 
 /// Initialize all dependencies.
@@ -479,6 +519,212 @@ Future<void> initDependencies(SharedPreferences prefs) async {
       getReceptions: sl(),
       getCitasPendientes: sl(),
       createReception: sl(),
+    ),
+  );
+
+  // ── Budget (Presupuestos) ─────────────────────────────
+  sl.registerLazySingleton<BudgetRemoteDataSource>(
+    () => BudgetRemoteDataSourceImpl(
+      apiClient: sl(),
+      sessionStorage: sl(),
+    ),
+  );
+  sl.registerLazySingleton<BudgetRepository>(
+    () => BudgetRepositoryImpl(
+      remoteDataSource: sl(),
+      networkInfo: sl(),
+    ),
+  );
+  sl.registerLazySingleton(() => GetBudgets(sl()));
+  sl.registerLazySingleton(() => GetBudgetDetail(sl()));
+  sl.registerLazySingleton(() => CreateBudget(sl()));
+  sl.registerLazySingleton(() => UpdateBudget(sl()));
+  sl.registerLazySingleton(() => ChangeBudgetStatus(sl()));
+  sl.registerFactory(
+    () => BudgetCubit(
+      getBudgets: sl(),
+      getBudgetDetail: sl(),
+      createBudget: sl(),
+      updateBudget: sl(),
+      changeBudgetStatus: sl(),
+    ),
+  );
+
+  // ── Work Orders (Órdenes de Trabajo) ─────────────────────────────
+  sl.registerLazySingleton<WorkOrderRemoteDataSource>(
+    () => WorkOrderRemoteDataSourceImpl(
+      apiClient: sl(),
+      sessionStorage: sl(),
+    ),
+  );
+  sl.registerLazySingleton<WorkOrderRepository>(
+    () => WorkOrderRepositoryImpl(
+      remoteDataSource: sl(),
+      networkInfo: sl(),
+    ),
+  );
+  sl.registerLazySingleton(() => GetWorkOrders(sl()));
+  sl.registerLazySingleton(() => GetWorkOrderDetail(sl()));
+  sl.registerLazySingleton(() => GetAvailableMechanics(sl()));
+  sl.registerLazySingleton(() => AssignMechanics(sl()));
+  sl.registerLazySingleton(() => AssignDetails(sl()));
+  sl.registerLazySingleton(() => StartWorkOrder(sl()));
+  sl.registerFactory(
+    () => WorkOrderCubit(
+      getWorkOrders: sl(),
+      getWorkOrderDetail: sl(),
+      getAvailableMechanics: sl(),
+      assignMechanics: sl(),
+      assignDetails: sl(),
+      startWorkOrder: sl(),
+    ),
+  );
+
+  // ── Workshop Progress (Avance en Taller) ─────────────────────────────
+  sl.registerLazySingleton<WorkshopProgressRemoteDataSource>(
+    () => WorkshopProgressRemoteDataSourceImpl(
+      apiClient: sl(),
+      sessionStorage: sl(),
+    ),
+  );
+  sl.registerLazySingleton<WorkshopProgressRepository>(
+    () => WorkshopProgressRepositoryImpl(
+      remoteDataSource: sl(),
+      networkInfo: sl(),
+    ),
+  );
+  sl.registerLazySingleton(() => GetActiveWorkOrders(sl()));
+  sl.registerLazySingleton(() => GetProgressWorkOrderDetail(sl()));
+  sl.registerLazySingleton(() => GetProgressHistory(sl()));
+  sl.registerLazySingleton(() => StartService(sl()));
+  sl.registerLazySingleton(() => PauseService(sl()));
+  sl.registerLazySingleton(() => FinishService(sl()));
+  sl.registerLazySingleton(() => MarkServiceUnnecessary(sl()));
+  sl.registerLazySingleton(() => FinishWorkOrder(sl()));
+  sl.registerLazySingleton(() => AddManualProgress(sl()));
+  sl.registerFactory(
+    () => WorkshopProgressCubit(
+      getActiveWorkOrders: sl(),
+      getWorkOrderDetail: sl(),
+      getProgressHistory: sl(),
+      startService: sl(),
+      pauseService: sl(),
+      finishService: sl(),
+      markServiceUnnecessary: sl(),
+      finishWorkOrder: sl(),
+      addManualProgress: sl(),
+    ),
+  );
+  // ── VEHICLE PROGRESS MODULE ──
+
+  // Usecases
+  sl.registerLazySingleton(() => GetOperativeAppointments(sl()));
+  sl.registerLazySingleton(() => GetVehicleProgressDetail(sl()));
+  sl.registerLazySingleton(() => RegisterVehicleArrival(sl()));
+  sl.registerLazySingleton(() => MarkVehicleInProcess(sl()));
+  sl.registerLazySingleton(() => MarkVehicleReturned(sl()));
+  sl.registerLazySingleton(() => GetVehicleProgressHistory(sl()));
+  sl.registerLazySingleton(() => AddManualGeneralProgress(sl()));
+
+  // Repository
+  sl.registerLazySingleton<VehicleProgressRepository>(
+    () => VehicleProgressRepositoryImpl(
+      remoteDataSource: sl(),
+      networkInfo: sl(),
+    ),
+  );
+
+  // DataSource
+  sl.registerLazySingleton<VehicleProgressRemoteDataSource>(
+    () => VehicleProgressRemoteDataSourceImpl(
+      apiClient: sl(),
+      sessionStorage: sl(),
+    ),
+  );
+
+  // Cubit
+  sl.registerFactory(
+    () => VehicleProgressCubit(
+      getAppointments: sl(),
+      getDetail: sl(),
+      registerArrival: sl(),
+      markInProcess: sl(),
+      markReturned: sl(),
+      getHistory: sl(),
+      addManualProgress: sl(),
+    ),
+  );
+
+  // ── AI Assistant ──────────────────────────────────────
+
+  // Cubits
+  sl.registerFactory(
+    () => AiConversationsCubit(
+      getAiConversations: sl(),
+      createAiConversation: sl(),
+      archiveAiConversation: sl(),
+    ),
+  );
+
+  sl.registerFactory(
+    () => AiChatCubit(
+      getAiConversationDetail: sl(),
+      sendAiMessage: sl(),
+      confirmAiAction: sl(),
+    ),
+  );
+
+  // Use Cases
+  sl.registerLazySingleton(() => GetAiConversations(sl()));
+  sl.registerLazySingleton(() => CreateAiConversation(sl()));
+  sl.registerLazySingleton(() => GetAiConversationDetail(sl()));
+  sl.registerLazySingleton(() => ArchiveAiConversation(sl()));
+  sl.registerLazySingleton(() => SendAiMessage(sl()));
+  sl.registerLazySingleton(() => ConfirmAiAction(sl()));
+
+  // Repository
+  sl.registerLazySingleton<AiRepository>(
+    () => AiRepositoryImpl(
+      remoteDataSource: sl(),
+      networkInfo: sl(),
+    ),
+  );
+
+  // DataSource
+  sl.registerLazySingleton<AiRemoteDataSource>(
+    () => AiRemoteDataSourceImpl(
+      apiClient: sl(),
+      sessionStorage: sl(),
+    ),
+  );
+
+  // ── Reports ───────────────────────────────────────────
+
+  // Cubits
+  sl.registerFactory(
+    () => VehicleReportCubit(
+      getTopVehicles: sl(),
+      getVehicleReport: sl(),
+    ),
+  );
+
+  // Use Cases
+  sl.registerLazySingleton(() => GetTopVehicles(sl()));
+  sl.registerLazySingleton(() => GetVehicleReport(sl()));
+
+  // Repository
+  sl.registerLazySingleton<ReportsRepository>(
+    () => ReportsRepositoryImpl(
+      remoteDataSource: sl(),
+      networkInfo: sl(),
+    ),
+  );
+
+  // DataSource
+  sl.registerLazySingleton<ReportsRemoteDataSource>(
+    () => ReportsRemoteDataSourceImpl(
+      apiClient: sl(),
+      sessionStorage: sl(),
     ),
   );
 }

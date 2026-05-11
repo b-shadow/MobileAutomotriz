@@ -64,16 +64,75 @@ class ApiConstants {
       '/api/$slug/vehiculos-servicios/citas/$id/reprogramar/';
   static String marcarNoShowCita(String slug, String id) =>
       '/api/$slug/vehiculos-servicios/citas/$id/marcar-no-show/';
+  static String citasRecepcionOperativa(String slug) =>
+      '/api/$slug/vehiculos-servicios/citas/recepcion-operativa/';
+  static String citaRegistrarLlegada(String slug, String id) =>
+      '/api/$slug/vehiculos-servicios/citas/$id/registrar-llegada/';
+  static String citaMarcarEnProceso(String slug, String id) =>
+      '/api/$slug/vehiculos-servicios/citas/$id/marcar-en-proceso/';
+  static String citaMarcarVehiculoDevuelto(String slug, String id) =>
+      '/api/$slug/vehiculos-servicios/citas/$id/marcar-vehiculo-devuelto/';
 
   // ── Recepciones de Vehículo ─────────────────────────────────
   static String recepciones(String slug) =>
-      '/api/$slug/recepciones-vehiculo/';
+      '/api/$slug/atencion-tecnica/recepciones-vehiculo/';
   static String recepcion(String slug, String id) =>
-      '/api/$slug/recepciones-vehiculo/$id/';
+      '/api/$slug/atencion-tecnica/recepciones-vehiculo/$id/';
   static String citasPendientesRecepcion(String slug) =>
-      '/api/$slug/recepciones-vehiculo/citas-pendientes/';
+      '/api/$slug/atencion-tecnica/recepciones-vehiculo/citas-pendientes/';
+
+  // ── Presupuestos de Cita ────────────────────────────────────
+  static String presupuestos(String slug) =>
+      '/api/$slug/atencion-tecnica/presupuestos-cita/';
+  static String presupuesto(String slug, String id) =>
+      '/api/$slug/atencion-tecnica/presupuestos-cita/$id/';
+  static String comunicarPresupuesto(String slug, String id) =>
+      '/api/$slug/atencion-tecnica/presupuestos-cita/$id/comunicar/';
+  static String aprobarPresupuesto(String slug, String id) =>
+      '/api/$slug/atencion-tecnica/presupuestos-cita/$id/aprobar/';
+  static String rechazarPresupuesto(String slug, String id) =>
+      '/api/$slug/atencion-tecnica/presupuestos-cita/$id/rechazar/';
+  static String ajustarPresupuesto(String slug, String id) =>
+      '/api/$slug/atencion-tecnica/presupuestos-cita/$id/ajustar/';
+  static String cerrarPresupuesto(String slug, String id) =>
+      '/api/$slug/atencion-tecnica/presupuestos-cita/$id/cerrar/';
+
+  // ── Órdenes de Trabajo ───────────────────────────────────────
+  static String ordenesTrabajo(String slug) =>
+      '/api/$slug/atencion-tecnica/ordenes-trabajo/';
+  static String ordenTrabajo(String slug, String id) =>
+      '/api/$slug/atencion-tecnica/ordenes-trabajo/$id/';
+  static String mecanicosDisponibles(String slug) =>
+      '/api/$slug/atencion-tecnica/ordenes-trabajo/mecanicos-disponibles/';
+  static String asignarMecanicos(String slug, String id) =>
+      '/api/$slug/atencion-tecnica/ordenes-trabajo/$id/asignar-mecanicos/';
+  static String asignarDetalles(String slug, String id) =>
+      '/api/$slug/atencion-tecnica/ordenes-trabajo/$id/asignar-detalles/';
+  static String iniciarOrdenTrabajo(String slug, String id) =>
+      '/api/$slug/atencion-tecnica/ordenes-trabajo/$id/iniciar/';
+
+  // ── Avance en Taller ─────────────────────────────────────────
+  static String avanceTallerList(String slug) =>
+      '/api/$slug/atencion-tecnica/avance-taller/';
+  static String avanceTallerDetalle(String slug, String id) =>
+      '/api/$slug/atencion-tecnica/avance-taller/$id/';
+  static String avanceTallerIniciar(String slug, String id) =>
+      '/api/$slug/atencion-tecnica/avance-taller/$id/iniciar-detalle/';
+  static String avanceTallerPausar(String slug, String id) =>
+      '/api/$slug/atencion-tecnica/avance-taller/$id/pausar-detalle/';
+  static String avanceTallerFinalizar(String slug, String id) =>
+      '/api/$slug/atencion-tecnica/avance-taller/$id/finalizar-detalle/';
+  static String avanceTallerInnecesario(String slug, String id) =>
+      '/api/$slug/atencion-tecnica/avance-taller/$id/marcar-innecesario/';
+  static String avanceTallerFinalizarOrden(String slug, String id) =>
+      '/api/$slug/atencion-tecnica/avance-taller/$id/finalizar-orden/';
+      
+  static String avancesVehiculoList(String slug) =>
+      '/api/$slug/atencion-tecnica/avances-vehiculo/';
 
   // ── Servicios ───────────────────────────────────────────
+
+
   static String servicios(String slug) => '/api/$slug/vehiculos-servicios/servicios/';
   static String servicio(String slug, String id) => '/api/$slug/vehiculos-servicios/servicios/$id/';
   static String servicioEstado(String slug, String id) =>
@@ -116,6 +175,15 @@ class ApiConstants {
   static String auditoriaResumen(String slug) =>
       '/api/$slug/administracion/auditoria/resumen/';
 
-  // ── Notificaciones ──────────────────────────────────────
   static String notificaciones(String slug) => '/api/$slug/comunicacion-control/notificaciones/';
+
+  // ── Inteligencia Artificial ─────────────────────────────
+  static String iaConversaciones(String slug) => '/api/$slug/comunicacion-control/ia/';
+  static String iaConversacion(String slug, String id) => '/api/$slug/comunicacion-control/ia/$id/';
+  static String iaArchivar(String slug, String id) => '/api/$slug/comunicacion-control/ia/$id/archivar/';
+  static String iaEnviarMensaje(String slug, String id) => '/api/$slug/comunicacion-control/ia/$id/enviar_mensaje/';
+  static String iaConfirmarAccion(String slug, String id) => '/api/$slug/comunicacion-control/ia/$id/confirmar_accion/';
+
+  // ── Reportes ────────────────────────────────────────────
+  static String reportesVehiculo(String slug) => '/api/$slug/vehiculos-servicios/reportes/vehiculo/';
 }
