@@ -1,18 +1,23 @@
 import 'package:equatable/equatable.dart';
 import 'package:mobile1_app/features/work_order/domain/entities/work_order.dart';
 import 'package:mobile1_app/features/workshop_progress/domain/entities/progress_log.dart';
+import 'package:mobile1_app/features/workshop_progress/domain/entities/spare_part_entities.dart';
 
 sealed class WorkshopProgressState extends Equatable {
   final List<WorkOrder> activeOrders;
   final List<ProgressLog> history;
+  final List<InventoryItem> inventoryItems;
+  final List<SparePartRequest> sparePartRequests;
 
   const WorkshopProgressState({
     this.activeOrders = const [],
     this.history = const [],
+    this.inventoryItems = const [],
+    this.sparePartRequests = const [],
   });
 
   @override
-  List<Object?> get props => [activeOrders, history];
+  List<Object?> get props => [activeOrders, history, inventoryItems, sparePartRequests];
 }
 
 final class WorkshopProgressInitial extends WorkshopProgressState {
@@ -20,11 +25,21 @@ final class WorkshopProgressInitial extends WorkshopProgressState {
 }
 
 final class WorkshopProgressLoading extends WorkshopProgressState {
-  const WorkshopProgressLoading({super.activeOrders, super.history});
+  const WorkshopProgressLoading({
+    super.activeOrders,
+    super.history,
+    super.inventoryItems,
+    super.sparePartRequests,
+  });
 }
 
 final class WorkshopProgressLoaded extends WorkshopProgressState {
-  const WorkshopProgressLoaded({required super.activeOrders, super.history});
+  const WorkshopProgressLoaded({
+    required super.activeOrders,
+    super.history,
+    super.inventoryItems,
+    super.sparePartRequests,
+  });
 }
 
 final class WorkshopProgressDetailLoaded extends WorkshopProgressState {
@@ -34,10 +49,12 @@ final class WorkshopProgressDetailLoaded extends WorkshopProgressState {
     required super.activeOrders,
     required super.history,
     required this.detail,
+    super.inventoryItems,
+    super.sparePartRequests,
   });
 
   @override
-  List<Object?> get props => [activeOrders, history, detail];
+  List<Object?> get props => [activeOrders, history, detail, inventoryItems, sparePartRequests];
 }
 
 final class WorkshopProgressHistoryLoaded extends WorkshopProgressState {
@@ -47,10 +64,12 @@ final class WorkshopProgressHistoryLoaded extends WorkshopProgressState {
     required super.activeOrders,
     required super.history,
     required this.detail,
+    super.inventoryItems,
+    super.sparePartRequests,
   });
 
   @override
-  List<Object?> get props => [activeOrders, history, detail];
+  List<Object?> get props => [activeOrders, history, detail, inventoryItems, sparePartRequests];
 }
 
 final class WorkshopProgressSuccess extends WorkshopProgressState {
@@ -62,10 +81,12 @@ final class WorkshopProgressSuccess extends WorkshopProgressState {
     required super.history,
     required this.message,
     this.detail,
+    super.inventoryItems,
+    super.sparePartRequests,
   });
 
   @override
-  List<Object?> get props => [activeOrders, history, message, detail];
+  List<Object?> get props => [activeOrders, history, message, detail, inventoryItems, sparePartRequests];
 }
 
 final class WorkshopProgressError extends WorkshopProgressState {
@@ -75,8 +96,10 @@ final class WorkshopProgressError extends WorkshopProgressState {
     required super.activeOrders,
     required super.history,
     required this.message,
+    super.inventoryItems,
+    super.sparePartRequests,
   });
 
   @override
-  List<Object?> get props => [activeOrders, history, message];
+  List<Object?> get props => [activeOrders, history, message, inventoryItems, sparePartRequests];
 }

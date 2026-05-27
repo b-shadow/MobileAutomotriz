@@ -5,6 +5,7 @@ import 'package:mobile1_app/core/network/api_client.dart';
 import 'package:mobile1_app/core/storage/session_storage.dart';
 import 'package:mobile1_app/features/work_order/data/models/work_order_model.dart';
 import 'package:mobile1_app/features/workshop_progress/data/models/progress_log_model.dart';
+import 'package:mobile1_app/features/workshop_progress/domain/entities/spare_part_entities.dart';
 
 abstract class WorkshopProgressRemoteDataSource {
   Future<List<WorkOrderModel>> getActiveWorkOrders();
@@ -22,6 +23,19 @@ abstract class WorkshopProgressRemoteDataSource {
     required String status,
     required String message,
     int? percentage,
+  });
+  // ── Repuestos / Inventario ───────────────────────────────
+  Future<List<InventoryItem>> getInventoryItems();
+  Future<List<SparePartRequest>> getSparePartRequests({String? ordenGlobalId});
+  Future<void> createSparePartRequest({
+    required String citaId,
+    required String ordenGlobalId,
+    required String motivo,
+    required List<SparePartRequestLine> lineas,
+  });
+  Future<void> markSparePartsReceived({
+    required String solicitudId,
+    required List<Map<String, dynamic>> detalles,
   });
 }
 
@@ -200,6 +214,100 @@ class WorkshopProgressRemoteDataSourceImpl implements WorkshopProgressRemoteData
       }
       final response = await apiClient.post(ApiConstants.avancesVehiculoList(_slug), data: payload);
       return (response.data['id'] ?? '').toString();
+    } on ServerException {
+      rethrow;
+    } catch (e) {
+      throw ServerException(message: e.toString());
+    }
+  }
+
+  // ── Repuestos / Inventario ───────────────────────────────────────────────
+
+  @override
+  Future<List<InventoryItem>> getInventoryItems() async {
+    try {
+      final response = await apiClient.get('${ApiConstants.inventarioItems(_slug)}?activo=true&page_size=500');
+      final List<dynamic> rows;
+      if (response.data is Map && response.data['results'] is List) {
+        rows = response.data['results'] as List<dynamic>;
+      } else if (response.data is List) {
+        rows = response.data as List<dynamic>;
+      } else {
+        rows = const [];
+      }
+      return rows.whereType<Map<String, dynamic>>().map(InventoryItem.fromJson).toList();
+    } on ServerException {
+      rethrow;
+    } catch (e) {
+      throw ServerException(message: e.toString());
+    }
+  }
+
+  @override
+  Future<List<SparePartRequest>> getSparePartRequests({String? ordenGlobalId}) async {
+    try {
+      final url = ordenGlobalId != null
+          ? '${ApiConstants.solicitudesRepuesto(_slug)}?orden_global=$ordenGlobalId&page_size=100'
+          : '${ApiConstants.solicitudesRepuesto(_slug)}?page_size=100';
+      final response = await apiClient.get(url);
+      final List<dynamic> rows;
+      if (response.data is Map && response.data['results'] is List) {
+        rows = response.data['results'] as List<dynamic>;
+      } else if (response.data is List) {
+        rows = response.data as List<dynamic>;
+      } else {
+        rows = const [];
+      }
+      return rows.whereType<Map<String, dynamic>>().map(SparePartRequest.fromJson).toList();
+    } on ServerException {
+      rethrow;
+    } catch (e) {
+      throw ServerException(message: e.toString());
+    }
+  }
+
+  @override
+  Future<void> createSparePartRequest({
+    required String citaId,
+    required String ordenGlobalId,
+    required String motivo,
+    required List<SparePartRequestLine> lineas,
+  }) async {
+    try {
+      final detalles = lineas
+          .where((l) => l.itemInventarioId.isNotEmpty && l.cantidadSolicitada > 0)
+          .map((l) => {
+                'item_inventario_id': l.itemInventarioId,
+                'cantidad_solicitada': l.cantidadSolicitada,
+                'observacion': l.observacion,
+              })
+          .toList();
+      await apiClient.post(
+        ApiConstants.solicitudesRepuesto(_slug),
+        data: {
+          'cita_id': citaId,
+          'orden_global_id': ordenGlobalId,
+          'motivo': motivo.isEmpty ? 'Solicitud de repuestos' : motivo,
+          'detalles': detalles,
+        },
+      );
+    } on ServerException {
+      rethrow;
+    } catch (e) {
+      throw ServerException(message: e.toString());
+    }
+  }
+
+  @override
+  Future<void> markSparePartsReceived({
+    required String solicitudId,
+    required List<Map<String, dynamic>> detalles,
+  }) async {
+    try {
+      await apiClient.post(
+        ApiConstants.marcarRecibidaTaller(_slug, solicitudId),
+        data: {'detalles': detalles},
+      );
     } on ServerException {
       rethrow;
     } catch (e) {

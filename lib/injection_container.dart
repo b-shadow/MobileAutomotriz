@@ -602,6 +602,10 @@ Future<void> initDependencies(SharedPreferences prefs) async {
   sl.registerLazySingleton(() => MarkServiceUnnecessary(sl()));
   sl.registerLazySingleton(() => FinishWorkOrder(sl()));
   sl.registerLazySingleton(() => AddManualProgress(sl()));
+  sl.registerLazySingleton(() => GetInventoryItems(sl()));
+  sl.registerLazySingleton(() => GetSparePartRequests(sl()));
+  sl.registerLazySingleton(() => CreateSparePartRequest(sl()));
+  sl.registerLazySingleton(() => MarkSparePartsReceived(sl()));
   sl.registerFactory(
     () => WorkshopProgressCubit(
       getActiveWorkOrders: sl(),
@@ -613,6 +617,10 @@ Future<void> initDependencies(SharedPreferences prefs) async {
       markServiceUnnecessary: sl(),
       finishWorkOrder: sl(),
       addManualProgress: sl(),
+      getInventoryItems: sl(),
+      getSparePartRequests: sl(),
+      createSparePartRequest: sl(),
+      markSparePartsReceived: sl(),
     ),
   );
   // ── VEHICLE PROGRESS MODULE ──

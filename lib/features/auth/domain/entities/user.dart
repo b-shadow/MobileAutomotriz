@@ -47,6 +47,12 @@ class User extends Equatable {
   /// Whether the user has the MECÁNICO role.
   bool get isMecanico => rolNombre.toUpperCase() == 'MECÁNICO';
 
+  /// Whether the user has the ADMINISTRATIVO role.
+  bool get isAdministrativo => rolNombre.toUpperCase() == 'ADMINISTRATIVO';
+
+  /// Whether the user has the ALMACENERO role.
+  bool get isAlmacenero => rolNombre.toUpperCase() == 'ALMACENERO';
+
   @override
   List<Object?> get props => [
         id,

@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
+import 'package:mobile1_app/features/auth/presentation/cubit/auth_cubit.dart';
+import 'package:mobile1_app/features/auth/presentation/cubit/auth_state.dart';
 import 'package:mobile1_app/features/work_order/domain/entities/work_order.dart';
 import 'package:mobile1_app/features/workshop_progress/domain/entities/progress_log.dart';
+import 'package:mobile1_app/features/workshop_progress/domain/entities/spare_part_entities.dart';
 import 'package:mobile1_app/features/workshop_progress/presentation/cubit/workshop_progress_cubit.dart';
 import 'package:mobile1_app/features/workshop_progress/presentation/cubit/workshop_progress_state.dart';
 
@@ -23,7 +26,7 @@ class _WorkshopProgressDetailPageState extends State<WorkshopProgressDetailPage>
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 2, vsync: this);
+    _tabController = TabController(length: 3, vsync: this);
     context
         .read<WorkshopProgressCubit>()
         .fetchWorkOrderDetail(widget.workOrderId);
@@ -111,6 +114,7 @@ class _WorkshopProgressDetailPageState extends State<WorkshopProgressDetailPage>
               unselectedLabelColor: Colors.white54,
               tabs: const [
                 Tab(text: 'Servicios', icon: Icon(Icons.handyman)),
+                Tab(text: 'Repuestos', icon: Icon(Icons.build)),
                 Tab(text: 'Historial', icon: Icon(Icons.history)),
               ],
             ),
@@ -132,6 +136,8 @@ class _WorkshopProgressDetailPageState extends State<WorkshopProgressDetailPage>
             controller: _tabController,
             children: [
               _ServiciosTab(order: order),
+              _RepuestosTab(
+                  order: order, solicitudes: state.sparePartRequests),
               _HistorialTab(order: order, history: history),
             ],
           ),
@@ -229,8 +235,8 @@ class _HeaderInfo extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text('Estado Global:',
-                  style: const TextStyle(
+              const Text('Estado Global:',
+                  style: TextStyle(
                       color: Colors.white,
                       fontSize: 14,
                       fontWeight: FontWeight.bold)),
@@ -254,7 +260,7 @@ class _HeaderInfo extends StatelessWidget {
   }
 }
 
-class _ServiceProgressItem extends StatelessWidget {
+class _ServiceProgressItem extends StatefulWidget {
   final WorkOrderDetail detalle;
   final String orderId;
   final String orderState;
@@ -266,60 +272,157 @@ class _ServiceProgressItem extends StatelessWidget {
   });
 
   @override
+  State<_ServiceProgressItem> createState() => _ServiceProgressItemState();
+}
+
+class _ServiceProgressItemState extends State<_ServiceProgressItem> {
+  late TextEditingController _tiempoRealCtrl;
+  late TextEditingController _motivoPausaCtrl;
+  late TextEditingController _motivoInnecesarioCtrl;
+  late TextEditingController _observacionesCtrl;
+
+  @override
+  void initState() {
+    super.initState();
+    _tiempoRealCtrl = TextEditingController(
+        text: widget.detalle.tiempoEstandarMin.toString());
+    _motivoPausaCtrl = TextEditingController();
+    _motivoInnecesarioCtrl = TextEditingController();
+    _observacionesCtrl = TextEditingController();
+  }
+
+  @override
+  void dispose() {
+    _tiempoRealCtrl.dispose();
+    _motivoPausaCtrl.dispose();
+    _motivoInnecesarioCtrl.dispose();
+    _observacionesCtrl.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final d = widget.detalle;
+
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: const Color(0xFF1E293B).withValues(alpha: 0.6),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
       ),
-      child: Theme(
-        data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
-        child: ExpansionTile(
-          iconColor: Colors.white,
-          collapsedIconColor: Colors.white54,
-          title: Text(detalle.servicioNombre,
-              style: const TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.w600,
-                  fontSize: 15)),
-          subtitle: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const SizedBox(height: 4),
-              Row(
-                children: [
-                  _EstadoBadge(estado: detalle.estado),
-                  const SizedBox(width: 8),
-                  Text('Est: ${detalle.tiempoEstandarMin} min',
-                      style:
-                          const TextStyle(color: Colors.white54, fontSize: 12)),
-                ],
+              Expanded(
+                child: Text(d.servicioNombre,
+                    style: const TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w600,
+                        fontSize: 15)),
               ),
-              if (detalle.mecanicoNombres != null)
-                Padding(
-                  padding: const EdgeInsets.only(top: 4),
-                  child: Text('Mecánico: ${detalle.mecanicoNombres}',
-                      style: const TextStyle(
-                          color: Color(0xFF8B5CF6), fontSize: 12)),
-                ),
+              _EstadoBadge(estado: d.estado),
             ],
           ),
-          children: [
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-              decoration: BoxDecoration(
-                color: Colors.black.withValues(alpha: 0.2),
-                borderRadius:
-                    const BorderRadius.vertical(bottom: Radius.circular(12)),
+          const SizedBox(height: 6),
+          Row(
+            children: [
+              const Icon(Icons.timer_outlined,
+                  size: 14, color: Colors.white54),
+              const SizedBox(width: 4),
+              Text('Est: ${d.tiempoEstandarMin} min',
+                  style: const TextStyle(color: Colors.white54, fontSize: 13)),
+              const SizedBox(width: 16),
+              const Icon(Icons.person_outline,
+                  size: 14, color: Colors.white54),
+              const SizedBox(width: 4),
+              Expanded(
+                child: Text(
+                  d.mecanicoNombres ?? 'Sin mecánico asignado',
+                  style: const TextStyle(color: Color(0xFF8B5CF6), fontSize: 13),
+                  overflow: TextOverflow.ellipsis,
+                ),
               ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: _buildActions(context),
+            ],
+          ),
+          const SizedBox(height: 12),
+
+          // Campos inline
+          Row(
+            children: [
+              Expanded(
+                child: _buildTextField(
+                  controller: _tiempoRealCtrl,
+                  label: 'Tiempo Real (min)',
+                  keyboardType: TextInputType.number,
+                ),
               ),
-            ),
-          ],
+              const SizedBox(width: 8),
+              Expanded(
+                child: _buildTextField(
+                  controller: _motivoPausaCtrl,
+                  label: 'Motivo Pausa',
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          Row(
+            children: [
+              Expanded(
+                child: _buildTextField(
+                  controller: _motivoInnecesarioCtrl,
+                  label: 'Motivo Innecesario',
+                ),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: _buildTextField(
+                  controller: _observacionesCtrl,
+                  label: 'Obs. Mecánico',
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+
+          // Botones de acción inline
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: _buildActions(context),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTextField({
+    required TextEditingController controller,
+    required String label,
+    TextInputType? keyboardType,
+  }) {
+    return Container(
+      height: 40,
+      decoration: BoxDecoration(
+        color: const Color(0xFF0F172A),
+        borderRadius: BorderRadius.circular(6),
+        border: Border.all(color: Colors.white12),
+      ),
+      child: TextField(
+        controller: controller,
+        keyboardType: keyboardType,
+        style: const TextStyle(color: Colors.white, fontSize: 13),
+        decoration: InputDecoration(
+          labelText: label,
+          labelStyle: const TextStyle(color: Colors.white38, fontSize: 12),
+          contentPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+          border: InputBorder.none,
+          isDense: true,
         ),
       ),
     );
@@ -327,188 +430,435 @@ class _ServiceProgressItem extends StatelessWidget {
 
   List<Widget> _buildActions(BuildContext context) {
     final cubit = context.read<WorkshopProgressCubit>();
+    final d = widget.detalle;
     final List<Widget> actions = [];
 
-    if (orderState == 'CERRADA' || orderState == 'CANCELADA' || orderState == 'FINALIZADA') {
-      return [const Text('La orden ya no es modificable', style: TextStyle(color: Colors.white54))];
+    if (widget.orderState == 'CERRADA' ||
+        widget.orderState == 'CANCELADA' ||
+        widget.orderState == 'FINALIZADA') {
+      return [
+        const Text('La orden ya no es modificable',
+            style: TextStyle(color: Colors.white54))
+      ];
     }
 
-    if (detalle.estado == 'POR_HACER' || detalle.estado == 'PAUSADO') {
-      actions.add(_ActionBtn(
-        icon: Icons.play_arrow,
+    if (d.estado == 'POR_HACER' || d.estado == 'PAUSADO') {
+      actions.add(_buildActionBtn(
         label: 'Iniciar',
         color: const Color(0xFF3B82F6),
-        onTap: () => cubit.startServiceDetail(orderId, detalle.id),
+        onTap: () => cubit.startServiceDetail(widget.orderId, d.id),
       ));
     }
 
-    if (detalle.estado == 'EN_PROCESO') {
-      actions.add(_ActionBtn(
-        icon: Icons.pause,
+    if (d.estado == 'EN_PROCESO') {
+      actions.add(_buildActionBtn(
         label: 'Pausar',
         color: const Color(0xFFF59E0B),
-        onTap: () => _showDialogPrompt(
-          context: context,
-          title: 'Pausar Servicio',
-          fieldLabel: 'Motivo de pausa',
-          onSubmit: (val) =>
-              cubit.pauseServiceDetail(orderId, detalle.id, val),
-        ),
+        onTap: () => cubit.pauseServiceDetail(
+            widget.orderId, d.id, _motivoPausaCtrl.text),
       ));
-      actions.add(_ActionBtn(
-        icon: Icons.check,
+      actions.add(_buildActionBtn(
         label: 'Finalizar',
         color: const Color(0xFF10B981),
-        onTap: () => _showFinishDialog(context, cubit),
+        onTap: () => cubit.finishServiceDetail(
+          widget.orderId,
+          d.id,
+          int.tryParse(_tiempoRealCtrl.text) ?? d.tiempoEstandarMin,
+          _observacionesCtrl.text,
+        ),
       ));
     }
 
-    if (detalle.estado != 'FINALIZADO' && detalle.estado != 'INNECESARIO') {
-      actions.add(_ActionBtn(
-        icon: Icons.cancel_outlined,
-        label: 'Anular',
-        color: const Color(0xFFEF4444),
-        onTap: () => _showDialogPrompt(
-          context: context,
-          title: 'Marcar como Innecesario',
-          fieldLabel: 'Justificación técnica',
-          onSubmit: (val) =>
-              cubit.markServiceUnnecessary(orderId, detalle.id, val),
-        ),
+    if (d.estado != 'FINALIZADO' && d.estado != 'INNECESARIO') {
+      actions.add(_buildActionBtn(
+        label: 'Innecesario',
+        color: const Color(0xFF64748B),
+        onTap: () => cubit.markServiceUnnecessary(
+            widget.orderId, d.id, _motivoInnecesarioCtrl.text),
       ));
     }
 
     if (actions.isEmpty) {
       actions.add(const Text('No hay acciones disponibles',
-          style: TextStyle(color: Colors.white54)));
+          style: TextStyle(color: Colors.white54, fontSize: 13)));
     }
 
     return actions;
   }
 
-  void _showFinishDialog(BuildContext context, WorkshopProgressCubit cubit) {
-    int tiempo = detalle.tiempoEstandarMin;
-    String obs = '';
-    showDialog(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        backgroundColor: const Color(0xFF1E293B),
-        title: const Text('Finalizar Servicio',
-            style: TextStyle(color: Colors.white)),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextFormField(
-              initialValue: tiempo.toString(),
-              keyboardType: TextInputType.number,
-              style: const TextStyle(color: Colors.white),
-              decoration: const InputDecoration(
-                labelText: 'Tiempo Real (minutos)',
-                labelStyle: TextStyle(color: Colors.white54),
-                enabledBorder: UnderlineInputBorder(
-                    borderSide: BorderSide(color: Colors.white24)),
-              ),
-              onChanged: (val) => tiempo = int.tryParse(val) ?? tiempo,
-            ),
-            const SizedBox(height: 12),
-            TextFormField(
-              maxLines: 2,
-              style: const TextStyle(color: Colors.white),
-              decoration: const InputDecoration(
-                labelText: 'Observaciones Técnicas (Opcional)',
-                labelStyle: TextStyle(color: Colors.white54),
-                enabledBorder: UnderlineInputBorder(
-                    borderSide: BorderSide(color: Colors.white24)),
-              ),
-              onChanged: (val) => obs = val,
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-              onPressed: () => Navigator.pop(ctx),
-              child: const Text('Cancelar',
-                  style: TextStyle(color: Colors.white54))),
-          TextButton(
-              onPressed: () {
-                cubit.finishServiceDetail(orderId, detalle.id, tiempo, obs);
-                Navigator.pop(ctx);
-              },
-              child: const Text('Completar',
-                  style: TextStyle(color: Color(0xFF10B981)))),
-        ],
-      ),
-    );
-  }
-
-  void _showDialogPrompt({
-    required BuildContext context,
-    required String title,
-    required String fieldLabel,
-    required Function(String) onSubmit,
+  Widget _buildActionBtn({
+    required String label,
+    required Color color,
+    required VoidCallback onTap,
   }) {
-    String text = '';
-    showDialog(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        backgroundColor: const Color(0xFF1E293B),
-        title: Text(title, style: const TextStyle(color: Colors.white)),
-        content: TextFormField(
-          maxLines: 2,
-          style: const TextStyle(color: Colors.white),
-          decoration: InputDecoration(
-            labelText: fieldLabel,
-            labelStyle: const TextStyle(color: Colors.white54),
-            enabledBorder: const UnderlineInputBorder(
-                borderSide: BorderSide(color: Colors.white24)),
-          ),
-          onChanged: (val) => text = val,
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(6),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+        decoration: BoxDecoration(
+          color: color.withValues(alpha: 0.15),
+          border: Border.all(color: color.withValues(alpha: 0.3)),
+          borderRadius: BorderRadius.circular(6),
         ),
-        actions: [
-          TextButton(
-              onPressed: () => Navigator.pop(ctx),
-              child: const Text('Cancelar',
-                  style: TextStyle(color: Colors.white54))),
-          TextButton(
-              onPressed: () {
-                onSubmit(text);
-                Navigator.pop(ctx);
-              },
-              child: const Text('Aceptar')),
-        ],
+        child: Text(label,
+            style: TextStyle(
+                color: color, fontSize: 12, fontWeight: FontWeight.bold)),
       ),
     );
   }
 }
 
-class _ActionBtn extends StatelessWidget {
-  final IconData icon;
-  final String label;
-  final Color color;
-  final VoidCallback onTap;
+// ─────────────────────────────────────────────────────────────────────────────
+// PESTAÑA: REPUESTOS
+// ─────────────────────────────────────────────────────────────────────────────
+class _RepuestosTab extends StatelessWidget {
+  final WorkOrder order;
+  final List<SparePartRequest> solicitudes;
 
-  const _ActionBtn({
-    required this.icon,
-    required this.label,
-    required this.color,
-    required this.onTap,
-  });
+  const _RepuestosTab({required this.order, required this.solicitudes});
 
   @override
   Widget build(BuildContext context) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(8),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-        child: Column(
-          children: [
-            Icon(icon, color: color, size: 24),
-            const SizedBox(height: 4),
-            Text(label, style: TextStyle(color: color, fontSize: 11)),
-          ],
+    // Aplanar todas las líneas de detalles de las solicitudes de esta orden
+    final detalles = solicitudes
+        .expand((s) => s.detalles.map(
+              (d) => _DetalleRepuestoExt(d, s.id, s.estado),
+            ))
+        .toList();
+
+    final pendientes = detalles.where((d) => d.detalle.pendienteRecibir).toList();
+    final recibidos = detalles.where((d) => d.detalle.cantidadRecibidaTaller > 0).toList();
+
+    return Stack(
+      children: [
+        SingleChildScrollView(
+          padding: const EdgeInsets.all(16).copyWith(bottom: 80),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text('Repuestos Pendientes de Recibir',
+                  style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold)),
+              const SizedBox(height: 12),
+              if (pendientes.isEmpty)
+                const Text('No hay repuestos pendientes.',
+                    style: TextStyle(color: Colors.white54, fontSize: 13))
+              else
+                ...pendientes.map((d) => _buildRepuestoCard(context, d, isPendiente: true)),
+              const SizedBox(height: 24),
+              const Text('Repuestos Recibidos',
+                  style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold)),
+              const SizedBox(height: 12),
+              if (recibidos.isEmpty)
+                const Text('No hay repuestos recibidos.',
+                    style: TextStyle(color: Colors.white54, fontSize: 13))
+              else
+                ...recibidos.map((d) => _buildRepuestoCard(context, d, isPendiente: false)),
+            ],
+          ),
         ),
+        Positioned(
+          bottom: 16,
+          right: 16,
+          child: BlocBuilder<AuthCubit, AuthState>(
+            builder: (context, authState) {
+              if (authState is AuthAuthenticated) {
+                final user = authState.user;
+                if (user.isAdmin || user.isAsesor) {
+                  return FloatingActionButton.extended(
+                    backgroundColor: const Color(0xFFEF4444),
+                    onPressed: () => _showSolicitarRepuestosSheet(context),
+                    icon: const Icon(Icons.add_shopping_cart, color: Colors.white),
+                    label: const Text('Solicitar Repuestos', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                  );
+                }
+              }
+              return const SizedBox.shrink();
+            },
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildRepuestoCard(BuildContext context, _DetalleRepuestoExt ext, {required bool isPendiente}) {
+    final d = ext.detalle;
+    return Container(
+      margin: const EdgeInsets.only(bottom: 8),
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: const Color(0xFF1E293B).withValues(alpha: 0.6),
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
       ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(d.itemNombre,
+                    style: const TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w600,
+                        fontSize: 14)),
+                const SizedBox(height: 4),
+                Text(
+                  isPendiente
+                      ? 'Entregado: ${d.cantidadEntregada} | Recibido: ${d.cantidadRecibidaTaller}'
+                      : 'Cantidad Recibida: ${d.cantidadRecibidaTaller}',
+                  style: const TextStyle(color: Colors.white54, fontSize: 12),
+                ),
+              ],
+            ),
+          ),
+          if (isPendiente)
+            ElevatedButton(
+              onPressed: () {
+                context.read<WorkshopProgressCubit>().markSparePartReceived(
+                      solicitudId: ext.solicitudId,
+                      detalleId: d.id,
+                      cantidadEntregada: d.cantidadEntregada,
+                      ordenGlobalId: order.id,
+                    );
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFF3B82F6),
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                minimumSize: Size.zero,
+                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+              ),
+              child: const Text('Marcar recibido',
+                  style: TextStyle(fontSize: 12, color: Colors.white)),
+            ),
+        ],
+      ),
+    );
+  }
+
+  void _showSolicitarRepuestosSheet(BuildContext context) {
+    context.read<WorkshopProgressCubit>().loadInventoryItems();
+    
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: const Color(0xFF1E293B),
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (ctx) => _SolicitarRepuestosForm(order: order, cubitContext: context),
+    );
+  }
+}
+
+class _DetalleRepuestoExt {
+  final SparePartDetail detalle;
+  final String solicitudId;
+  final String solicitudEstado;
+  _DetalleRepuestoExt(this.detalle, this.solicitudId, this.solicitudEstado);
+}
+
+class _SolicitarRepuestosForm extends StatefulWidget {
+  final WorkOrder order;
+  final BuildContext cubitContext;
+
+  const _SolicitarRepuestosForm({required this.order, required this.cubitContext});
+
+  @override
+  State<_SolicitarRepuestosForm> createState() => _SolicitarRepuestosFormState();
+}
+
+class _SolicitarRepuestosFormState extends State<_SolicitarRepuestosForm> {
+  String _motivo = '';
+  List<SparePartRequestLine> _lineas = [SparePartRequestLine()];
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.only(
+          bottom: MediaQuery.of(context).viewInsets.bottom,
+          left: 16,
+          right: 16,
+          top: 24),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text('Nueva solicitud de repuestos',
+              style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold)),
+          const SizedBox(height: 16),
+          _buildTextField(
+            label: 'Motivo general',
+            onChanged: (val) => _motivo = val,
+          ),
+          const SizedBox(height: 16),
+          const Text('Repuestos:',
+              style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+          const SizedBox(height: 8),
+          ConstrainedBox(
+            constraints: BoxConstraints(maxHeight: MediaQuery.of(context).size.height * 0.4),
+            child: SingleChildScrollView(
+              child: Column(
+                children: List.generate(_lineas.length, (index) {
+                  return _buildLineaForm(index);
+                }),
+              ),
+            ),
+          ),
+          const SizedBox(height: 8),
+          OutlinedButton.icon(
+            onPressed: () {
+              setState(() {
+                _lineas.add(SparePartRequestLine());
+              });
+            },
+            style: OutlinedButton.styleFrom(foregroundColor: Colors.white),
+            icon: const Icon(Icons.add, size: 16),
+            label: const Text('Agregar línea'),
+          ),
+          const SizedBox(height: 24),
+          Row(
+            children: [
+              Expanded(
+                child: TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text('Cancelar',
+                      style: TextStyle(color: Colors.white54)),
+                ),
+              ),
+              Expanded(
+                child: ElevatedButton(
+                  onPressed: () {
+                    widget.cubitContext.read<WorkshopProgressCubit>().createSparePartRequest(
+                          citaId: widget.order.citaId,
+                          ordenGlobalId: widget.order.id,
+                          motivo: _motivo,
+                          lineas: _lineas,
+                        );
+                    Navigator.pop(context);
+                  },
+                  style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFFEF4444)),
+                  child: const Text('Crear Solicitud',
+                      style: TextStyle(color: Colors.white)),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 24),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildLineaForm(int index) {
+    final linea = _lineas[index];
+    final inventoryItems = widget.cubitContext.read<WorkshopProgressCubit>().state.inventoryItems;
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 8),
+      padding: const EdgeInsets.all(8),
+      decoration: BoxDecoration(
+        color: const Color(0xFF0F172A),
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: Colors.white12),
+      ),
+      child: Column(
+        children: [
+          Row(
+            children: [
+              Expanded(
+                flex: 3,
+                child: DropdownButtonHideUnderline(
+                  child: DropdownButton<String>(
+                    value: linea.itemInventarioId.isEmpty ? null : linea.itemInventarioId,
+                    hint: const Text('Seleccionar ítem...', style: TextStyle(color: Colors.white54, fontSize: 13)),
+                    isExpanded: true,
+                    dropdownColor: const Color(0xFF1E293B),
+                    style: const TextStyle(color: Colors.white, fontSize: 13),
+                    items: inventoryItems.map((item) {
+                      return DropdownMenuItem(
+                        value: item.id,
+                        child: Text(item.label, overflow: TextOverflow.ellipsis),
+                      );
+                    }).toList(),
+                    onChanged: (val) {
+                      setState(() {
+                        linea.itemInventarioId = val ?? '';
+                      });
+                    },
+                  ),
+                ),
+              ),
+              if (_lineas.length > 1)
+                IconButton(
+                  icon: const Icon(Icons.close, color: Colors.white54, size: 20),
+                  onPressed: () {
+                    setState(() {
+                      _lineas.removeAt(index);
+                    });
+                  },
+                ),
+            ],
+          ),
+          Row(
+            children: [
+              Expanded(
+                flex: 1,
+                child: _buildTextField(
+                  label: 'Cant.',
+                  initialValue: linea.cantidadSolicitada.toString(),
+                  keyboardType: TextInputType.number,
+                  onChanged: (val) => linea.cantidadSolicitada = int.tryParse(val) ?? 1,
+                ),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                flex: 3,
+                child: _buildTextField(
+                  label: 'Observación',
+                  initialValue: linea.observacion,
+                  onChanged: (val) => linea.observacion = val,
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTextField({
+    required String label,
+    String? initialValue,
+    TextInputType? keyboardType,
+    required Function(String) onChanged,
+  }) {
+    return TextFormField(
+      initialValue: initialValue,
+      keyboardType: keyboardType,
+      style: const TextStyle(color: Colors.white, fontSize: 13),
+      decoration: InputDecoration(
+        labelText: label,
+        labelStyle: const TextStyle(color: Colors.white54, fontSize: 12),
+        isDense: true,
+        contentPadding: const EdgeInsets.symmetric(vertical: 8),
+        enabledBorder: const UnderlineInputBorder(
+            borderSide: BorderSide(color: Colors.white24)),
+        focusedBorder: const UnderlineInputBorder(
+            borderSide: BorderSide(color: Color(0xFF8B5CF6))),
+      ),
+      onChanged: onChanged,
     );
   }
 }
@@ -709,7 +1059,6 @@ class _HistoryLogItem extends StatelessWidget {
   }
 }
 
-// Reuse the badge builder for consistency inside the detail
 class _EstadoBadge extends StatelessWidget {
   final String estado;
   const _EstadoBadge({required this.estado});

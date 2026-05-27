@@ -49,6 +49,14 @@ class _WorkshopProgressPageState extends State<WorkshopProgressPage> {
               content: Text(state.message),
             ));
           }
+          if (state is WorkshopProgressSuccess) {
+            ScaffoldMessenger.of(ctx).showSnackBar(SnackBar(
+              backgroundColor: const Color(0xFF10B981),
+              content: Text(state.message),
+            ));
+            // Refrescar lista tras finalizar una OT
+            context.read<WorkshopProgressCubit>().fetchActiveWorkOrders();
+          }
         },
         builder: (ctx, state) {
           if (state is WorkshopProgressLoading && state.activeOrders.isEmpty) {
@@ -88,6 +96,8 @@ class _WorkshopProgressPageState extends State<WorkshopProgressPage> {
   }
 }
 
+// ── Tarjeta de Orden Activa ───────────────────────────────────────────────────
+
 class _ActiveOrderCard extends StatelessWidget {
   final WorkOrder order;
 
@@ -96,7 +106,6 @@ class _ActiveOrderCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final fmtDate = DateFormat('dd/MM/yyyy HH:mm');
-    // Calculamos progreso localmente basado en detalles
     final total = order.detalles.length;
     final terminados = order.detalles
         .where((d) => d.estado == 'FINALIZADO' || d.estado == 'INNECESARIO')
@@ -116,6 +125,7 @@ class _ActiveOrderCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // Cabecera: número OT + badge estado
             Row(
               children: [
                 const Icon(Icons.handyman, color: Color(0xFF8B5CF6), size: 20),
@@ -146,6 +156,7 @@ class _ActiveOrderCard extends StatelessWidget {
                 label: 'Apertura',
                 value: fmtDate.format(order.fechaApertura.toLocal())),
             const SizedBox(height: 12),
+            // Barra de progreso
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -171,12 +182,69 @@ class _ActiveOrderCard extends StatelessWidget {
                 ),
               ],
             ),
+            // ── Botón "Finalizar OT" inline (igual que en la web) ──────────
+            if (order.estado != 'FINALIZADA' &&
+                order.estado != 'CERRADA' &&
+                order.estado != 'CANCELADA') ...[
+              const SizedBox(height: 12),
+              SizedBox(
+                width: double.infinity,
+                child: OutlinedButton.icon(
+                  onPressed: () => _confirmFinish(context, order),
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: const Color(0xFF10B981),
+                    side: BorderSide(
+                        color: const Color(0xFF10B981).withValues(alpha: 0.5)),
+                    padding: const EdgeInsets.symmetric(vertical: 10),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8)),
+                  ),
+                  icon: const Icon(Icons.check_circle_outline, size: 16),
+                  label: const Text('Finalizar OT',
+                      style: TextStyle(
+                          fontSize: 13, fontWeight: FontWeight.w600)),
+                ),
+              ),
+            ],
           ],
         ),
       ),
     );
   }
+
+  void _confirmFinish(BuildContext context, WorkOrder order) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: const Color(0xFF1E293B),
+        title: const Text('Finalizar Orden',
+            style: TextStyle(color: Colors.white)),
+        content: Text(
+          '¿Confirmas finalizar la OT #${order.numero}?\n\nEsta acción no se puede deshacer.',
+          style: const TextStyle(color: Colors.white70),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('Cancelar',
+                style: TextStyle(color: Colors.white54)),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.pop(ctx);
+              context.read<WorkshopProgressCubit>().finishWorkOrder(order.id);
+            },
+            child: const Text('Finalizar',
+                style: TextStyle(
+                    color: Color(0xFF10B981), fontWeight: FontWeight.bold)),
+          ),
+        ],
+      ),
+    );
+  }
 }
+
+// ── Helpers ───────────────────────────────────────────────────────────────────
 
 class _InfoRow extends StatelessWidget {
   final IconData icon;

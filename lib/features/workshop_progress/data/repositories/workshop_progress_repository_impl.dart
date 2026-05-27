@@ -5,6 +5,7 @@ import 'package:mobile1_app/core/network/network_info.dart';
 import 'package:mobile1_app/features/work_order/domain/entities/work_order.dart';
 import 'package:mobile1_app/features/workshop_progress/data/datasources/workshop_progress_remote_data_source.dart';
 import 'package:mobile1_app/features/workshop_progress/domain/entities/progress_log.dart';
+import 'package:mobile1_app/features/workshop_progress/domain/entities/spare_part_entities.dart';
 import 'package:mobile1_app/features/workshop_progress/domain/repositories/workshop_progress_repository.dart';
 
 class WorkshopProgressRepositoryImpl implements WorkshopProgressRepository {
@@ -137,6 +138,60 @@ class WorkshopProgressRepositoryImpl implements WorkshopProgressRepository {
         percentage: percentage,
       );
       return Success(data);
+    } on ServerException catch (e) {
+      return Err(ServerFailure(message: e.message, statusCode: e.statusCode));
+    }
+  }
+
+  @override
+  Future<Result<List<InventoryItem>>> getInventoryItems() async {
+    if (!await networkInfo.isConnected) return const Err(NetworkFailure());
+    try {
+      final data = await remoteDataSource.getInventoryItems();
+      return Success(data);
+    } on ServerException catch (e) {
+      return Err(ServerFailure(message: e.message, statusCode: e.statusCode));
+    }
+  }
+
+  @override
+  Future<Result<List<SparePartRequest>>> getSparePartRequests({String? ordenGlobalId}) async {
+    if (!await networkInfo.isConnected) return const Err(NetworkFailure());
+    try {
+      final data = await remoteDataSource.getSparePartRequests(ordenGlobalId: ordenGlobalId);
+      return Success(data);
+    } on ServerException catch (e) {
+      return Err(ServerFailure(message: e.message, statusCode: e.statusCode));
+    }
+  }
+
+  @override
+  Future<Result<void>> createSparePartRequest({
+    required String citaId,
+    required String ordenGlobalId,
+    required String motivo,
+    required List<SparePartRequestLine> lineas,
+  }) async {
+    if (!await networkInfo.isConnected) return const Err(NetworkFailure());
+    try {
+      await remoteDataSource.createSparePartRequest(
+        citaId: citaId, ordenGlobalId: ordenGlobalId, motivo: motivo, lineas: lineas,
+      );
+      return const Success(null);
+    } on ServerException catch (e) {
+      return Err(ServerFailure(message: e.message, statusCode: e.statusCode));
+    }
+  }
+
+  @override
+  Future<Result<void>> markSparePartsReceived({
+    required String solicitudId,
+    required List<Map<String, dynamic>> detalles,
+  }) async {
+    if (!await networkInfo.isConnected) return const Err(NetworkFailure());
+    try {
+      await remoteDataSource.markSparePartsReceived(solicitudId: solicitudId, detalles: detalles);
+      return const Success(null);
     } on ServerException catch (e) {
       return Err(ServerFailure(message: e.message, statusCode: e.statusCode));
     }

@@ -113,19 +113,19 @@ class ApiConstants {
 
   // ── Avance en Taller ─────────────────────────────────────────
   static String avanceTallerList(String slug) =>
-      '/api/$slug/atencion-tecnica/avance-taller/';
+      '/api/$slug/atencion-tecnica/taller-interno/';
   static String avanceTallerDetalle(String slug, String id) =>
-      '/api/$slug/atencion-tecnica/avance-taller/$id/';
+      '/api/$slug/atencion-tecnica/taller-interno/$id/';
   static String avanceTallerIniciar(String slug, String id) =>
-      '/api/$slug/atencion-tecnica/avance-taller/$id/iniciar-detalle/';
+      '/api/$slug/atencion-tecnica/taller-interno/$id/iniciar-detalle/';
   static String avanceTallerPausar(String slug, String id) =>
-      '/api/$slug/atencion-tecnica/avance-taller/$id/pausar-detalle/';
+      '/api/$slug/atencion-tecnica/taller-interno/$id/pausar-detalle/';
   static String avanceTallerFinalizar(String slug, String id) =>
-      '/api/$slug/atencion-tecnica/avance-taller/$id/finalizar-detalle/';
+      '/api/$slug/atencion-tecnica/taller-interno/$id/finalizar-detalle/';
   static String avanceTallerInnecesario(String slug, String id) =>
-      '/api/$slug/atencion-tecnica/avance-taller/$id/marcar-innecesario/';
+      '/api/$slug/atencion-tecnica/taller-interno/$id/marcar-innecesario/';
   static String avanceTallerFinalizarOrden(String slug, String id) =>
-      '/api/$slug/atencion-tecnica/avance-taller/$id/finalizar-orden/';
+      '/api/$slug/atencion-tecnica/taller-interno/$id/finalizar-orden/';
       
   static String avancesVehiculoList(String slug) =>
       '/api/$slug/atencion-tecnica/avances-vehiculo/';
@@ -186,4 +186,13 @@ class ApiConstants {
 
   // ── Reportes ────────────────────────────────────────────
   static String reportesVehiculo(String slug) => '/api/$slug/vehiculos-servicios/reportes/vehiculo/';
+
+  // ── Inventario ───────────────────────────────────────────
+  static String inventarioItems(String slug) => '/api/$slug/gestion-administrativa/items-inventario/';
+  static String inventarioItem(String slug, String id) => '/api/$slug/gestion-administrativa/items-inventario/$id/';
+
+  // ── Solicitudes de Repuestos ─────────────────────────────
+  static String solicitudesRepuesto(String slug) => '/api/$slug/gestion-administrativa/solicitudes-repuesto/';
+  static String solicitudRepuesto(String slug, String id) => '/api/$slug/gestion-administrativa/solicitudes-repuesto/$id/';
+  static String marcarRecibidaTaller(String slug, String id) => '/api/$slug/gestion-administrativa/solicitudes-repuesto/$id/marcar-recibida-taller/';
 }

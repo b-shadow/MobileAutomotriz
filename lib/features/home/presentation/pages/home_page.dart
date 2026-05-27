@@ -7,9 +7,59 @@ import 'package:mobile1_app/features/auth/domain/entities/user.dart';
 import 'package:mobile1_app/features/auth/presentation/cubit/auth_cubit.dart';
 import 'package:mobile1_app/features/auth/presentation/cubit/auth_state.dart';
 
-/// Placeholder home page — shows user info and logout.
-///
-/// Will be replaced with actual feature pages in future iterations.
+// ─────────────────────────────────────────────────────────────────────────────
+// Role-based visibility helpers  (mirror de roleHelper.js del frontend)
+// ─────────────────────────────────────────────────────────────────────────────
+
+extension _RoleHelpers on User {
+  /// ADMIN, ASESOR DE SERVICIO, USUARIO
+  bool get canViewVehiculos => isAdmin || isAsesor || isUsuario;
+
+  /// ADMIN, ASESOR DE SERVICIO, USUARIO, MECÁNICO
+  bool get canViewServiciosCatalogo =>
+      isAdmin || isAsesor || isUsuario || isMecanico;
+
+  /// Todos los roles autenticados
+  bool get canViewEspaciosTrabajo => true;
+
+  /// ADMIN, ASESOR DE SERVICIO, USUARIO, MECÁNICO
+  bool get canViewPlanVehiculo =>
+      isAdmin || isAsesor || isUsuario || isMecanico;
+
+  /// ADMIN, ASESOR DE SERVICIO, USUARIO
+  bool get canViewCitas => isAdmin || isAsesor || isUsuario;
+
+  /// ADMIN, ASESOR DE SERVICIO
+  bool get canViewRecepcionVehiculo => isAdmin || isAsesor;
+
+  /// ADMIN, ASESOR DE SERVICIO
+  bool get canViewPresupuestos => isAdmin || isAsesor;
+
+  /// ADMIN, ASESOR DE SERVICIO
+  bool get canViewOrdenesTrabajo => isAdmin || isAsesor;
+
+  /// ADMIN, ASESOR DE SERVICIO, MECÁNICO
+  bool get canViewTallerInterno => isAdmin || isAsesor || isMecanico;
+
+  /// Avance General Vehículo: todos los roles (visible para todos en el frontend)
+  bool get canViewAvanceVehiculo => true;
+
+  /// ADMIN solamente
+  bool get canManageUsers => isAdmin;
+
+  /// ADMIN solamente
+  bool get canManageCompany => isAdmin;
+
+  /// ADMIN solamente
+  bool get canManageSuscription => isAdmin;
+
+  /// ADMIN solamente
+  bool get canViewBitacora => isAdmin;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+
+/// Home page — muestra los módulos visibles según el rol del usuario autenticado.
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
 
@@ -139,7 +189,52 @@ class HomePage extends StatelessWidget {
           ),
           const SizedBox(height: 32),
 
-          // ── Action Buttons ───────────────────────────
+          // ── Módulos de Gestión de Usuarios (solo ADMIN) ─
+          if (user.canManageCompany) ...[
+            _buildModuleButton(
+              context,
+              label: 'Gestionar Empresa',
+              icon: Icons.business_rounded,
+              iconColor: Colors.blueAccent,
+              route: '/company-management',
+            ),
+            const SizedBox(height: 12),
+          ],
+
+          if (user.canManageSuscription) ...[
+            _buildModuleButton(
+              context,
+              label: 'Gestionar Suscripcion',
+              icon: Icons.receipt_long,
+              iconColor: Colors.amberAccent,
+              route: '/subscription-management',
+            ),
+            const SizedBox(height: 12),
+          ],
+
+          if (user.canManageUsers) ...[
+            _buildModuleButton(
+              context,
+              label: 'Gestionar Usuarios y Roles',
+              icon: Icons.manage_accounts,
+              iconColor: Colors.yellowAccent,
+              route: '/user-management',
+            ),
+            const SizedBox(height: 12),
+          ],
+
+          if (user.canViewBitacora) ...[
+            _buildModuleButton(
+              context,
+              label: 'Gestionar Bitacora',
+              icon: Icons.history,
+              iconColor: Colors.purpleAccent,
+              route: '/audit-management',
+            ),
+            const SizedBox(height: 12),
+          ],
+
+          // ── Editar Perfil (todos) ────────────────────
           SizedBox(
             width: double.infinity,
             child: ElevatedButton.icon(
@@ -161,391 +256,127 @@ class HomePage extends StatelessWidget {
               ),
             ),
           ),
-          
-          if (user.isAdmin) ...[
-            const SizedBox(height: 16),
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton.icon(
-                onPressed: () => context.push('/company-management'),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF1E293B),
-                  foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    side: BorderSide(color: Colors.white.withValues(alpha: 0.1)),
-                  ),
-                ),
-                icon: const Icon(Icons.business_rounded, size: 20, color: Colors.blueAccent),
-                label: const Text(
-                  'Gestionar Empresa',
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                ),
-              ),
-            ),
-            const SizedBox(height: 12),
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton.icon(
-                onPressed: () => context.push('/subscription-management'),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF1E293B),
-                  foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    side: BorderSide(color: Colors.white.withValues(alpha: 0.1)),
-                  ),
-                ),
-                icon: const Icon(
-                  Icons.receipt_long,
-                  size: 20,
-                  color: Colors.amberAccent,
-                ),
-                label: const Text(
-                  'Gestionar Suscripcion',
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                ),
-              ),
-            ),
+          const SizedBox(height: 12),
 
-            const SizedBox(height: 12),
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton.icon(
-                onPressed: () => context.push('/service-catalog-management'),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF1E293B),
-                  foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    side: BorderSide(color: Colors.white.withValues(alpha: 0.1)),
-                  ),
-                ),
-                icon: const Icon(
-                  Icons.build_circle_outlined,
-                  size: 20,
-                  color: Colors.orangeAccent,
-                ),
-                label: const Text(
-                  'Gestionar Catalogo de Servicios',
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                ),
-              ),
+          // ── Vehículos y Servicios ────────────────────
+          if (user.canViewVehiculos) ...[
+            _buildModuleButton(
+              context,
+              label: 'Gestionar Vehiculos',
+              icon: Icons.directions_car,
+              iconColor: Colors.greenAccent,
+              route: '/vehicle-management',
             ),
-
             const SizedBox(height: 12),
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton.icon(
-                onPressed: () => context.push('/audit-management'),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF1E293B),
-                  foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    side: BorderSide(color: Colors.white.withValues(alpha: 0.1)),
-                  ),
-                ),
-                icon: const Icon(
-                  Icons.history,
-                  size: 20,
-                  color: Colors.purpleAccent,
-                ),
-                label: const Text(
-                  'Gestionar Bitacora',
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                ),
-              ),
-            ),
           ],
 
-          const SizedBox(height: 12),
-          SizedBox(
-            width: double.infinity,
-            child: ElevatedButton.icon(
-              onPressed: () => context.push('/vehicle-management'),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF1E293B),
-                foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(vertical: 16),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  side: BorderSide(color: Colors.white.withValues(alpha: 0.1)),
-                ),
-              ),
-              icon: const Icon(
-                Icons.directions_car,
-                size: 20,
-                color: Colors.greenAccent,
-              ),
-              label: const Text(
-                'Gestionar Vehiculos',
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-              ),
+          if (user.canViewServiciosCatalogo) ...[
+            _buildModuleButton(
+              context,
+              label: 'Gestionar Catalogo de Servicios',
+              icon: Icons.build_circle_outlined,
+              iconColor: Colors.orangeAccent,
+              route: '/service-catalog-management',
             ),
-          ),
+            const SizedBox(height: 12),
+          ],
 
-          const SizedBox(height: 12),
-          SizedBox(
-            width: double.infinity,
-            child: ElevatedButton.icon(
-              onPressed: () => context.push('/workspace-management'),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF1E293B),
-                foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(vertical: 16),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  side: BorderSide(color: Colors.white.withValues(alpha: 0.1)),
-                ),
-              ),
-              icon: const Icon(
-                Icons.warehouse_outlined,
-                size: 20,
-                color: Colors.cyanAccent,
-              ),
-              label: const Text(
-                'Configurar Espacios de Trabajo',
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-              ),
+          if (user.canViewEspaciosTrabajo) ...[
+            _buildModuleButton(
+              context,
+              label: 'Configurar Espacios de Trabajo',
+              icon: Icons.warehouse_outlined,
+              iconColor: Colors.cyanAccent,
+              route: '/workspace-management',
             ),
-          ),
+            const SizedBox(height: 12),
+          ],
 
-          const SizedBox(height: 12),
-          SizedBox(
-            width: double.infinity,
-            child: ElevatedButton.icon(
-              onPressed: () => context.push('/user-management'),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF1E293B),
-                foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(vertical: 16),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  side: BorderSide(color: Colors.white.withValues(alpha: 0.1)),
-                ),
-              ),
-              icon: const Icon(
-                Icons.manage_accounts,
-                size: 20,
-                color: Colors.yellowAccent,
-              ),
-              label: const Text(
-                'Gestionar Usuarios y Roles',
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-              ),
+          if (user.canViewPlanVehiculo) ...[
+            _buildModuleButton(
+              context,
+              label: 'Gestionar Plan de Vehiculo',
+              icon: Icons.assignment_turned_in,
+              iconColor: Colors.lightBlueAccent,
+              route: '/vehicle-plan-management',
             ),
-          ),
+            const SizedBox(height: 12),
+          ],
 
-          const SizedBox(height: 12),
-          SizedBox(
-            width: double.infinity,
-            child: ElevatedButton.icon(
-              onPressed: () => context.push('/vehicle-plan-management'),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF1E293B),
-                foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(vertical: 16),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  side: BorderSide(color: Colors.white.withValues(alpha: 0.1)),
-                ),
-              ),
-              icon: const Icon(
-                Icons.assignment_turned_in,
-                size: 20,
-                color: Colors.lightBlueAccent,
-              ),
-              label: const Text(
-                'Gestionar Plan de Vehiculo',
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-              ),
+          if (user.canViewCitas) ...[
+            _buildModuleButton(
+              context,
+              label: 'Gestionar Citas',
+              icon: Icons.calendar_today_rounded,
+              iconColor: const Color(0xFF8B5CF6),
+              route: '/appointment-management',
+              borderColor: const Color(0xFF8B5CF6),
             ),
-          ),
+            const SizedBox(height: 12),
+          ],
 
-          const SizedBox(height: 12),
-          SizedBox(
-            width: double.infinity,
-            child: ElevatedButton.icon(
-              onPressed: () => context.push('/appointment-management'),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF1E293B),
-                foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(vertical: 16),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  side: BorderSide(color: const Color(0xFF8B5CF6).withValues(alpha: 0.4)),
-                ),
-              ),
-              icon: const Icon(
-                Icons.calendar_today_rounded,
-                size: 20,
-                color: Color(0xFF8B5CF6),
-              ),
-              label: const Text(
-                'Gestionar Citas',
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-              ),
+          // ── Atención Técnica ─────────────────────────
+          if (user.canViewRecepcionVehiculo) ...[
+            _buildModuleButton(
+              context,
+              label: 'Recepción e Inspección',
+              icon: Icons.car_repair_rounded,
+              iconColor: const Color(0xFF10B981),
+              route: '/reception-management',
+              borderColor: const Color(0xFF10B981),
             ),
-          ),
-          const SizedBox(height: 12),
-          SizedBox(
-            width: double.infinity,
-            child: ElevatedButton.icon(
-              onPressed: () => context.push('/reception-management'),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF1E293B),
-                foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(vertical: 16),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  side: BorderSide(color: const Color(0xFF10B981).withValues(alpha: 0.4)),
-                ),
-              ),
-              icon: const Icon(
-                Icons.car_repair_rounded,
-                size: 20,
-                color: Color(0xFF10B981),
-              ),
-              label: const Text(
-                'Recepción e Inspección',
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-              ),
+            const SizedBox(height: 12),
+          ],
+
+          if (user.canViewPresupuestos) ...[
+            _buildModuleButton(
+              context,
+              label: 'Gestión de Presupuestos',
+              icon: Icons.request_quote_rounded,
+              iconColor: const Color(0xFFF59E0B),
+              route: '/budget-management',
+              borderColor: const Color(0xFFF59E0B),
             ),
-          ),
-          const SizedBox(height: 12),
-          SizedBox(
-            width: double.infinity,
-            child: ElevatedButton.icon(
-              onPressed: () => context.push('/budget-management'),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF1E293B),
-                foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(vertical: 16),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  side: BorderSide(color: const Color(0xFFF59E0B).withValues(alpha: 0.4)),
-                ),
-              ),
-              icon: const Icon(
-                Icons.request_quote_rounded,
-                size: 20,
-                color: Color(0xFFF59E0B),
-              ),
-              label: const Text(
-                'Gestión de Presupuestos',
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-              ),
+            const SizedBox(height: 12),
+          ],
+
+          if (user.canViewOrdenesTrabajo) ...[
+            _buildModuleButton(
+              context,
+              label: 'Órdenes de Trabajo',
+              icon: Icons.handyman_rounded,
+              iconColor: const Color(0xFF10B981),
+              route: '/work-orders',
+              borderColor: const Color(0xFF10B981),
             ),
-          ),
-          const SizedBox(height: 12),
-          SizedBox(
-            width: double.infinity,
-            child: ElevatedButton.icon(
-              onPressed: () => context.push('/work-orders'),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF1E293B),
-                foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(vertical: 16),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  side: BorderSide(color: const Color(0xFF10B981).withValues(alpha: 0.4)),
-                ),
-              ),
-              icon: const Icon(
-                Icons.handyman_rounded,
-                size: 20,
-                color: Color(0xFF10B981),
-              ),
-              label: const Text(
-                'Órdenes de Trabajo',
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-              ),
+            const SizedBox(height: 12),
+          ],
+
+          if (user.canViewTallerInterno) ...[
+            _buildModuleButton(
+              context,
+              label: 'Avance en Taller',
+              icon: Icons.garage_rounded,
+              iconColor: const Color(0xFF8B5CF6),
+              route: '/workshop-progress',
+              borderColor: const Color(0xFF8B5CF6),
             ),
-          ),
-          const SizedBox(height: 12),
-          SizedBox(
-            width: double.infinity,
-            child: ElevatedButton.icon(
-              onPressed: () => context.push('/workshop-progress'),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF1E293B),
-                foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(vertical: 16),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  side: BorderSide(color: const Color(0xFF8B5CF6).withValues(alpha: 0.4)),
-                ),
-              ),
-              icon: const Icon(
-                Icons.garage_rounded,
-                size: 20,
-                color: Color(0xFF8B5CF6),
-              ),
-              label: const Text(
-                'Avance en Taller',
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-              ),
+            const SizedBox(height: 12),
+          ],
+
+          if (user.canViewAvanceVehiculo) ...[
+            _buildModuleButton(
+              context,
+              label: 'Avance General Vehículo',
+              icon: Icons.directions_car,
+              iconColor: const Color(0xFF3B82F6),
+              route: '/vehicle-progress',
+              borderColor: const Color(0xFF3B82F6),
             ),
-          ),
-          const SizedBox(height: 12),
-          SizedBox(
-            width: double.infinity,
-            child: ElevatedButton.icon(
-              onPressed: () => context.push('/vehicle-progress'),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF1E293B),
-                foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(vertical: 16),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  side: BorderSide(color: const Color(0xFF3B82F6).withValues(alpha: 0.4)),
-                ),
-              ),
-              icon: const Icon(
-                Icons.directions_car,
-                size: 20,
-                color: Color(0xFF3B82F6),
-              ),
-              label: const Text(
-                'Avance General Vehículo',
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-              ),
-            ),
-          ),
-          const SizedBox(height: 12),
+            const SizedBox(height: 12),
+          ],
+
+          // ── Inteligencia Artificial (todos) ──────────
           SizedBox(
             width: double.infinity,
             child: ElevatedButton.icon(
@@ -572,6 +403,8 @@ class HomePage extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 12),
+
+          // ── Reportes (todos) ─────────────────────────
           SizedBox(
             width: double.infinity,
             child: ElevatedButton.icon(
@@ -597,7 +430,7 @@ class HomePage extends StatelessWidget {
               ),
             ),
           ),
-          
+
           const SizedBox(height: 32),
 
           // ── Placeholder message ─────────────────────
@@ -640,6 +473,43 @@ class HomePage extends StatelessWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  /// Botón de módulo genérico con restricción de rol.
+  Widget _buildModuleButton(
+    BuildContext context, {
+    required String label,
+    required IconData icon,
+    required Color iconColor,
+    required String route,
+    Color? borderColor,
+  }) {
+    return SizedBox(
+      width: double.infinity,
+      child: ElevatedButton.icon(
+        onPressed: () => context.push(route),
+        style: ElevatedButton.styleFrom(
+          backgroundColor: const Color(0xFF1E293B),
+          foregroundColor: Colors.white,
+          padding: const EdgeInsets.symmetric(vertical: 16),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+            side: BorderSide(
+              color: borderColor != null
+                  ? borderColor.withValues(alpha: 0.4)
+                  : Colors.white.withValues(alpha: 0.1),
+            ),
+          ),
+        ),
+        icon: Icon(icon, size: 20, color: iconColor),
+        label: Text(
+          label,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+        ),
       ),
     );
   }

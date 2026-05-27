@@ -2,6 +2,7 @@ import 'package:mobile1_app/core/error/result.dart';
 import 'package:mobile1_app/core/usecases/usecase.dart';
 import 'package:mobile1_app/features/work_order/domain/entities/work_order.dart';
 import 'package:mobile1_app/features/workshop_progress/domain/entities/progress_log.dart';
+import 'package:mobile1_app/features/workshop_progress/domain/entities/spare_part_entities.dart';
 import 'package:mobile1_app/features/workshop_progress/domain/repositories/workshop_progress_repository.dart';
 
 class GetActiveWorkOrders implements UseCase<List<WorkOrder>, NoParams> {
@@ -109,4 +110,42 @@ class AddManualProgress {
           status: status,
           message: message,
           percentage: percentage);
+}
+
+// ── Repuestos / Inventario ─────────────────────────────────────────────────
+
+class GetInventoryItems {
+  final WorkshopProgressRepository repository;
+  GetInventoryItems(this.repository);
+  Future<Result<List<InventoryItem>>> call() => repository.getInventoryItems();
+}
+
+class GetSparePartRequests {
+  final WorkshopProgressRepository repository;
+  GetSparePartRequests(this.repository);
+  Future<Result<List<SparePartRequest>>> call({String? ordenGlobalId}) =>
+      repository.getSparePartRequests(ordenGlobalId: ordenGlobalId);
+}
+
+class CreateSparePartRequest {
+  final WorkshopProgressRepository repository;
+  CreateSparePartRequest(this.repository);
+  Future<Result<void>> call({
+    required String citaId,
+    required String ordenGlobalId,
+    required String motivo,
+    required List<SparePartRequestLine> lineas,
+  }) =>
+      repository.createSparePartRequest(
+          citaId: citaId, ordenGlobalId: ordenGlobalId, motivo: motivo, lineas: lineas);
+}
+
+class MarkSparePartsReceived {
+  final WorkshopProgressRepository repository;
+  MarkSparePartsReceived(this.repository);
+  Future<Result<void>> call({
+    required String solicitudId,
+    required List<Map<String, dynamic>> detalles,
+  }) =>
+      repository.markSparePartsReceived(solicitudId: solicitudId, detalles: detalles);
 }

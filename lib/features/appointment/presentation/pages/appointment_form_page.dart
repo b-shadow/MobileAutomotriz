@@ -24,6 +24,7 @@ class _AppointmentFormSheetState extends State<AppointmentFormSheet> {
   // Datos cargados desde el backend
   List<Map<String, dynamic>> _vehiculos = [];
   List<Map<String, dynamic>> _planDetalles = [];
+  Set<String> _planDetallesInhabilitados = {};
   List<Map<String, dynamic>> _espacios = [];
 
   // Selecciones
@@ -96,25 +97,63 @@ class _AppointmentFormSheetState extends State<AppointmentFormSheet> {
   Future<void> _loadPlanDetalles(String planId) async {
     setState(() {
       _planDetalles = [];
+      _planDetallesInhabilitados = {};
       _serviciosSeleccionados.clear();
     });
     try {
-      final resp = await _api.get(ApiConstants.planVehiculoDetalles(_slug, planId));
+      // Usamos el endpoint del plan completo (igual que el frontend),
+      // que devuelve { id, detalles: [...] } con todos los servicios incluidos.
+      final resp = await _api.get(ApiConstants.planVehiculo(_slug, planId));
       final data = resp.data;
+
       List<dynamic> rows = [];
-      if (data is Map && data['results'] is List) {
-        rows = data['results'] as List;
+      if (data is Map<String, dynamic>) {
+        // El plan trae sus detalles directamente o en un campo "detalles"
+        final detalles = data['detalles'];
+        if (detalles is List) {
+          rows = detalles;
+        }
       } else if (data is List) {
         rows = data;
       }
-      // Solo los servicios PENDIENTES
+
+      // Si el endpoint del plan no devolvió detalles, caemos al endpoint /detalles/
+      if (rows.isEmpty) {
+        final resp2 = await _api.get(ApiConstants.planVehiculoDetalles(_slug, planId));
+        final data2 = resp2.data;
+        if (data2 is Map && data2['results'] is List) {
+          rows = data2['results'] as List;
+        } else if (data2 is List) {
+          rows = data2;
+        }
+      }
+
+      final all = rows.whereType<Map<String, dynamic>>().toList();
+
+      // Estados que no se pueden seleccionar (ya usados o terminados)
+      const inhabilitados = {'PROGRAMADO', 'EN_PROCESO', 'COMPLETADO', 'CANCELADO'};
+
+      // Mostramos todos excepto COMPLETADO y CANCELADO (esos ya no son útiles)
+      const ocultos = {'COMPLETADO', 'CANCELADO'};
+
+      final visibles = all.where((d) {
+        final estado = (d['estado'] ?? '').toString().toUpperCase();
+        return !ocultos.contains(estado);
+      }).toList();
+
+      final inhabilitadosSet = <String>{};
+      for (final d in visibles) {
+        final estado = (d['estado'] ?? '').toString().toUpperCase();
+        if (inhabilitados.contains(estado)) {
+          inhabilitadosSet.add(d['id']?.toString() ?? '');
+        }
+      }
+
       setState(() {
-        _planDetalles = rows
-            .whereType<Map<String, dynamic>>()
-            .where((d) => (d['estado'] ?? '') == 'PENDIENTE')
-            .toList();
+        _planDetalles = visibles;
+        _planDetallesInhabilitados = inhabilitadosSet;
       });
-    } catch (_) {
+    } catch (e) {
       setState(() => _error = 'No se pudieron cargar los servicios del plan.');
     }
   }
@@ -141,20 +180,46 @@ class _AppointmentFormSheetState extends State<AppointmentFormSheet> {
 
   void _onVehiculoChanged(String? id) {
     if (id == null) return;
-    setState(() => _vehiculoId = id);
+    setState(() {
+      _vehiculoId = id;
+      _planDetalles = [];
+      _planDetallesInhabilitados = {};
+      _serviciosSeleccionados.clear();
+      _planServicioId = null;
+    });
 
-    // Buscar el plan del vehículo
+    // Buscar el plan del vehículo:
+    // El backend puede devolver plan_servicio_id (UUID string directo) o
+    // plan_servicio como objeto anidado { id, ... } — manejamos ambos casos.
     final vehiculo = _vehiculos.firstWhere(
       (v) => v['id']?.toString() == id,
       orElse: () => {},
     );
-    final plan = vehiculo['plan_servicio'];
-    if (plan is Map<String, dynamic>) {
-      final planId = plan['id']?.toString();
-      if (planId != null) {
-        setState(() => _planServicioId = planId);
-        _loadPlanDetalles(planId);
+
+    String? planId;
+
+    // 1. Campo directo: plan_servicio_id (igual al frontend: vehiculo.plan_servicio_id)
+    final directId = vehiculo['plan_servicio_id'];
+    if (directId != null && directId.toString().isNotEmpty) {
+      planId = directId.toString();
+    }
+
+    // 2. Campo anidado: plan_servicio: { id: ... }
+    if (planId == null) {
+      final planObj = vehiculo['plan_servicio'];
+      if (planObj is Map<String, dynamic>) {
+        final nested = planObj['id']?.toString();
+        if (nested != null && nested.isNotEmpty) {
+          planId = nested;
+        }
+      } else if (planObj is String && planObj.isNotEmpty) {
+        planId = planObj;
       }
+    }
+
+    if (planId != null) {
+      setState(() => _planServicioId = planId);
+      _loadPlanDetalles(planId);
     }
   }
 
@@ -359,25 +424,45 @@ class _AppointmentFormSheetState extends State<AppointmentFormSheet> {
                           // ── Servicios del Plan ───────────────────
                           if (_vehiculoId != null) ...[
                             const SizedBox(height: 16),
-                            _SectionTitle('2. Servicios del Plan (PENDIENTES)'),
+                            _SectionTitle('2. Servicios a Realizar'),
                             const SizedBox(height: 8),
-                            if (_planDetalles.isEmpty)
+                            if (_planDetalles.isEmpty && _planServicioId == null)
                               const Padding(
                                 padding: EdgeInsets.only(bottom: 8),
                                 child: Text(
-                                  'No hay servicios pendientes en el plan de este vehículo.',
+                                  'Este vehículo no tiene un plan de servicios asignado. Debes asignarle un plan primero para agendar una cita.',
+                                  style: TextStyle(color: Colors.white38, fontSize: 13),
+                                ),
+                              )
+                            else if (_planDetalles.isEmpty && _planServicioId != null)
+                              const Padding(
+                                padding: EdgeInsets.only(bottom: 8),
+                                child: Text(
+                                  'El plan asociado a este vehículo no tiene servicios.',
                                   style: TextStyle(color: Colors.white38, fontSize: 13),
                                 ),
                               )
                             else
                               ..._planDetalles.map((d) {
                                 final id = d['id']?.toString() ?? '';
-                                final cat = d['servicio_catalogo'];
-                                final nombre = (cat is Map ? cat['nombre'] : null)?.toString() ??
+                                // El backend puede retornar el nombre en varios campos:
+                                // - servicio_nombre (campo aplanado del frontend)
+                                // - servicio_catalogo.nombre (objeto anidado)
+                                // - nombre (campo directo)
+                                final nombre = d['servicio_nombre']?.toString() ??
+                                    (d['servicio_catalogo'] is Map
+                                        ? (d['servicio_catalogo'] as Map)['nombre']?.toString()
+                                        : null) ??
                                     d['nombre']?.toString() ??
                                     'Servicio';
                                 final tiempo = d['tiempo_estandar_min']?.toString() ?? '0';
-                                final precio = (d['precio_referencial'] as num?)?.toDouble() ?? 0.0;
+                                // precio_referencial puede venir como String ("0.00") o num
+                                final precioRaw = d['precio_referencial'];
+                                final precio = precioRaw is num
+                                    ? precioRaw.toDouble()
+                                    : double.tryParse(precioRaw?.toString() ?? '0') ?? 0.0;
+                                final inhabilitado = _planDetallesInhabilitados.contains(id);
+                                final estado = (d['estado'] ?? '').toString().toUpperCase();
                                 final selected = _serviciosSeleccionados.contains(id);
                                 return _ServiceCheckTile(
                                   id: id,
@@ -385,15 +470,19 @@ class _AppointmentFormSheetState extends State<AppointmentFormSheet> {
                                   tiempo: tiempo,
                                   precio: precio,
                                   selected: selected,
-                                  onChanged: (v) {
-                                    setState(() {
-                                      if (v == true) {
-                                        _serviciosSeleccionados.add(id);
-                                      } else {
-                                        _serviciosSeleccionados.remove(id);
-                                      }
-                                    });
-                                  },
+                                  inhabilitado: inhabilitado,
+                                  estado: estado,
+                                  onChanged: inhabilitado
+                                      ? null
+                                      : (v) {
+                                          setState(() {
+                                            if (v == true) {
+                                              _serviciosSeleccionados.add(id);
+                                            } else {
+                                              _serviciosSeleccionados.remove(id);
+                                            }
+                                          });
+                                        },
                                 );
                               }),
                           ],
@@ -608,7 +697,9 @@ class _ServiceCheckTile extends StatelessWidget {
   final String tiempo;
   final double precio;
   final bool selected;
-  final ValueChanged<bool?> onChanged;
+  final bool inhabilitado;
+  final String estado;
+  final ValueChanged<bool?>? onChanged;
 
   const _ServiceCheckTile({
     required this.id,
@@ -616,6 +707,8 @@ class _ServiceCheckTile extends StatelessWidget {
     required this.tiempo,
     required this.precio,
     required this.selected,
+    this.inhabilitado = false,
+    this.estado = 'PENDIENTE',
     required this.onChanged,
   });
 
@@ -624,25 +717,59 @@ class _ServiceCheckTile extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.only(bottom: 6),
       decoration: BoxDecoration(
-        color: selected
-            ? const Color(0xFF8B5CF6).withValues(alpha: 0.1)
-            : const Color(0xFF1E293B),
+        color: inhabilitado
+            ? Colors.white.withValues(alpha: 0.03)
+            : selected
+                ? const Color(0xFF8B5CF6).withValues(alpha: 0.1)
+                : const Color(0xFF1E293B),
         borderRadius: BorderRadius.circular(10),
         border: Border.all(
-          color: selected
-              ? const Color(0xFF8B5CF6).withValues(alpha: 0.5)
-              : Colors.white12,
+          color: inhabilitado
+              ? Colors.white12
+              : selected
+                  ? const Color(0xFF8B5CF6).withValues(alpha: 0.5)
+                  : Colors.white12,
         ),
       ),
       child: CheckboxListTile(
-        value: selected,
+        value: inhabilitado ? false : selected,
         onChanged: onChanged,
         activeColor: const Color(0xFF8B5CF6),
         checkColor: Colors.white,
-        title: Text(nombre,
-            style: const TextStyle(color: Colors.white, fontSize: 14)),
-        subtitle: Text('$tiempo min · Bs. ${precio.toStringAsFixed(2)}',
-            style: const TextStyle(color: Colors.white54, fontSize: 12)),
+        title: Text(
+          nombre,
+          style: TextStyle(
+            color: inhabilitado ? Colors.white30 : Colors.white,
+            fontSize: 14,
+            decoration: inhabilitado ? TextDecoration.lineThrough : null,
+          ),
+        ),
+        subtitle: Row(
+          children: [
+            Text(
+              '$tiempo min · Bs. ${precio.toStringAsFixed(2)}',
+              style: const TextStyle(color: Colors.white54, fontSize: 12),
+            ),
+            if (inhabilitado) ...[
+              const SizedBox(width: 6),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFEF4444).withValues(alpha: 0.15),
+                  borderRadius: BorderRadius.circular(4),
+                ),
+                child: Text(
+                  estado == 'EN_PROCESO' ? 'en proceso' : 'programado',
+                  style: const TextStyle(
+                    color: Color(0xFFEF4444),
+                    fontSize: 10,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+            ],
+          ],
+        ),
         controlAffinity: ListTileControlAffinity.leading,
         dense: true,
       ),
