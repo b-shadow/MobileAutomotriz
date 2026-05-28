@@ -28,13 +28,16 @@ class AppTheme {
 
         // AppBar
         appBarTheme: AppBarTheme(
-          backgroundColor: AppColors.darkBackground,
+          backgroundColor: Colors.transparent,
           foregroundColor: AppColors.darkTextPrimary,
           elevation: 0,
           centerTitle: false,
+          iconTheme: const IconThemeData(color: Colors.white),
           systemOverlayStyle: SystemUiOverlayStyle.light,
           titleTextStyle: AppTypography.darkTextTheme.titleLarge?.copyWith(
             fontSize: 20,
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
           ),
         ),
 
@@ -136,6 +139,29 @@ class AppTheme {
           selectedItemColor: AppColors.primary,
           unselectedItemColor: AppColors.darkTextTertiary,
           elevation: 0,
+        ),
+
+        // Dialog
+        dialogTheme: DialogThemeData(
+          backgroundColor: AppColors.darkCard,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          titleTextStyle: AppTypography.darkTextTheme.titleLarge?.copyWith(
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
+          ),
+          contentTextStyle: AppTypography.darkTextTheme.bodyMedium?.copyWith(
+            color: AppColors.darkTextSecondary,
+          ),
+        ),
+
+        // Bottom Sheet
+        bottomSheetTheme: const BottomSheetThemeData(
+          backgroundColor: AppColors.darkCard,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+          ),
         ),
       );
 

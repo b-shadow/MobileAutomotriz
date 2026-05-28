@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:mobile1_app/core/theme/app_colors.dart';
 import '../cubit/vehicle_progress_cubit.dart';
 
 class VehicleProgressPage extends StatefulWidget {
@@ -20,32 +21,29 @@ class _VehicleProgressPageState extends State<VehicleProgressPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFC),
+      backgroundColor: AppColors.darkBackground,
       appBar: AppBar(
-        title: const Text('Avance del Vehículo', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
-        backgroundColor: const Color(0xFF3B82F6),
-        elevation: 0,
-        iconTheme: const IconThemeData(color: Colors.white),
+        title: const Text('Avance del Vehículo'),
       ),
       body: BlocConsumer<VehicleProgressCubit, VehicleProgressState>(
         listener: (context, state) {
           if (state is VehicleProgressError) {
             ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-              backgroundColor: const Color(0xFFEF4444),
+              backgroundColor: AppColors.error,
               content: Text(state.message),
             ));
           }
         },
         builder: (context, state) {
           if (state is VehicleProgressInitial) {
-            return const Center(child: CircularProgressIndicator());
+            return const Center(child: CircularProgressIndicator(color: AppColors.primary));
           }
 
           final appointments = _getAppointmentsFromState(state);
           final isLoading = state is VehicleProgressLoading;
 
           if (isLoading && appointments.isEmpty) {
-            return const Center(child: CircularProgressIndicator());
+            return const Center(child: CircularProgressIndicator(color: AppColors.primary));
           }
 
           if (appointments.isEmpty) {
@@ -53,28 +51,32 @@ class _VehicleProgressPageState extends State<VehicleProgressPage> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(Icons.directions_car_outlined, size: 64, color: Colors.grey[400]),
+                  Icon(Icons.directions_car_outlined, size: 64, color: AppColors.darkTextTertiary),
                   const SizedBox(height: 16),
-                  Text('No hay vehículos en atención', style: TextStyle(color: Colors.grey[600], fontSize: 16)),
+                  Text('No hay vehículos en atención', style: TextStyle(color: AppColors.darkTextSecondary, fontSize: 16)),
                 ],
               ),
             );
           }
 
           return RefreshIndicator(
+            color: AppColors.primary,
             onRefresh: () => context.read<VehicleProgressCubit>().fetchAppointments(),
             child: ListView.builder(
               padding: const EdgeInsets.all(16),
               itemCount: appointments.length,
               itemBuilder: (context, index) {
                 final appointment = appointments[index];
-                return Card(
-                  elevation: 2,
+                return Container(
                   margin: const EdgeInsets.only(bottom: 12),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  decoration: BoxDecoration(
+                    color: AppColors.darkCard,
+                    borderRadius: BorderRadius.circular(14),
+                    border: Border.all(color: AppColors.darkCardBorder),
+                  ),
                   child: InkWell(
                     onTap: () => context.push('/vehicle-progress-detail/${appointment.id}'),
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: BorderRadius.circular(14),
                     child: Padding(
                       padding: const EdgeInsets.all(16),
                       child: Column(
@@ -85,7 +87,7 @@ class _VehicleProgressPageState extends State<VehicleProgressPage> {
                             children: [
                               Text(
                                 appointment.vehiculoPlaca,
-                                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+                                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: Colors.white),
                               ),
                               _buildStatusBadge(appointment.estado),
                             ],
@@ -93,12 +95,12 @@ class _VehicleProgressPageState extends State<VehicleProgressPage> {
                           const SizedBox(height: 8),
                           Row(
                             children: [
-                              const Icon(Icons.person, size: 16, color: Colors.grey),
+                              Icon(Icons.person, size: 16, color: AppColors.darkTextTertiary),
                               const SizedBox(width: 4),
                               Expanded(
                                 child: Text(
                                   appointment.clienteNombres,
-                                  style: TextStyle(color: Colors.grey[700]),
+                                  style: TextStyle(color: AppColors.darkTextSecondary),
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
                                 ),
@@ -109,12 +111,12 @@ class _VehicleProgressPageState extends State<VehicleProgressPage> {
                             const SizedBox(height: 4),
                             Row(
                               children: [
-                                const Icon(Icons.support_agent, size: 16, color: Colors.grey),
+                                Icon(Icons.support_agent, size: 16, color: AppColors.darkTextTertiary),
                                 const SizedBox(width: 4),
                                 Expanded(
                                   child: Text(
                                     'Asesor: ${appointment.asesorNombres}',
-                                    style: TextStyle(color: Colors.grey[700]),
+                                    style: TextStyle(color: AppColors.darkTextSecondary),
                                     maxLines: 1,
                                     overflow: TextOverflow.ellipsis,
                                   ),
@@ -128,9 +130,9 @@ class _VehicleProgressPageState extends State<VehicleProgressPage> {
                             children: [
                               Text(
                                 '${appointment.serviciosCount} servicios',
-                                style: const TextStyle(fontWeight: FontWeight.w600, color: Color(0xFF3B82F6)),
+                                style: const TextStyle(fontWeight: FontWeight.w600, color: AppColors.primary),
                               ),
-                              const Icon(Icons.chevron_right, color: Colors.grey),
+                              Icon(Icons.chevron_right, color: AppColors.darkTextTertiary),
                             ],
                           ),
                         ],
@@ -159,26 +161,26 @@ class _VehicleProgressPageState extends State<VehicleProgressPage> {
     Color color;
     switch (status) {
       case 'PROGRAMADA':
-        color = Colors.orange;
+        color = AppColors.warning;
         break;
       case 'EN_ESPERA_INGRESO':
-        color = Colors.blue;
+        color = AppColors.info;
         break;
       case 'EN_PROCESO':
-        color = Colors.purple;
+        color = AppColors.primary;
         break;
       case 'FINALIZADA':
-        color = Colors.green;
+        color = AppColors.success;
         break;
       default:
-        color = Colors.grey;
+        color = AppColors.darkTextTertiary;
     }
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.1),
+        color: color.withValues(alpha: 0.15),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: color.withValues(alpha: 0.5)),
+        border: Border.all(color: color.withValues(alpha: 0.4)),
       ),
       child: Text(
         status.replaceAll('_', ' '),

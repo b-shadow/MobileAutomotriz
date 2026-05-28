@@ -1,4 +1,5 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
+import 'package:mobile1_app/core/theme/app_colors.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mobile1_app/features/budget/domain/entities/budget.dart';
 import 'package:mobile1_app/features/budget/presentation/cubit/budget_cubit.dart';
@@ -26,12 +27,12 @@ class _BudgetDetailPageState extends State<BudgetDetailPage> {
       listener: (context, state) {
         if (state is BudgetError) {
           ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-            backgroundColor: const Color(0xFFEF4444),
+            backgroundColor: AppColors.error,
             content: Text(state.message),
           ));
         } else if (state is BudgetSuccess) {
           ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-            backgroundColor: const Color(0xFF10B981),
+            backgroundColor: AppColors.success,
             content: Text(state.message),
           ));
           context.read<BudgetCubit>().fetchBudgetDetail(widget.budgetId);
@@ -40,7 +41,7 @@ class _BudgetDetailPageState extends State<BudgetDetailPage> {
       builder: (context, state) {
         if (state is BudgetLoading) {
           return const Scaffold(
-            backgroundColor: Color(0xFF0F172A),
+            backgroundColor: AppColors.darkBackground,
             body: Center(
                 child: CircularProgressIndicator(color: Color(0xFF3B82F6))),
           );
@@ -55,7 +56,7 @@ class _BudgetDetailPageState extends State<BudgetDetailPage> {
 
         if (budget == null) {
           return Scaffold(
-            backgroundColor: const Color(0xFF0F172A),
+            backgroundColor: AppColors.darkBackground,
             appBar: AppBar(
                 backgroundColor: Colors.transparent, elevation: 0),
             body: const Center(
@@ -66,9 +67,9 @@ class _BudgetDetailPageState extends State<BudgetDetailPage> {
         }
 
         return Scaffold(
-          backgroundColor: const Color(0xFF0F172A),
+          backgroundColor: AppColors.darkBackground,
           appBar: AppBar(
-            backgroundColor: const Color(0xFF1E293B),
+            backgroundColor: AppColors.darkCard,
             elevation: 0,
             iconTheme: const IconThemeData(color: Colors.white),
             title: const Text('Detalle Presupuesto',
@@ -94,7 +95,7 @@ class _BudgetDetailPageState extends State<BudgetDetailPage> {
                 Container(
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    color: const Color(0xFF1E293B),
+                    color: AppColors.darkCard,
                     borderRadius: BorderRadius.circular(16),
                     border: Border.all(
                         color: Colors.white.withValues(alpha: 0.1)),
@@ -114,7 +115,7 @@ class _BudgetDetailPageState extends State<BudgetDetailPage> {
                       _TotalesRow('Subtotal', budget.subtotal),
                       const SizedBox(height: 8),
                       _TotalesRow('Descuento', budget.descuento,
-                          color: const Color(0xFFF59E0B)),
+                          color: AppColors.warning),
                       const SizedBox(height: 8),
                       const Divider(color: Colors.white10, height: 24),
                       Row(
@@ -185,7 +186,7 @@ class _DetalleItem extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: 10),
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: const Color(0xFF1E293B).withValues(alpha: 0.5),
+        color: AppColors.darkCard.withValues(alpha: 0.5),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
       ),
@@ -246,7 +247,7 @@ class _AccionesPresupuesto extends StatelessWidget {
           _ActionButton(
             icon: Icons.send,
             label: 'Comunicar al Cliente',
-            color: const Color(0xFF3B82F6),
+            color: AppColors.info,
             onPressed: () =>
                 cubit.changeStatus(id: budget.id, action: 'comunicar'),
           ),
@@ -254,14 +255,14 @@ class _AccionesPresupuesto extends StatelessWidget {
           _ActionButton(
             icon: Icons.thumb_up,
             label: 'Aprobar Presupuesto',
-            color: const Color(0xFF10B981),
+            color: AppColors.success,
             onPressed: () =>
                 cubit.changeStatus(id: budget.id, action: 'aprobar'),
           ),
           _ActionButton(
             icon: Icons.thumb_down,
             label: 'Rechazar Presupuesto',
-            color: const Color(0xFFEF4444),
+            color: AppColors.error,
             onPressed: () => _mostrarDialogoRechazo(context, cubit),
           ),
         ],
@@ -269,7 +270,7 @@ class _AccionesPresupuesto extends StatelessWidget {
           _ActionButton(
             icon: Icons.tune,
             label: 'Ajustar Presupuesto',
-            color: const Color(0xFF8B5CF6),
+            color: AppColors.primary,
             onPressed: () =>
                 cubit.changeStatus(id: budget.id, action: 'ajustar'),
           ),
@@ -282,7 +283,7 @@ class _AccionesPresupuesto extends StatelessWidget {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        backgroundColor: const Color(0xFF1E293B),
+        backgroundColor: AppColors.darkCard,
         title: const Text('Rechazar Presupuesto',
             style: TextStyle(color: Colors.white)),
         content: TextField(
@@ -292,7 +293,7 @@ class _AccionesPresupuesto extends StatelessWidget {
             hintText: 'Motivo del rechazo',
             hintStyle: const TextStyle(color: Colors.white38),
             filled: true,
-            fillColor: const Color(0xFF0F172A),
+            fillColor: AppColors.darkBackground,
             border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(8),
                 borderSide: BorderSide.none),
@@ -311,7 +312,7 @@ class _AccionesPresupuesto extends StatelessWidget {
                   id: budget.id, action: 'rechazar', motivo: ctrl.text);
             },
             style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFFEF4444)),
+                backgroundColor: AppColors.error),
             child: const Text('Confirmar',
                 style: TextStyle(color: Colors.white)),
           ),
@@ -368,12 +369,12 @@ class _EstadoBadge extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final (color, label) = switch (estado) {
-      'BORRADOR' => (const Color(0xFF94A3B8), 'Borrador'),
-      'COMUNICADO' => (const Color(0xFFF59E0B), 'Comunicado'),
-      'APROBADO' => (const Color(0xFF10B981), 'Aprobado'),
-      'RECHAZADO' => (const Color(0xFFEF4444), 'Rechazado'),
-      'AJUSTADO' => (const Color(0xFF8B5CF6), 'Ajustado'),
-      'CERRADO' => (const Color(0xFF3B82F6), 'Cerrado'),
+      'BORRADOR' => (AppColors.darkTextTertiary, 'Borrador'),
+      'COMUNICADO' => (AppColors.warning, 'Comunicado'),
+      'APROBADO' => (AppColors.success, 'Aprobado'),
+      'RECHAZADO' => (AppColors.error, 'Rechazado'),
+      'AJUSTADO' => (AppColors.primary, 'Ajustado'),
+      'CERRADO' => (AppColors.info, 'Cerrado'),
       _ => (Colors.grey, estado),
     };
 

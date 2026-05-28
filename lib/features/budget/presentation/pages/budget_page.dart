@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
+import 'package:mobile1_app/core/theme/app_colors.dart';
 import 'package:mobile1_app/features/appointment/domain/entities/appointment.dart';
 import 'package:mobile1_app/features/appointment/presentation/cubit/appointment_cubit.dart';
 import 'package:mobile1_app/features/appointment/presentation/cubit/appointment_state.dart';
@@ -40,12 +41,12 @@ class _BudgetPageState extends State<BudgetPage>
       listener: (ctx, state) {
         if (state is BudgetError) {
           ScaffoldMessenger.of(ctx).showSnackBar(SnackBar(
-            backgroundColor: const Color(0xFFEF4444),
+            backgroundColor: AppColors.error,
             content: Text(state.message),
           ));
         } else if (state is BudgetSuccess) {
           ScaffoldMessenger.of(ctx).showSnackBar(SnackBar(
-            backgroundColor: const Color(0xFF10B981),
+            backgroundColor: AppColors.success,
             content: Text(state.message),
           ));
           if (state.budget != null) {
@@ -54,7 +55,7 @@ class _BudgetPageState extends State<BudgetPage>
         }
       },
       child: Scaffold(
-        backgroundColor: const Color(0xFF0F172A),
+        backgroundColor: AppColors.darkBackground,
         appBar: AppBar(
           backgroundColor: Colors.transparent,
           elevation: 0,
@@ -75,8 +76,8 @@ class _BudgetPageState extends State<BudgetPage>
           ],
           bottom: TabBar(
             controller: _tabs,
-            indicatorColor: const Color(0xFF3B82F6),
-            labelColor: const Color(0xFF3B82F6),
+            indicatorColor: AppColors.info,
+            labelColor: AppColors.info,
             unselectedLabelColor: Colors.white38,
             tabs: const [
               Tab(text: 'Historial'),
@@ -122,7 +123,7 @@ class _HistorialTab extends StatelessWidget {
         }
 
         return RefreshIndicator(
-          color: const Color(0xFF3B82F6),
+          color: AppColors.info,
           onRefresh: () => context.read<BudgetCubit>().fetchBudgets(),
           child: ListView.separated(
             padding: const EdgeInsets.fromLTRB(16, 12, 16, 30),
@@ -149,7 +150,7 @@ class _BudgetCard extends StatelessWidget {
       borderRadius: BorderRadius.circular(14),
       child: Container(
         decoration: BoxDecoration(
-          color: const Color(0xFF1E293B),
+          color: AppColors.darkCard,
           borderRadius: BorderRadius.circular(14),
           border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
         ),
@@ -222,7 +223,7 @@ class _GenerarTab extends StatelessWidget {
         }
 
         return RefreshIndicator(
-          color: const Color(0xFF3B82F6),
+          color: AppColors.info,
           onRefresh: () =>
               context.read<AppointmentCubit>().fetchAppointments(),
           child: ListView.separated(
@@ -247,7 +248,7 @@ class _CitaCard extends StatelessWidget {
     final fmtDate = DateFormat('dd/MM/yyyy HH:mm');
     return Container(
       decoration: BoxDecoration(
-        color: const Color(0xFF1E293B),
+        color: AppColors.darkCard,
         borderRadius: BorderRadius.circular(14),
         border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
       ),
@@ -303,7 +304,7 @@ class _CitaCard extends StatelessWidget {
                       ? null
                       : () => _generateBudget(context, cita.id),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF3B82F6),
+                    backgroundColor: AppColors.info,
                     foregroundColor: Colors.white,
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(10)),
@@ -363,12 +364,12 @@ class _EstadoBadge extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final (color, label) = switch (estado) {
-      'BORRADOR' => (const Color(0xFF94A3B8), 'Borrador'),
-      'COMUNICADO' => (const Color(0xFFF59E0B), 'Comunicado'),
-      'APROBADO' => (const Color(0xFF10B981), 'Aprobado'),
-      'RECHAZADO' => (const Color(0xFFEF4444), 'Rechazado'),
-      'AJUSTADO' => (const Color(0xFF8B5CF6), 'Ajustado'),
-      'CERRADO' => (const Color(0xFF3B82F6), 'Cerrado'),
+      'BORRADOR' => (AppColors.darkTextTertiary, 'Borrador'),
+      'COMUNICADO' => (AppColors.warning, 'Comunicado'),
+      'APROBADO' => (AppColors.success, 'Aprobado'),
+      'RECHAZADO' => (AppColors.error, 'Rechazado'),
+      'AJUSTADO' => (AppColors.primary, 'Ajustado'),
+      'CERRADO' => (AppColors.info, 'Cerrado'),
       _ => (Colors.grey, estado),
     };
 

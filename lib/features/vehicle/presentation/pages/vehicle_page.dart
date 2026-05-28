@@ -1,6 +1,7 @@
-import 'dart:async';
+﻿import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:mobile1_app/core/theme/app_colors.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mobile1_app/config/env/env_config.dart';
 import 'package:mobile1_app/core/constants/api_constants.dart';
@@ -171,7 +172,7 @@ class _VehiclePageState extends State<VehiclePage> {
         }
       },
       child: Scaffold(
-        backgroundColor: const Color(0xFF0F172A),
+        backgroundColor: AppColors.darkBackground,
         appBar: AppBar(
           backgroundColor: Colors.transparent,
           elevation: 0,
@@ -198,7 +199,7 @@ class _VehiclePageState extends State<VehiclePage> {
               child: ElevatedButton.icon(
                 onPressed: _loadingOwners ? null : () => _openVehicleForm(),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF8B5CF6),
+                  backgroundColor: AppColors.primary,
                   foregroundColor: Colors.white,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(14),
@@ -264,7 +265,7 @@ class _VehiclePageState extends State<VehiclePage> {
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: const Color(0xFF1E293B),
+        color: AppColors.darkCard,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(color: Colors.white12),
       ),
@@ -519,7 +520,7 @@ class _VehicleFormSheetState extends State<_VehicleFormSheet> {
     return InputDecoration(
       labelText: label,
       filled: true,
-      fillColor: const Color(0xFF26264A),
+      fillColor: AppColors.darkSurfaceVariant,
       labelStyle: const TextStyle(color: Colors.white70),
       enabledBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(14),
@@ -587,7 +588,7 @@ class _VehicleFormSheetState extends State<_VehicleFormSheet> {
       heightFactor: 0.94,
       child: Container(
         decoration: const BoxDecoration(
-          color: Color(0xFF0F172A),
+          color: AppColors.darkBackground,
           borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
         ),
         child: Padding(
@@ -635,7 +636,7 @@ class _VehicleFormSheetState extends State<_VehicleFormSheet> {
                       if (widget.canAssignOwner && isCreate) ...[
                         DropdownButtonFormField<String>(
                           initialValue: _selectedOwnerId,
-                          dropdownColor: const Color(0xFF1E293B),
+                          dropdownColor: AppColors.darkCard,
                           decoration: _decoration('Propietario'),
                           items: widget.ownerOptions
                               .map(
@@ -761,7 +762,7 @@ class _VehicleFormSheetState extends State<_VehicleFormSheet> {
                     child: ElevatedButton(
                       onPressed: _submitting ? null : _submit,
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF8B5CF6),
+                        backgroundColor: AppColors.primary,
                         foregroundColor: Colors.white,
                         padding: const EdgeInsets.symmetric(vertical: 14),
                       ),

@@ -1,4 +1,5 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
+import 'package:mobile1_app/core/theme/app_colors.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mobile1_app/features/auth/data/models/usuario_model.dart';
 import 'package:mobile1_app/features/user_management/domain/entities/create_user_payload.dart';
@@ -56,7 +57,7 @@ class _UserManagementPageState extends State<UserManagementPage> {
       child: DefaultTabController(
         length: 2,
         child: Scaffold(
-          backgroundColor: const Color(0xFF0F172A),
+          backgroundColor: AppColors.darkBackground,
           appBar: AppBar(
             backgroundColor: Colors.transparent,
             elevation: 0,
@@ -86,7 +87,7 @@ class _UserManagementPageState extends State<UserManagementPage> {
                       child: ElevatedButton.icon(
                         onPressed: () => _showCreateUserDialog(context),
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF8B5CF6),
+                          backgroundColor: AppColors.primary,
                           foregroundColor: Colors.white,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(14),
@@ -149,7 +150,7 @@ class _UserManagementPageState extends State<UserManagementPage> {
             hintText: 'Buscar por nombre o email...',
             hintStyle: const TextStyle(color: Colors.white54),
             filled: true,
-            fillColor: const Color(0xFF1E293B),
+            fillColor: AppColors.darkCard,
             suffixIcon: IconButton(
               icon: const Icon(Icons.search, color: Colors.white70),
               onPressed: () {
@@ -182,7 +183,7 @@ class _UserManagementPageState extends State<UserManagementPage> {
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: const Color(0xFF1E293B),
+        color: AppColors.darkCard,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(color: Colors.white12),
       ),
@@ -220,7 +221,7 @@ class _UserManagementPageState extends State<UserManagementPage> {
                     initialValue: roles.any((role) => role.id == user.rolId)
                         ? user.rolId
                         : null,
-                    dropdownColor: const Color(0xFF1E293B),
+                    dropdownColor: AppColors.darkCard,
                     decoration: const InputDecoration(
                       labelText: 'Rol',
                       labelStyle: TextStyle(color: Colors.white70),
@@ -284,7 +285,7 @@ class _UserManagementPageState extends State<UserManagementPage> {
               child: Container(
                 padding: const EdgeInsets.all(14),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF1E293B),
+                  color: AppColors.darkCard,
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(color: Colors.white12),
                 ),

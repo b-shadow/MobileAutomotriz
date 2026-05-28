@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:mobile1_app/core/storage/session_storage.dart';
+import 'package:mobile1_app/core/theme/app_colors.dart';
 import 'package:mobile1_app/features/appointment/domain/entities/appointment.dart';
 import 'package:mobile1_app/features/appointment/presentation/cubit/appointment_cubit.dart';
 import 'package:mobile1_app/features/appointment/presentation/cubit/appointment_state.dart';
@@ -48,19 +49,19 @@ class _AppointmentPageState extends State<AppointmentPage> {
       listener: (ctx, state) {
         if (state is AppointmentError) {
           ScaffoldMessenger.of(ctx).showSnackBar(SnackBar(
-            backgroundColor: const Color(0xFFEF4444),
+            backgroundColor: AppColors.error,
             content: Text(state.message),
           ));
         }
         if (state is AppointmentSuccess) {
           ScaffoldMessenger.of(ctx).showSnackBar(SnackBar(
-            backgroundColor: const Color(0xFF10B981),
+            backgroundColor: AppColors.success,
             content: Text(state.message),
           ));
         }
       },
       child: Scaffold(
-        backgroundColor: const Color(0xFF0F172A),
+        backgroundColor: AppColors.darkBackground,
         appBar: AppBar(
           backgroundColor: Colors.transparent,
           elevation: 0,
@@ -81,7 +82,7 @@ class _AppointmentPageState extends State<AppointmentPage> {
         floatingActionButton: _canManage
             ? FloatingActionButton.extended(
                 onPressed: () => _openCreateForm(context),
-                backgroundColor: const Color(0xFF8B5CF6),
+                backgroundColor: AppColors.primary,
                 icon: const Icon(Icons.add, color: Colors.white),
                 label: const Text('Nueva Cita',
                     style: TextStyle(
@@ -130,7 +131,7 @@ class _AppointmentPageState extends State<AppointmentPage> {
                   }
 
                   return RefreshIndicator(
-                    color: const Color(0xFF8B5CF6),
+                    color: AppColors.primary,
                     onRefresh: () =>
                         context.read<AppointmentCubit>().fetchAppointments(),
                     child: ListView.separated(
@@ -188,7 +189,7 @@ class _AppointmentPageState extends State<AppointmentPage> {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (dlg) => AlertDialog(
-        backgroundColor: const Color(0xFF1E293B),
+        backgroundColor: AppColors.darkCard,
         title: Row(
           children: [
             const Icon(Icons.person_off_outlined,
@@ -212,7 +213,7 @@ class _AppointmentPageState extends State<AppointmentPage> {
               padding:
                   const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
               decoration: BoxDecoration(
-                color: const Color(0xFF64748B).withValues(alpha: 0.15),
+                color: AppColors.darkTextTertiary.withValues(alpha: 0.15),
                 borderRadius: BorderRadius.circular(6),
               ),
               child: const Text(
@@ -236,7 +237,7 @@ class _AppointmentPageState extends State<AppointmentPage> {
           ),
           ElevatedButton.icon(
             style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF64748B)),
+                backgroundColor: AppColors.darkTextTertiary),
             icon: const Icon(Icons.person_off_outlined,
                 size: 16, color: Colors.white),
             onPressed: () => Navigator.of(dlg).pop(true),
@@ -260,7 +261,7 @@ class _AppointmentPageState extends State<AppointmentPage> {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (dlg) => AlertDialog(
-        backgroundColor: const Color(0xFF1E293B),
+        backgroundColor: AppColors.darkCard,
         title: const Text('Cancelar Cita',
             style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
         content: Column(
@@ -281,7 +282,7 @@ class _AppointmentPageState extends State<AppointmentPage> {
             child: const Text('Volver', style: TextStyle(color: Colors.white54)),
           ),
           ElevatedButton(
-            style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFEF4444)),
+            style: ElevatedButton.styleFrom(backgroundColor: AppColors.error),
             onPressed: () => Navigator.of(dlg).pop(true),
             child: const Text('Cancelar Cita',
                 style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
@@ -308,7 +309,7 @@ class _AppointmentPageState extends State<AppointmentPage> {
       context: context,
       builder: (dlg) => StatefulBuilder(
         builder: (dlgCtx, setDlgState) => AlertDialog(
-          backgroundColor: const Color(0xFF1E293B),
+          backgroundColor: AppColors.darkCard,
           title: const Text('Reprogramar Cita',
               style:
                   TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
@@ -410,7 +411,7 @@ class _AppointmentPageState extends State<AppointmentPage> {
             ),
             ElevatedButton(
               style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF8B5CF6)),
+                  backgroundColor: AppColors.primary),
               onPressed: () {
                 Navigator.of(dlg).pop();
                 final duracion = cita.duracionEstimadaMin;
@@ -465,12 +466,12 @@ class _EstadoFilterBar extends StatelessWidget {
                   padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
                   decoration: BoxDecoration(
                     color: selected
-                        ? const Color(0xFF8B5CF6)
-                        : const Color(0xFF1E293B),
+                        ? AppColors.primary
+                        : AppColors.darkCard,
                     borderRadius: BorderRadius.circular(20),
                     border: Border.all(
                       color: selected
-                          ? const Color(0xFF8B5CF6)
+                          ? AppColors.primary
                           : Colors.white12,
                     ),
                   ),
@@ -518,7 +519,7 @@ class _AppointmentCard extends StatelessWidget {
 
     return Container(
       decoration: BoxDecoration(
-        color: const Color(0xFF1E293B),
+        color: AppColors.darkCard,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: Colors.white.withValues(alpha: 0.07)),
         boxShadow: [
@@ -653,7 +654,7 @@ class _AppointmentCard extends StatelessWidget {
                         OutlinedButton.icon(
                           onPressed: onCancel,
                           style: OutlinedButton.styleFrom(
-                            foregroundColor: const Color(0xFFEF4444),
+                            foregroundColor: AppColors.error,
                             side: const BorderSide(
                                 color: Color(0xFFEF4444), width: 1),
                             padding: const EdgeInsets.symmetric(
@@ -675,15 +676,15 @@ class _AppointmentCard extends StatelessWidget {
   }
 
   (Color, String) _estadoColor(String estado) => switch (estado) {
-        'PROGRAMADA' => (const Color(0xFF3B82F6), 'Programada'),
-        'PENDIENTE_APROBACION' => (const Color(0xFFF59E0B), 'Pendiente'),
-        'EN_ESPERA_INGRESO' => (const Color(0xFFA78BFA), 'En espera'),
+        'PROGRAMADA' => (AppColors.info, 'Programada'),
+        'PENDIENTE_APROBACION' => (AppColors.warning, 'Pendiente'),
+        'EN_ESPERA_INGRESO' => (AppColors.primaryLight, 'En espera'),
         'EN_PROCESO' => (const Color(0xFFF97316), 'En proceso'),
-        'FINALIZADA' => (const Color(0xFF10B981), 'Finalizada'),
-        'CANCELADA' => (const Color(0xFFEF4444), 'Cancelada'),
+        'FINALIZADA' => (AppColors.success, 'Finalizada'),
+        'CANCELADA' => (AppColors.error, 'Cancelada'),
         'REPROGRAMADA' => (const Color(0xFF6366F1), 'Reprogramada'),
-        'NO_SHOW' => (const Color(0xFF64748B), 'No se presentó'),
-        _ => (const Color(0xFF64748B), estado),
+        'NO_SHOW' => (AppColors.darkTextTertiary, 'No se presentó'),
+        _ => (AppColors.darkTextTertiary, estado),
       };
 }
 
@@ -710,15 +711,15 @@ class _StatusChip extends StatelessWidget {
   }
 
   (Color, String) _color(String e) => switch (e) {
-        'PROGRAMADA' => (const Color(0xFF3B82F6), 'Programada'),
-        'PENDIENTE_APROBACION' => (const Color(0xFFF59E0B), 'Pendiente'),
-        'EN_ESPERA_INGRESO' => (const Color(0xFFA78BFA), 'En espera'),
+        'PROGRAMADA' => (AppColors.info, 'Programada'),
+        'PENDIENTE_APROBACION' => (AppColors.warning, 'Pendiente'),
+        'EN_ESPERA_INGRESO' => (AppColors.primaryLight, 'En espera'),
         'EN_PROCESO' => (const Color(0xFFF97316), 'En proceso'),
-        'FINALIZADA' => (const Color(0xFF10B981), 'Finalizada'),
-        'CANCELADA' => (const Color(0xFFEF4444), 'Cancelada'),
+        'FINALIZADA' => (AppColors.success, 'Finalizada'),
+        'CANCELADA' => (AppColors.error, 'Cancelada'),
         'REPROGRAMADA' => (const Color(0xFF6366F1), 'Reprogramada'),
-        'NO_SHOW' => (const Color(0xFF64748B), 'No se presentó'),
-        _ => (const Color(0xFF64748B), e),
+        'NO_SHOW' => (AppColors.darkTextTertiary, 'No se presentó'),
+        _ => (AppColors.darkTextTertiary, e),
       };
 }
 
@@ -785,7 +786,7 @@ class _DarkTextField extends StatelessWidget {
         labelText: label,
         labelStyle: const TextStyle(color: Colors.white54),
         filled: true,
-        fillColor: const Color(0xFF0F172A),
+        fillColor: AppColors.darkBackground,
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10),
           borderSide: const BorderSide(color: Colors.white24),
@@ -809,13 +810,13 @@ class _PickerRow extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
       decoration: BoxDecoration(
-        color: const Color(0xFF0F172A),
+        color: AppColors.darkBackground,
         borderRadius: BorderRadius.circular(10),
         border: Border.all(color: Colors.white24),
       ),
       child: Row(
         children: [
-          Icon(icon, color: const Color(0xFF8B5CF6), size: 16),
+          Icon(icon, color: AppColors.primary, size: 16),
           const SizedBox(width: 8),
           Text(label, style: const TextStyle(color: Colors.white70)),
         ],

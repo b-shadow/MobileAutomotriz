@@ -1,4 +1,5 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
+import 'package:mobile1_app/core/theme/app_colors.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mobile1_app/features/auth/data/models/usuario_model.dart';
 import 'package:mobile1_app/features/workspace/domain/entities/workspace_schedule.dart';
@@ -53,7 +54,7 @@ class _WorkspaceManagementPageState extends State<WorkspaceManagementPage> {
         }
       },
       child: Scaffold(
-        backgroundColor: const Color(0xFF0F172A),
+        backgroundColor: AppColors.darkBackground,
         appBar: AppBar(
           backgroundColor: Colors.transparent,
           elevation: 0,
@@ -83,7 +84,7 @@ class _WorkspaceManagementPageState extends State<WorkspaceManagementPage> {
                     child: ElevatedButton.icon(
                       onPressed: () => _showCreateSpaceSheet(context),
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF8B5CF6),
+                        backgroundColor: AppColors.primary,
                         foregroundColor: Colors.white,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(14),
@@ -193,10 +194,10 @@ class _WorkspaceManagementPageState extends State<WorkspaceManagementPage> {
       child: Container(
         padding: const EdgeInsets.all(14),
         decoration: BoxDecoration(
-          color: isSelected ? const Color(0xFF2A3148) : const Color(0xFF1E293B),
+          color: isSelected ? const Color(0xFF2A3148) : AppColors.darkCard,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
-            color: isSelected ? const Color(0xFF8B5CF6) : Colors.white12,
+            color: isSelected ? AppColors.primary : Colors.white12,
           ),
         ),
         child: Column(
@@ -313,7 +314,7 @@ class _WorkspaceManagementPageState extends State<WorkspaceManagementPage> {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: const Color(0xFF1E293B),
+        color: AppColors.darkCard,
         borderRadius: BorderRadius.circular(10),
         border: Border.all(color: Colors.white10),
       ),
@@ -662,7 +663,7 @@ class _ScheduleFormSheetState extends State<_ScheduleFormSheet> {
           children: [
             DropdownButtonFormField<int>(
               initialValue: _diaSemana,
-              dropdownColor: const Color(0xFF1E293B),
+              dropdownColor: AppColors.darkCard,
               decoration: _inputDecoration('Dia de la semana'),
               items: const [
                 DropdownMenuItem(value: 0, child: Text('Lunes')),
@@ -736,7 +737,7 @@ class _BaseSheet extends StatelessWidget {
       heightFactor: 0.9,
       child: Container(
         decoration: const BoxDecoration(
-          color: Color(0xFF0F172A),
+          color: AppColors.darkBackground,
           borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
         ),
         child: Padding(
@@ -789,7 +790,7 @@ class _BaseSheet extends StatelessWidget {
                     child: ElevatedButton(
                       onPressed: submitting ? null : onSubmit,
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF8B5CF6),
+                        backgroundColor: AppColors.primary,
                         foregroundColor: Colors.white,
                         padding: const EdgeInsets.symmetric(vertical: 14),
                       ),
@@ -819,7 +820,7 @@ InputDecoration _inputDecoration(String label) {
   return InputDecoration(
     labelText: label,
     filled: true,
-    fillColor: const Color(0xFF26264A),
+    fillColor: AppColors.darkSurfaceVariant,
     labelStyle: const TextStyle(color: Colors.white70),
     enabledBorder: OutlineInputBorder(
       borderRadius: BorderRadius.circular(14),

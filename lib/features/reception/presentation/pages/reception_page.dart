@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
+import 'package:mobile1_app/core/theme/app_colors.dart';
 import 'package:mobile1_app/features/appointment/domain/entities/appointment.dart';
 import 'package:mobile1_app/features/reception/domain/entities/reception.dart';
 import 'package:mobile1_app/features/reception/presentation/cubit/reception_cubit.dart';
@@ -41,20 +42,20 @@ class _ReceptionPageState extends State<ReceptionPage>
       listener: (ctx, state) {
         if (state is ReceptionError) {
           ScaffoldMessenger.of(ctx).showSnackBar(SnackBar(
-            backgroundColor: const Color(0xFFEF4444),
+            backgroundColor: AppColors.error,
             content: Text(state.message),
           ));
         }
         if (state is ReceptionSuccess) {
           ScaffoldMessenger.of(ctx).showSnackBar(SnackBar(
-            backgroundColor: const Color(0xFF10B981),
+            backgroundColor: AppColors.success,
             content: Text(state.message),
           ));
           _tabs.animateTo(1); // salta a "Registradas"
         }
       },
       child: Scaffold(
-        backgroundColor: const Color(0xFF0F172A),
+        backgroundColor: AppColors.darkBackground,
         appBar: AppBar(
           backgroundColor: Colors.transparent,
           elevation: 0,
@@ -77,8 +78,8 @@ class _ReceptionPageState extends State<ReceptionPage>
           ],
           bottom: TabBar(
             controller: _tabs,
-            indicatorColor: const Color(0xFF10B981),
-            labelColor: const Color(0xFF10B981),
+            indicatorColor: AppColors.success,
+            labelColor: AppColors.success,
             unselectedLabelColor: Colors.white38,
             tabs: const [
               Tab(text: 'Citas Pendientes'),
@@ -150,7 +151,7 @@ class _PendientesTab extends StatelessWidget {
     }
 
     return RefreshIndicator(
-      color: const Color(0xFF10B981),
+      color: AppColors.success,
       onRefresh: () =>
           context.read<ReceptionCubit>().fetchCitasPendientes(),
       child: ListView.separated(
@@ -178,13 +179,13 @@ class _CitaPendienteCard extends StatelessWidget {
     final fmt = DateFormat('dd/MM/yyyy HH:mm');
     return Container(
       decoration: BoxDecoration(
-        color: const Color(0xFF1E293B),
+        color: AppColors.darkCard,
         borderRadius: BorderRadius.circular(14),
         border: Border.all(
-            color: const Color(0xFF10B981).withValues(alpha: 0.25)),
+            color: AppColors.success.withValues(alpha: 0.25)),
         boxShadow: [
           BoxShadow(
-              color: const Color(0xFF10B981).withValues(alpha: 0.06),
+              color: AppColors.success.withValues(alpha: 0.06),
               blurRadius: 10,
               offset: const Offset(0, 3)),
         ],
@@ -232,7 +233,7 @@ class _CitaPendienteCard extends StatelessWidget {
             child: ElevatedButton.icon(
               onPressed: onRegistrar,
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF10B981),
+                backgroundColor: AppColors.success,
                 foregroundColor: Colors.white,
                 padding: const EdgeInsets.symmetric(vertical: 12),
                 shape: RoundedRectangleBorder(
@@ -273,7 +274,7 @@ class _RegistradasTab extends StatelessWidget {
     }
 
     return RefreshIndicator(
-      color: const Color(0xFF10B981),
+      color: AppColors.success,
       onRefresh: () => context.read<ReceptionCubit>().fetchReceptions(),
       child: ListView.separated(
         padding: const EdgeInsets.fromLTRB(16, 12, 16, 30),
@@ -294,12 +295,12 @@ class _RecepcionCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final fmt = DateFormat('dd/MM/yyyy HH:mm');
     final color = reception.yaRecogido
-        ? const Color(0xFF64748B)
-        : const Color(0xFF10B981);
+        ? AppColors.darkTextTertiary
+        : AppColors.success;
 
     return Container(
       decoration: BoxDecoration(
-        color: const Color(0xFF1E293B),
+        color: AppColors.darkCard,
         borderRadius: BorderRadius.circular(14),
         border: Border.all(color: color.withValues(alpha: 0.2)),
       ),
@@ -327,12 +328,12 @@ class _RecepcionCard extends StatelessWidget {
                       horizontal: 8, vertical: 3),
                   decoration: BoxDecoration(
                     color:
-                        const Color(0xFF64748B).withValues(alpha: 0.2),
+                        AppColors.darkTextTertiary.withValues(alpha: 0.2),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: const Text('Recogido',
                       style: TextStyle(
-                          color: Color(0xFF94A3B8),
+                          color: AppColors.darkTextTertiary,
                           fontSize: 11,
                           fontWeight: FontWeight.bold)),
                 ),
@@ -444,7 +445,7 @@ class _RegistroRecepcionSheetState extends State<_RegistroRecepcionSheet> {
                   Container(
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
-                      color: const Color(0xFF10B981).withValues(alpha: 0.15),
+                      color: AppColors.success.withValues(alpha: 0.15),
                       borderRadius: BorderRadius.circular(10),
                     ),
                     child: const Icon(Icons.fact_check_outlined,
@@ -475,10 +476,10 @@ class _RegistroRecepcionSheetState extends State<_RegistroRecepcionSheet> {
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF10B981).withValues(alpha: 0.08),
+                  color: AppColors.success.withValues(alpha: 0.08),
                   borderRadius: BorderRadius.circular(10),
                   border: Border.all(
-                      color: const Color(0xFF10B981).withValues(alpha: 0.2)),
+                      color: AppColors.success.withValues(alpha: 0.2)),
                 ),
                 child: Row(
                   children: [
@@ -489,7 +490,7 @@ class _RegistroRecepcionSheetState extends State<_RegistroRecepcionSheet> {
                       child: Text(
                         'Al registrar la recepción, la cita pasará automáticamente a estado EN PROCESO y se generará una Orden de Trabajo.',
                         style: TextStyle(
-                            color: const Color(0xFF10B981).withValues(alpha: 0.9),
+                            color: AppColors.success.withValues(alpha: 0.9),
                             fontSize: 12),
                       ),
                     ),
@@ -535,12 +536,12 @@ class _RegistroRecepcionSheetState extends State<_RegistroRecepcionSheet> {
                           horizontal: 14, vertical: 10),
                       decoration: BoxDecoration(
                         color: selected
-                            ? const Color(0xFF10B981)
-                            : const Color(0xFF0F172A),
+                            ? AppColors.success
+                            : AppColors.darkBackground,
                         borderRadius: BorderRadius.circular(10),
                         border: Border.all(
                           color: selected
-                              ? const Color(0xFF10B981)
+                              ? AppColors.success
                               : Colors.white24,
                         ),
                       ),
@@ -591,9 +592,9 @@ class _RegistroRecepcionSheetState extends State<_RegistroRecepcionSheet> {
                     return ElevatedButton.icon(
                       onPressed: loading ? null : () => _submit(ctx),
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF10B981),
+                        backgroundColor: AppColors.success,
                         disabledBackgroundColor:
-                            const Color(0xFF10B981).withValues(alpha: 0.4),
+                            AppColors.success.withValues(alpha: 0.4),
                         foregroundColor: Colors.white,
                         padding:
                             const EdgeInsets.symmetric(vertical: 16),
@@ -651,7 +652,7 @@ class _RegistroRecepcionSheetState extends State<_RegistroRecepcionSheet> {
         hintText: hint,
         hintStyle: const TextStyle(color: Colors.white24),
         filled: true,
-        fillColor: const Color(0xFF0F172A),
+        fillColor: AppColors.darkBackground,
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10),
           borderSide: const BorderSide(color: Colors.white24),
@@ -683,9 +684,9 @@ class _EstadoBadge extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final (color, label) = switch (estado) {
-      'PROGRAMADA' => (const Color(0xFF3B82F6), 'Programada'),
-      'EN_ESPERA_INGRESO' => (const Color(0xFFA78BFA), 'En espera'),
-      _ => (const Color(0xFF64748B), estado),
+      'PROGRAMADA' => (AppColors.info, 'Programada'),
+      'EN_ESPERA_INGRESO' => (AppColors.primaryLight, 'En espera'),
+      _ => (AppColors.darkTextTertiary, estado),
     };
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 3),

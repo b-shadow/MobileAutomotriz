@@ -1,4 +1,5 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
+import 'package:mobile1_app/core/theme/app_colors.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:mobile1_app/features/company/domain/entities/plan.dart';
@@ -31,7 +32,7 @@ class _SubscriptionPageState extends State<SubscriptionPage> {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      backgroundColor: const Color(0xFF1E293B),
+      backgroundColor: AppColors.darkCard,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
@@ -54,7 +55,7 @@ class _SubscriptionPageState extends State<SubscriptionPage> {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      backgroundColor: const Color(0xFF1E293B),
+      backgroundColor: AppColors.darkCard,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
@@ -75,7 +76,7 @@ class _SubscriptionPageState extends State<SubscriptionPage> {
       isScrollControlled: true,
       isDismissible: false,
       enableDrag: false,
-      backgroundColor: const Color(0xFF1E293B),
+      backgroundColor: AppColors.darkCard,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
@@ -129,7 +130,7 @@ class _SubscriptionPageState extends State<SubscriptionPage> {
         }
       },
       child: Scaffold(
-        backgroundColor: const Color(0xFF0F172A),
+        backgroundColor: AppColors.darkBackground,
         appBar: AppBar(
           backgroundColor: Colors.transparent,
           elevation: 0,
@@ -254,7 +255,7 @@ class _SubscriptionPageState extends State<SubscriptionPage> {
       width: double.infinity,
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
-        color: const Color(0xFF1E293B),
+        color: AppColors.darkCard,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(color: Colors.white10),
       ),
@@ -287,7 +288,7 @@ class _SubscriptionPageState extends State<SubscriptionPage> {
               ElevatedButton.icon(
                 onPressed: () => _showRenewModal(context, subscription),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF8B5CF6),
+                  backgroundColor: AppColors.primary,
                   foregroundColor: Colors.white,
                   padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                 ),
@@ -323,7 +324,7 @@ class _SubscriptionPageState extends State<SubscriptionPage> {
       width: double.infinity,
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
-        color: const Color(0xFF1E293B),
+        color: AppColors.darkCard,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(color: Colors.white10),
       ),
@@ -411,7 +412,7 @@ class _SubscriptionPageState extends State<SubscriptionPage> {
                             style: ElevatedButton.styleFrom(
                               backgroundColor: isCurrent
                                   ? const Color(0xFF5B2A99)
-                                  : const Color(0xFF8B5CF6),
+                                  : AppColors.primary,
                               disabledBackgroundColor: const Color(0xFF5B2A99),
                               foregroundColor: Colors.white,
                             ),
@@ -434,7 +435,7 @@ class _SubscriptionPageState extends State<SubscriptionPage> {
       width: double.infinity,
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
-        color: const Color(0xFF1E293B),
+        color: AppColors.darkCard,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(color: Colors.white10),
       ),
@@ -469,7 +470,7 @@ class _SubscriptionPageState extends State<SubscriptionPage> {
       width: double.infinity,
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
-        color: const Color(0xFF1E293B),
+        color: AppColors.darkCard,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(color: Colors.white10),
       ),

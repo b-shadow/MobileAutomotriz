@@ -1,4 +1,5 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
+import 'package:mobile1_app/core/theme/app_colors.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
@@ -23,7 +24,7 @@ class _WorkshopProgressPageState extends State<WorkshopProgressPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF0F172A),
+      backgroundColor: AppColors.darkBackground,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -45,13 +46,13 @@ class _WorkshopProgressPageState extends State<WorkshopProgressPage> {
         listener: (ctx, state) {
           if (state is WorkshopProgressError) {
             ScaffoldMessenger.of(ctx).showSnackBar(SnackBar(
-              backgroundColor: const Color(0xFFEF4444),
+              backgroundColor: AppColors.error,
               content: Text(state.message),
             ));
           }
           if (state is WorkshopProgressSuccess) {
             ScaffoldMessenger.of(ctx).showSnackBar(SnackBar(
-              backgroundColor: const Color(0xFF10B981),
+              backgroundColor: AppColors.success,
               content: Text(state.message),
             ));
             // Refrescar lista tras finalizar una OT
@@ -79,7 +80,7 @@ class _WorkshopProgressPageState extends State<WorkshopProgressPage> {
           }
 
           return RefreshIndicator(
-            color: const Color(0xFF8B5CF6),
+            color: AppColors.primary,
             onRefresh: () =>
                 context.read<WorkshopProgressCubit>().fetchActiveWorkOrders(),
             child: ListView.separated(
@@ -117,7 +118,7 @@ class _ActiveOrderCard extends StatelessWidget {
       borderRadius: BorderRadius.circular(14),
       child: Container(
         decoration: BoxDecoration(
-          color: const Color(0xFF1E293B),
+          color: AppColors.darkCard,
           borderRadius: BorderRadius.circular(14),
           border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
         ),
@@ -176,7 +177,7 @@ class _ActiveOrderCard extends StatelessWidget {
                 LinearProgressIndicator(
                   value: total == 0 ? 0 : terminados / total,
                   backgroundColor: Colors.white.withValues(alpha: 0.1),
-                  color: const Color(0xFF8B5CF6),
+                  color: AppColors.primary,
                   minHeight: 6,
                   borderRadius: BorderRadius.circular(3),
                 ),
@@ -192,9 +193,9 @@ class _ActiveOrderCard extends StatelessWidget {
                 child: OutlinedButton.icon(
                   onPressed: () => _confirmFinish(context, order),
                   style: OutlinedButton.styleFrom(
-                    foregroundColor: const Color(0xFF10B981),
+                    foregroundColor: AppColors.success,
                     side: BorderSide(
-                        color: const Color(0xFF10B981).withValues(alpha: 0.5)),
+                        color: AppColors.success.withValues(alpha: 0.5)),
                     padding: const EdgeInsets.symmetric(vertical: 10),
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(8)),
@@ -216,7 +217,7 @@ class _ActiveOrderCard extends StatelessWidget {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        backgroundColor: const Color(0xFF1E293B),
+        backgroundColor: AppColors.darkCard,
         title: const Text('Finalizar Orden',
             style: TextStyle(color: Colors.white)),
         content: Text(
@@ -281,11 +282,11 @@ class _EstadoBadge extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final (color, label) = switch (estado) {
-      'ABIERTA' => (const Color(0xFFF59E0B), 'Abierta'),
+      'ABIERTA' => (AppColors.warning, 'Abierta'),
       'ASIGNADA' => (const Color(0xFF6366F1), 'Asignada'),
-      'EN_PROCESO' => (const Color(0xFF3B82F6), 'En Proceso'),
-      'PAUSADA' => (const Color(0xFFEF4444), 'Pausada'),
-      'FINALIZADA' => (const Color(0xFF10B981), 'Finalizada'),
+      'EN_PROCESO' => (AppColors.info, 'En Proceso'),
+      'PAUSADA' => (AppColors.error, 'Pausada'),
+      'FINALIZADA' => (AppColors.success, 'Finalizada'),
       _ => (Colors.grey, estado),
     };
 

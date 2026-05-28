@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:mobile1_app/core/theme/app_colors.dart';
 import 'package:mobile1_app/features/work_order/domain/entities/work_order.dart';
 import 'package:mobile1_app/features/work_order/presentation/cubit/work_order_cubit.dart';
 import 'package:mobile1_app/features/work_order/presentation/cubit/work_order_state.dart';
@@ -27,12 +28,12 @@ class _WorkOrderDetailPageState extends State<WorkOrderDetailPage> {
       listener: (context, state) {
         if (state is WorkOrderError) {
           ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-            backgroundColor: const Color(0xFFEF4444),
+            backgroundColor: AppColors.error,
             content: Text(state.message),
           ));
         } else if (state is WorkOrderSuccess) {
           ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-            backgroundColor: const Color(0xFF10B981),
+            backgroundColor: AppColors.success,
             content: Text(state.message),
           ));
           context
@@ -43,9 +44,9 @@ class _WorkOrderDetailPageState extends State<WorkOrderDetailPage> {
       builder: (context, state) {
         if (state is WorkOrderLoading && state.workOrders.isEmpty) {
           return const Scaffold(
-            backgroundColor: Color(0xFF0F172A),
+            backgroundColor: AppColors.darkBackground,
             body: Center(
-                child: CircularProgressIndicator(color: Color(0xFF3B82F6))),
+                child: CircularProgressIndicator(color: AppColors.info)),
           );
         }
 
@@ -58,7 +59,7 @@ class _WorkOrderDetailPageState extends State<WorkOrderDetailPage> {
 
         if (order == null) {
           return Scaffold(
-            backgroundColor: const Color(0xFF0F172A),
+            backgroundColor: AppColors.darkBackground,
             appBar: AppBar(backgroundColor: Colors.transparent, elevation: 0),
             body: const Center(
               child: Text('Cargando o no se encontró la orden',
@@ -70,9 +71,9 @@ class _WorkOrderDetailPageState extends State<WorkOrderDetailPage> {
         final mechanicsList = state.mechanics;
 
         return Scaffold(
-          backgroundColor: const Color(0xFF0F172A),
+          backgroundColor: AppColors.darkBackground,
           appBar: AppBar(
-            backgroundColor: const Color(0xFF1E293B),
+            backgroundColor: AppColors.darkCard,
             elevation: 0,
             iconTheme: const IconThemeData(color: Colors.white),
             title: const Text('Detalle de Orden',
@@ -123,7 +124,7 @@ class _HeaderInfo extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: const Color(0xFF1E293B),
+        color: AppColors.darkCard,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
       ),
@@ -167,12 +168,12 @@ class _StartOrderButton extends StatelessWidget {
       child: ElevatedButton.icon(
         onPressed: () => context.read<WorkOrderCubit>().startWorkOrder(order.id),
         style: ElevatedButton.styleFrom(
-          backgroundColor: const Color(0xFF10B981).withValues(alpha: 0.15),
-          foregroundColor: const Color(0xFF10B981),
+          backgroundColor: AppColors.success.withValues(alpha: 0.15),
+          foregroundColor: AppColors.success,
           padding: const EdgeInsets.symmetric(vertical: 14),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
-            side: BorderSide(color: const Color(0xFF10B981).withValues(alpha: 0.5)),
+            side: BorderSide(color: AppColors.success.withValues(alpha: 0.5)),
           ),
         ),
         icon: const Icon(Icons.play_circle_fill, size: 22),
@@ -218,7 +219,7 @@ class _MechanicsSection extends StatelessWidget {
                 margin: const EdgeInsets.only(bottom: 8),
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF1E293B).withValues(alpha: 0.5),
+                  color: AppColors.darkCard.withValues(alpha: 0.5),
                   borderRadius: BorderRadius.circular(12),
                   border:
                       Border.all(color: Colors.white.withValues(alpha: 0.05)),
@@ -238,7 +239,7 @@ class _MechanicsSection extends StatelessWidget {
                         padding: const EdgeInsets.symmetric(
                             horizontal: 6, vertical: 2),
                         decoration: BoxDecoration(
-                          color: const Color(0xFF3B82F6).withValues(alpha: 0.2),
+                          color: AppColors.info.withValues(alpha: 0.2),
                           borderRadius: BorderRadius.circular(4),
                         ),
                         child: const Text('Principal',
@@ -255,7 +256,7 @@ class _MechanicsSection extends StatelessWidget {
   void _showAssignMechanicSheet(BuildContext context) {
     showModalBottomSheet(
       context: context,
-      backgroundColor: const Color(0xFF1E293B),
+      backgroundColor: AppColors.darkCard,
       isScrollControlled: true,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
@@ -314,7 +315,7 @@ class _AssignMechanicSheetState extends State<_AssignMechanicSheet> {
                 style: TextStyle(color: Colors.white54))
           else
             DropdownButtonFormField<String>(
-              dropdownColor: const Color(0xFF1E293B),
+              dropdownColor: AppColors.darkCard,
               value: selectedMechanicId,
               hint: const Text('Seleccione un mecánico',
                   style: TextStyle(color: Colors.white38)),
@@ -327,7 +328,7 @@ class _AssignMechanicSheetState extends State<_AssignMechanicSheet> {
               onChanged: (val) => setState(() => selectedMechanicId = val),
               decoration: InputDecoration(
                 filled: true,
-                fillColor: const Color(0xFF0F172A),
+                fillColor: AppColors.darkBackground,
                 border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8),
                     borderSide: BorderSide.none),
@@ -339,7 +340,7 @@ class _AssignMechanicSheetState extends State<_AssignMechanicSheet> {
                 style: TextStyle(color: Colors.white)),
             value: esPrincipal,
             onChanged: (val) => setState(() => esPrincipal = val),
-            activeColor: const Color(0xFF3B82F6),
+            activeColor: AppColors.info,
             contentPadding: EdgeInsets.zero,
           ),
           const SizedBox(height: 24),
@@ -383,7 +384,7 @@ class _AssignMechanicSheetState extends State<_AssignMechanicSheet> {
                       Navigator.pop(context);
                     },
               style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF3B82F6),
+                  backgroundColor: AppColors.info,
                   padding: const EdgeInsets.symmetric(vertical: 14)),
               child: const Text('Guardar Asignación',
                   style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
@@ -433,7 +434,7 @@ class _DetalleItem extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: 10),
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: const Color(0xFF1E293B).withValues(alpha: 0.5),
+        color: AppColors.darkCard.withValues(alpha: 0.5),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
       ),
@@ -511,14 +512,14 @@ class _EstadoBadge extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final (color, label) = switch (estado) {
-      'ABIERTA' => (const Color(0xFFF59E0B), 'Abierta'),
-      'ASIGNADA' => (const Color(0xFF8B5CF6), 'Asignada'),
-      'EN_PROCESO' => (const Color(0xFF3B82F6), 'En Proceso'),
-      'PAUSADA' => (const Color(0xFFEF4444), 'Pausada'),
-      'COMPLETADA' => (const Color(0xFF10B981), 'Completada'),
-      'CERRADA' => (const Color(0xFF64748B), 'Cerrada'),
-      'POR_HACER' => (const Color(0xFF94A3B8), 'Por Hacer'),
-      'FINALIZADO' => (const Color(0xFF10B981), 'Finalizado'),
+      'ABIERTA' => (AppColors.warning, 'Abierta'),
+      'ASIGNADA' => (AppColors.primary, 'Asignada'),
+      'EN_PROCESO' => (AppColors.info, 'En Proceso'),
+      'PAUSADA' => (AppColors.error, 'Pausada'),
+      'COMPLETADA' => (AppColors.success, 'Completada'),
+      'CERRADA' => (AppColors.darkTextTertiary, 'Cerrada'),
+      'POR_HACER' => (AppColors.darkTextTertiary, 'Por Hacer'),
+      'FINALIZADO' => (AppColors.success, 'Finalizado'),
       _ => (Colors.grey, estado),
     };
 

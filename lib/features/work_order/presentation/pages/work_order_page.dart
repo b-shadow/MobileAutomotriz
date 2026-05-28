@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
+import 'package:mobile1_app/core/theme/app_colors.dart';
 import 'package:mobile1_app/features/work_order/domain/entities/work_order.dart';
 import 'package:mobile1_app/features/work_order/presentation/cubit/work_order_cubit.dart';
 import 'package:mobile1_app/features/work_order/presentation/cubit/work_order_state.dart';
@@ -23,7 +24,7 @@ class _WorkOrderPageState extends State<WorkOrderPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF0F172A),
+      backgroundColor: AppColors.darkBackground,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -44,7 +45,7 @@ class _WorkOrderPageState extends State<WorkOrderPage> {
         listener: (ctx, state) {
           if (state is WorkOrderError) {
             ScaffoldMessenger.of(ctx).showSnackBar(SnackBar(
-              backgroundColor: const Color(0xFFEF4444),
+              backgroundColor: AppColors.error,
               content: Text(state.message),
             ));
           }
@@ -71,7 +72,7 @@ class _WorkOrderPageState extends State<WorkOrderPage> {
           }
 
           return RefreshIndicator(
-            color: const Color(0xFF3B82F6),
+            color: AppColors.info,
             onRefresh: () => context.read<WorkOrderCubit>().fetchWorkOrders(),
             child: ListView.separated(
               padding: const EdgeInsets.all(16),
@@ -99,7 +100,7 @@ class _WorkOrderCard extends StatelessWidget {
       borderRadius: BorderRadius.circular(14),
       child: Container(
         decoration: BoxDecoration(
-          color: const Color(0xFF1E293B),
+          color: AppColors.darkCard,
           borderRadius: BorderRadius.circular(14),
           border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
         ),
@@ -190,11 +191,11 @@ class _EstadoBadge extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final (color, label) = switch (estado) {
-      'ABIERTA' => (const Color(0xFFF59E0B), 'Abierta'),
+      'ABIERTA' => (AppColors.warning, 'Abierta'),
       'ASIGNADA' => (const Color(0xFF8B5CF6), 'Asignada'),
-      'EN_PROCESO' => (const Color(0xFF3B82F6), 'En Proceso'),
-      'PAUSADA' => (const Color(0xFFEF4444), 'Pausada'),
-      'COMPLETADA' => (const Color(0xFF10B981), 'Completada'),
+      'EN_PROCESO' => (AppColors.info, 'En Proceso'),
+      'PAUSADA' => (AppColors.error, 'Pausada'),
+      'COMPLETADA' => (AppColors.success, 'Completada'),
       'CERRADA' => (const Color(0xFF64748B), 'Cerrada'),
       _ => (Colors.grey, estado),
     };

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
+import 'package:mobile1_app/core/theme/app_colors.dart';
 import '../cubit/ai_chat_cubit.dart';
 
 class AiChatPage extends StatefulWidget {
@@ -51,24 +52,21 @@ class _AiChatPageState extends State<AiChatPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF3F4F6),
+      backgroundColor: AppColors.darkBackground,
       appBar: AppBar(
         title: const Row(
           children: [
             Icon(Icons.smart_toy, color: Colors.white),
             SizedBox(width: 8),
-            Text('Asistente Virtual', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
+            Text('Asistente Virtual'),
           ],
         ),
-        backgroundColor: const Color(0xFF4F46E5),
-        elevation: 1,
-        iconTheme: const IconThemeData(color: Colors.white),
       ),
       body: BlocConsumer<AiChatCubit, AiChatState>(
         listener: (context, state) {
           if (state is AiChatError) {
             ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-              backgroundColor: const Color(0xFFEF4444),
+              backgroundColor: AppColors.error,
               content: Text(state.message),
             ));
           }
@@ -78,7 +76,7 @@ class _AiChatPageState extends State<AiChatPage> {
         },
         builder: (context, state) {
           if (state is AiChatInitial || (state is AiChatLoading && state is! AiChatLoaded)) {
-            return const Center(child: CircularProgressIndicator());
+            return const Center(child: CircularProgressIndicator(color: AppColors.primary));
           }
 
           if (state is AiChatLoaded) {
@@ -108,7 +106,7 @@ class _AiChatPageState extends State<AiChatPage> {
             );
           }
 
-          return const Center(child: Text('Error al cargar la conversación'));
+          return Center(child: Text('Error al cargar la conversación', style: TextStyle(color: AppColors.darkTextSecondary)));
         },
       ),
     );
@@ -120,24 +118,24 @@ class _AiChatPageState extends State<AiChatPage> {
       child: Container(
         margin: const EdgeInsets.only(bottom: 12),
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-        decoration: const BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.only(
+        decoration: BoxDecoration(
+          color: AppColors.darkCard,
+          borderRadius: const BorderRadius.only(
             topLeft: Radius.circular(16),
             topRight: Radius.circular(16),
             bottomRight: Radius.circular(16),
           ),
         ),
-        child: const Row(
+        child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            SizedBox(
+            const SizedBox(
               width: 12,
               height: 12,
-              child: CircularProgressIndicator(strokeWidth: 2),
+              child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.primary),
             ),
-            SizedBox(width: 8),
-            Text('Escribiendo...', style: TextStyle(color: Colors.grey, fontStyle: FontStyle.italic)),
+            const SizedBox(width: 8),
+            Text('Escribiendo...', style: TextStyle(color: AppColors.darkTextTertiary, fontStyle: FontStyle.italic)),
           ],
         ),
       ),
@@ -146,6 +144,21 @@ class _AiChatPageState extends State<AiChatPage> {
 
   Widget _buildChatBubble(String text, bool isMe, DateTime time) {
     final dateFormat = DateFormat('HH:mm');
+
+    final Color bubbleColor;
+    final Color textColor;
+    final Color timeColor;
+
+    if (isMe) {
+      bubbleColor = AppColors.primary;
+      textColor = Colors.white;
+      timeColor = Colors.white70;
+    } else {
+      bubbleColor = AppColors.darkCard;
+      textColor = AppColors.darkTextPrimary;
+      timeColor = AppColors.darkTextTertiary;
+    }
+
     return Align(
       alignment: isMe ? Alignment.centerRight : Alignment.centerLeft,
       child: Container(
@@ -153,7 +166,7 @@ class _AiChatPageState extends State<AiChatPage> {
         margin: const EdgeInsets.only(bottom: 12),
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         decoration: BoxDecoration(
-          color: isMe ? const Color(0xFF4F46E5) : Colors.white,
+          color: bubbleColor,
           borderRadius: BorderRadius.only(
             topLeft: const Radius.circular(16),
             topRight: const Radius.circular(16),
@@ -162,7 +175,7 @@ class _AiChatPageState extends State<AiChatPage> {
           ),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.05),
+              color: Colors.black.withValues(alpha: 0.2),
               blurRadius: 5,
               offset: const Offset(0, 2),
             ),
@@ -173,18 +186,12 @@ class _AiChatPageState extends State<AiChatPage> {
           children: [
             Text(
               text,
-              style: TextStyle(
-                color: isMe ? Colors.white : Colors.black87,
-                fontSize: 15,
-              ),
+              style: TextStyle(color: textColor, fontSize: 15),
             ),
             const SizedBox(height: 4),
             Text(
               dateFormat.format(time.toLocal()),
-              style: TextStyle(
-                color: isMe ? Colors.white70 : Colors.grey[500],
-                fontSize: 10,
-              ),
+              style: TextStyle(color: timeColor, fontSize: 10),
             ),
           ],
         ),
@@ -202,8 +209,9 @@ class _AiChatPageState extends State<AiChatPage> {
           return Padding(
             padding: const EdgeInsets.only(right: 8),
             child: ActionChip(
-              label: Text(action),
-              backgroundColor: Colors.indigo.withValues(alpha: 0.1),
+              label: Text(action, style: const TextStyle(color: AppColors.primary)),
+              backgroundColor: AppColors.primary.withValues(alpha: 0.1),
+              side: BorderSide(color: AppColors.primary.withValues(alpha: 0.3)),
               onPressed: () => _sendMessage(action),
             ),
           );
@@ -216,10 +224,10 @@ class _AiChatPageState extends State<AiChatPage> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.darkSurface,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
+            color: Colors.black.withValues(alpha: 0.2),
             blurRadius: 10,
             offset: const Offset(0, -5),
           ),
@@ -232,14 +240,24 @@ class _AiChatPageState extends State<AiChatPage> {
               child: TextField(
                 controller: _textController,
                 enabled: !isWaiting,
+                style: const TextStyle(color: AppColors.darkTextPrimary, fontSize: 15),
                 decoration: InputDecoration(
                   hintText: 'Escribe un mensaje...',
+                  hintStyle: TextStyle(color: AppColors.darkTextTertiary),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(24),
                     borderSide: BorderSide.none,
                   ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(24),
+                    borderSide: BorderSide.none,
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(24),
+                    borderSide: BorderSide.none,
+                  ),
                   filled: true,
-                  fillColor: Colors.grey[100],
+                  fillColor: AppColors.darkSurfaceVariant,
                   contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                 ),
                 textInputAction: TextInputAction.send,
@@ -248,7 +266,7 @@ class _AiChatPageState extends State<AiChatPage> {
             ),
             const SizedBox(width: 8),
             CircleAvatar(
-              backgroundColor: isWaiting ? Colors.grey : const Color(0xFF4F46E5),
+              backgroundColor: isWaiting ? AppColors.darkTextTertiary : AppColors.primary,
               radius: 24,
               child: IconButton(
                 icon: const Icon(Icons.send, color: Colors.white),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:mobile1_app/core/theme/app_colors.dart';
 import 'package:mobile1_app/features/auth/data/models/usuario_model.dart';
 import 'package:mobile1_app/features/service/domain/entities/service_item.dart';
 import 'package:mobile1_app/features/service/presentation/cubit/service_cubit.dart';
@@ -51,7 +52,7 @@ class _ServiceCatalogPageState extends State<ServiceCatalogPage> {
         }
       },
       child: Scaffold(
-        backgroundColor: const Color(0xFF0F172A),
+        backgroundColor: AppColors.darkBackground,
         appBar: AppBar(
           backgroundColor: Colors.transparent,
           elevation: 0,
@@ -78,7 +79,7 @@ class _ServiceCatalogPageState extends State<ServiceCatalogPage> {
                     child: ElevatedButton.icon(
                       onPressed: () => _openServiceForm(context),
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF8B5CF6),
+                        backgroundColor: AppColors.primary,
                         foregroundColor: Colors.white,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(14),
@@ -145,7 +146,7 @@ class _ServiceCatalogPageState extends State<ServiceCatalogPage> {
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: const Color(0xFF1E293B),
+        color: AppColors.darkCard,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(color: Colors.white12),
       ),
@@ -359,7 +360,7 @@ class _ServiceFormSheetState extends State<_ServiceFormSheet> {
     return InputDecoration(
       labelText: label,
       filled: true,
-      fillColor: const Color(0xFF26264A),
+      fillColor: AppColors.darkSurfaceVariant,
       labelStyle: const TextStyle(color: Colors.white70),
       enabledBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(14),
@@ -405,7 +406,7 @@ class _ServiceFormSheetState extends State<_ServiceFormSheet> {
       heightFactor: 0.9,
       child: Container(
         decoration: const BoxDecoration(
-          color: Color(0xFF0F172A),
+          color: AppColors.darkBackground,
           borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
         ),
         child: Padding(
@@ -519,7 +520,7 @@ class _ServiceFormSheetState extends State<_ServiceFormSheet> {
                     child: ElevatedButton(
                       onPressed: _submitting ? null : _submit,
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF8B5CF6),
+                        backgroundColor: AppColors.primary,
                         foregroundColor: Colors.white,
                         padding: const EdgeInsets.symmetric(vertical: 14),
                       ),

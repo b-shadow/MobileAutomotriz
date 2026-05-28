@@ -1,5 +1,6 @@
-import 'package:flutter/cupertino.dart';
+﻿import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:mobile1_app/core/theme/app_colors.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mobile1_app/features/auth/presentation/cubit/auth_cubit.dart';
 import 'package:mobile1_app/features/auth/presentation/cubit/auth_state.dart';
@@ -16,7 +17,7 @@ class ProfilePage extends StatelessWidget {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      backgroundColor: const Color(0xFF1E293B),
+      backgroundColor: AppColors.darkCard,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
@@ -38,7 +39,7 @@ class ProfilePage extends StatelessWidget {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      backgroundColor: const Color(0xFF1E293B),
+      backgroundColor: AppColors.darkCard,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
@@ -75,7 +76,7 @@ class ProfilePage extends StatelessWidget {
         }
       },
       child: Scaffold(
-        backgroundColor: const Color(0xFF0F172A),
+        backgroundColor: AppColors.darkBackground,
         appBar: AppBar(
           backgroundColor: Colors.transparent,
           elevation: 0,
@@ -119,7 +120,7 @@ class ProfilePage extends StatelessWidget {
                     action: ElevatedButton.icon(
                       onPressed: () => _showEditPersonalInfo(context, authState),
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF8B5CF6),
+                        backgroundColor: AppColors.primary,
                         foregroundColor: Colors.white,
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                       ),
@@ -156,7 +157,7 @@ class ProfilePage extends StatelessWidget {
                     action: OutlinedButton.icon(
                       onPressed: () => _showChangePassword(context, authState),
                       style: OutlinedButton.styleFrom(
-                        foregroundColor: const Color(0xFF8B5CF6),
+                        foregroundColor: AppColors.primary,
                         side: const BorderSide(color: Color(0xFF8B5CF6)),
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                       ),
@@ -214,7 +215,7 @@ class ProfilePage extends StatelessWidget {
                         Container(
                           padding: const EdgeInsets.all(12),
                           decoration: BoxDecoration(
-                            color: const Color(0xFF1E293B).withValues(alpha: 0.5),
+                            color: AppColors.darkCard.withValues(alpha: 0.5),
                             borderRadius: BorderRadius.circular(8),
                             border: Border.all(color: Colors.white10),
                           ),
@@ -265,7 +266,7 @@ class ProfilePage extends StatelessWidget {
     IconData? titleIcon,
     Color? titleIconColor,
     Widget? action,
-    Color backgroundColor = const Color(0xFF1E293B),
+    Color backgroundColor = AppColors.darkCard,
     required Widget child,
   }) {
     return Container(

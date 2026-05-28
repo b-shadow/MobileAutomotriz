@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:mobile1_app/core/theme/app_colors.dart';
 import '../cubit/vehicle_report_cubit.dart';
 import '../../domain/entities/report_entities.dart';
 import '../../data/report_export_service.dart';
@@ -43,15 +44,9 @@ class _VehicleReportsPageState extends State<VehicleReportsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFC),
+      backgroundColor: AppColors.darkBackground,
       appBar: AppBar(
-        title: const Text(
-          'Reportes de Vehículo',
-          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
-        ),
-        backgroundColor: const Color(0xFF2563EB),
-        elevation: 0,
-        iconTheme: const IconThemeData(color: Colors.white),
+        title: const Text('Reportes de Vehículo'),
       ),
       body: Column(
         children: [
@@ -61,14 +56,14 @@ class _VehicleReportsPageState extends State<VehicleReportsPage> {
               listener: (context, state) {
                 if (state is VehicleReportError) {
                   ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                    backgroundColor: const Color(0xFFEF4444),
+                    backgroundColor: AppColors.error,
                     content: Text(state.message),
                   ));
                 }
               },
               builder: (context, state) {
                 if (state is VehicleReportLoading) {
-                  return const Center(child: CircularProgressIndicator());
+                  return const Center(child: CircularProgressIndicator(color: AppColors.primary));
                 }
 
                 if (state is VehicleReportTopLoaded) {
@@ -84,18 +79,13 @@ class _VehicleReportsPageState extends State<VehicleReportsPage> {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        const Icon(Icons.error_outline,
-                            size: 60, color: Colors.grey),
+                        Icon(Icons.error_outline, size: 60, color: AppColors.darkTextTertiary),
                         const SizedBox(height: 16),
-                        Text(state.message,
-                            style: const TextStyle(
-                                color: Colors.grey, fontSize: 16)),
+                        Text(state.message, style: TextStyle(color: AppColors.darkTextSecondary, fontSize: 16)),
                         const SizedBox(height: 16),
                         ElevatedButton(
-                          onPressed: () =>
-                              context
-                                  .read<VehicleReportCubit>()
-                                  .fetchTopVehicles(),
+                          onPressed: () => context.read<VehicleReportCubit>().fetchTopVehicles(),
+                          style: ElevatedButton.styleFrom(backgroundColor: AppColors.primary, foregroundColor: Colors.white),
                           child: const Text('Volver al Top 10'),
                         ),
                       ],
@@ -115,29 +105,29 @@ class _VehicleReportsPageState extends State<VehicleReportsPage> {
   Widget _buildSearchBar() {
     return Container(
       padding: const EdgeInsets.all(16),
-      decoration: const BoxDecoration(
-        color: Color(0xFF2563EB),
-        borderRadius: BorderRadius.only(
+      decoration: BoxDecoration(
+        color: AppColors.darkSurface,
+        borderRadius: const BorderRadius.only(
           bottomLeft: Radius.circular(24),
           bottomRight: Radius.circular(24),
         ),
       ),
       child: TextField(
         controller: _searchController,
-        style: const TextStyle(color: Colors.black87),
+        style: const TextStyle(color: Colors.white),
         decoration: InputDecoration(
           hintText: 'Buscar por número de placa...',
-          hintStyle: TextStyle(color: Colors.grey[500]),
-          prefixIcon: const Icon(Icons.search, color: Color(0xFF2563EB)),
+          hintStyle: TextStyle(color: AppColors.darkTextTertiary),
+          prefixIcon: Icon(Icons.search, color: AppColors.primary),
           suffixIcon: IconButton(
-            icon: const Icon(Icons.clear, color: Colors.grey),
+            icon: Icon(Icons.clear, color: AppColors.darkTextTertiary),
             onPressed: () {
               _searchController.clear();
               _onSearch();
             },
           ),
           filled: true,
-          fillColor: Colors.white,
+          fillColor: AppColors.darkSurfaceVariant,
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12),
             borderSide: BorderSide.none,
@@ -152,7 +142,7 @@ class _VehicleReportsPageState extends State<VehicleReportsPage> {
 
   Widget _buildTopVehiclesList(List<TopVehicle> topVehicles) {
     if (topVehicles.isEmpty) {
-      return const Center(child: Text('No hay vehículos registrados.'));
+      return Center(child: Text('No hay vehículos registrados.', style: TextStyle(color: AppColors.darkTextSecondary)));
     }
 
     return ListView.builder(
@@ -164,44 +154,38 @@ class _VehicleReportsPageState extends State<VehicleReportsPage> {
             padding: EdgeInsets.only(bottom: 16),
             child: Text(
               '🏆 Top 10 Vehículos Más Frecuentes',
-              style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: Color(0xFF1E293B)),
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
             ),
           );
         }
 
         final vehiculo = topVehicles[index - 1];
-        return Card(
-          elevation: 1,
+        return Container(
           margin: const EdgeInsets.only(bottom: 12),
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          decoration: BoxDecoration(
+            color: AppColors.darkCard,
+            borderRadius: BorderRadius.circular(14),
+            border: Border.all(color: AppColors.darkCardBorder),
+          ),
           child: ListTile(
+            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
             leading: CircleAvatar(
-              backgroundColor: const Color(0xFFEFF6FF),
+              backgroundColor: AppColors.primary.withValues(alpha: 0.15),
               child: Text(
                 '$index',
-                style: const TextStyle(
-                    color: Color(0xFF2563EB), fontWeight: FontWeight.bold),
+                style: const TextStyle(color: AppColors.primary, fontWeight: FontWeight.bold),
               ),
             ),
-            title: Text(vehiculo.placa,
-                style: const TextStyle(fontWeight: FontWeight.bold)),
-            subtitle: Text(vehiculo.vehiculo),
+            title: Text(vehiculo.placa, style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
+            subtitle: Text(vehiculo.vehiculo, style: TextStyle(color: AppColors.darkTextSecondary)),
             trailing: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
-                const Text('Visitas',
-                    style: TextStyle(fontSize: 12, color: Colors.grey)),
+                Text('Visitas', style: TextStyle(fontSize: 12, color: AppColors.darkTextTertiary)),
                 Text(
                   '${vehiculo.visitas}',
-                  style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: Color(0xFF2563EB)),
+                  style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppColors.primary),
                 ),
               ],
             ),
@@ -222,51 +206,39 @@ class _VehicleReportsPageState extends State<VehicleReportsPage> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // ── Tarjeta de Identificación + botón Exportar ──────────────
-          Card(
-            elevation: 2,
-            shape:
-                RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-            child: Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(20),
-              decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                  colors: [Color(0xFF1E40AF), Color(0xFF3B82F6)],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              gradient: const LinearGradient(
+                colors: [AppColors.primaryDark, AppColors.primary],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Título + botón exportar en la misma fila
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text('Reporte de Vehículo', style: TextStyle(color: Colors.white70)),
+                    _ExportButton(onTap: () => _showExportSheet(detail)),
+                  ],
                 ),
-                borderRadius: BorderRadius.circular(16),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Título + botón exportar en la misma fila
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const Text('Reporte de Vehículo',
-                          style: TextStyle(color: Colors.white70)),
-                      _ExportButton(
-                        onTap: () => _showExportSheet(detail),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    detail.placa,
-                    style: const TextStyle(
-                        fontSize: 32,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    '${detail.marca} ${detail.modelo}',
-                    style:
-                        const TextStyle(fontSize: 18, color: Colors.white),
-                  ),
-                ],
-              ),
+                const SizedBox(height: 8),
+                Text(
+                  detail.placa,
+                  style: const TextStyle(fontSize: 32, fontWeight: FontWeight.bold, color: Colors.white),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  '${detail.marca} ${detail.modelo}',
+                  style: const TextStyle(fontSize: 18, color: Colors.white),
+                ),
+              ],
             ),
           ),
           const SizedBox(height: 20),
@@ -279,7 +251,7 @@ class _VehicleReportsPageState extends State<VehicleReportsPage> {
                   title: 'Total Visitas',
                   value: '${detail.totalVisitas}',
                   icon: Icons.history,
-                  color: const Color(0xFF10B981),
+                  color: AppColors.success,
                 ),
               ),
               const SizedBox(width: 16),
@@ -288,7 +260,7 @@ class _VehicleReportsPageState extends State<VehicleReportsPage> {
                   title: 'Última Visita',
                   value: detail.ultimaVisita,
                   icon: Icons.calendar_today,
-                  color: const Color(0xFFF59E0B),
+                  color: AppColors.warning,
                 ),
               ),
             ],
@@ -298,14 +270,11 @@ class _VehicleReportsPageState extends State<VehicleReportsPage> {
           // Historial
           const Text(
             '📋 Historial de Atenciones',
-            style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: Color(0xFF1E293B)),
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
           ),
           const SizedBox(height: 12),
           if (detail.historial.isEmpty)
-            const Text('No hay registros en el historial.')
+            Text('No hay registros en el historial.', style: TextStyle(color: AppColors.darkTextSecondary))
           else
             ...detail.historial.map((h) => _buildHistoryItem(h)),
         ],
@@ -319,24 +288,22 @@ class _VehicleReportsPageState extends State<VehicleReportsPage> {
     required IconData icon,
     required Color color,
   }) {
-    return Card(
-      elevation: 1,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Icon(icon, color: color, size: 28),
-            const SizedBox(height: 12),
-            Text(title,
-                style: const TextStyle(color: Colors.grey, fontSize: 12)),
-            const SizedBox(height: 4),
-            Text(value,
-                style: const TextStyle(
-                    fontSize: 18, fontWeight: FontWeight.bold)),
-          ],
-        ),
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: AppColors.darkCard,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: AppColors.darkCardBorder),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(icon, color: color, size: 28),
+          const SizedBox(height: 12),
+          Text(title, style: TextStyle(color: AppColors.darkTextTertiary, fontSize: 12)),
+          const SizedBox(height: 4),
+          Text(value, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white)),
+        ],
       ),
     );
   }
@@ -345,51 +312,43 @@ class _VehicleReportsPageState extends State<VehicleReportsPage> {
     Color statusColor;
     switch (history.estado.toUpperCase()) {
       case 'COMPLETADA':
-        statusColor = const Color(0xFF10B981);
+        statusColor = AppColors.success;
         break;
       case 'CANCELADA':
-        statusColor = const Color(0xFFEF4444);
+        statusColor = AppColors.error;
         break;
       case 'EN TALLER':
-        statusColor = const Color(0xFF3B82F6);
+        statusColor = AppColors.info;
         break;
       default:
-        statusColor = const Color(0xFFF59E0B);
+        statusColor = AppColors.warning;
     }
 
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.darkCard,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.grey[200]!),
+        border: Border.all(color: AppColors.darkCardBorder),
       ),
       child: ListTile(
-        contentPadding:
-            const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         leading: Container(
           width: 12,
           height: 12,
-          decoration: BoxDecoration(
-            color: statusColor,
-            shape: BoxShape.circle,
-          ),
+          decoration: BoxDecoration(color: statusColor, shape: BoxShape.circle),
         ),
-        title: Text(history.fecha,
-            style: const TextStyle(fontWeight: FontWeight.bold)),
-        subtitle: Text('Canal: ${history.canal}'),
+        title: Text(history.fecha, style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
+        subtitle: Text('Canal: ${history.canal}', style: TextStyle(color: AppColors.darkTextSecondary)),
         trailing: Container(
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
           decoration: BoxDecoration(
-            color: statusColor.withValues(alpha: 0.1),
+            color: statusColor.withValues(alpha: 0.15),
             borderRadius: BorderRadius.circular(20),
           ),
           child: Text(
             history.estado,
-            style: TextStyle(
-                color: statusColor,
-                fontWeight: FontWeight.bold,
-                fontSize: 12),
+            style: TextStyle(color: statusColor, fontWeight: FontWeight.bold, fontSize: 12),
           ),
         ),
       ),
@@ -419,11 +378,7 @@ class _ExportButton extends StatelessWidget {
           children: [
             Icon(Icons.download_rounded, color: Colors.white, size: 16),
             SizedBox(width: 6),
-            Text('Exportar',
-                style: TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.w600,
-                    fontSize: 13)),
+            Text('Exportar', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600, fontSize: 13)),
           ],
         ),
       ),
@@ -467,9 +422,9 @@ class _ExportBottomSheetState extends State<_ExportBottomSheet> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: const BoxDecoration(
-        color: Color(0xFF0F172A),
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      decoration: BoxDecoration(
+        color: AppColors.darkCard,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
       ),
       padding: const EdgeInsets.fromLTRB(24, 12, 24, 40),
       child: Column(
@@ -481,7 +436,7 @@ class _ExportBottomSheetState extends State<_ExportBottomSheet> {
               width: 40,
               height: 4,
               decoration: BoxDecoration(
-                color: Colors.white24,
+                color: AppColors.darkTextTertiary,
                 borderRadius: BorderRadius.circular(99),
               ),
             ),
@@ -489,24 +444,20 @@ class _ExportBottomSheetState extends State<_ExportBottomSheet> {
           const SizedBox(height: 20),
 
           // Título
-          const Row(
+          Row(
             children: [
-              Icon(Icons.download_rounded, color: Color(0xFF3B82F6), size: 22),
-              SizedBox(width: 10),
-              Text(
+              Icon(Icons.download_rounded, color: AppColors.primary, size: 22),
+              const SizedBox(width: 10),
+              const Text(
                 'Exportar Reporte',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                ),
+                style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
               ),
             ],
           ),
           const SizedBox(height: 6),
           Text(
             'Vehículo ${widget.detail.placa} — ${widget.detail.marca} ${widget.detail.modelo}',
-            style: const TextStyle(color: Colors.white54, fontSize: 13),
+            style: TextStyle(color: AppColors.darkTextSecondary, fontSize: 13),
           ),
           const SizedBox(height: 24),
 
@@ -516,14 +467,11 @@ class _ExportBottomSheetState extends State<_ExportBottomSheet> {
               margin: const EdgeInsets.only(bottom: 16),
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: const Color(0xFFEF4444).withValues(alpha: 0.1),
+                color: AppColors.errorLight,
                 borderRadius: BorderRadius.circular(10),
-                border: Border.all(
-                    color: const Color(0xFFEF4444).withValues(alpha: 0.3)),
+                border: Border.all(color: AppColors.error.withValues(alpha: 0.3)),
               ),
-              child: Text(_error!,
-                  style:
-                      const TextStyle(color: Color(0xFFEF4444), fontSize: 13)),
+              child: Text(_error!, style: const TextStyle(color: AppColors.error, fontSize: 13)),
             ),
 
           if (_exporting)
@@ -531,10 +479,9 @@ class _ExportBottomSheetState extends State<_ExportBottomSheet> {
               padding: EdgeInsets.symmetric(vertical: 24),
               child: Column(
                 children: [
-                  CircularProgressIndicator(color: Color(0xFF3B82F6)),
+                  CircularProgressIndicator(color: AppColors.primary),
                   SizedBox(height: 12),
-                  Text('Generando archivo...',
-                      style: TextStyle(color: Colors.white54)),
+                  Text('Generando archivo...', style: TextStyle(color: AppColors.darkTextSecondary)),
                 ],
               ),
             )
@@ -542,7 +489,7 @@ class _ExportBottomSheetState extends State<_ExportBottomSheet> {
             // PDF
             _FormatTile(
               icon: Icons.picture_as_pdf_rounded,
-              color: const Color(0xFFEF4444),
+              color: AppColors.error,
               title: 'PDF',
               subtitle: 'Documento con tablas y estilos · comparte fácilmente',
               onTap: () => _export('pdf'),
@@ -551,7 +498,7 @@ class _ExportBottomSheetState extends State<_ExportBottomSheet> {
             // CSV
             _FormatTile(
               icon: Icons.table_chart_rounded,
-              color: const Color(0xFF10B981),
+              color: AppColors.success,
               title: 'CSV',
               subtitle: 'Archivo de texto separado por comas · Excel / Sheets',
               onTap: () => _export('csv'),
@@ -607,19 +554,9 @@ class _FormatTile extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    title,
-                    style: TextStyle(
-                      color: color,
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
+                  Text(title, style: TextStyle(color: color, fontSize: 16, fontWeight: FontWeight.bold)),
                   const SizedBox(height: 3),
-                  Text(
-                    subtitle,
-                    style: const TextStyle(color: Colors.white54, fontSize: 12),
-                  ),
+                  Text(subtitle, style: TextStyle(color: AppColors.darkTextSecondary, fontSize: 12)),
                 ],
               ),
             ),

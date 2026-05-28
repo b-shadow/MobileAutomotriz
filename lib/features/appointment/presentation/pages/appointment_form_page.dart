@@ -1,4 +1,5 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
+import 'package:mobile1_app/core/theme/app_colors.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mobile1_app/core/network/api_client.dart';
 import 'package:mobile1_app/core/storage/session_storage.dart';
@@ -235,7 +236,7 @@ class _AppointmentFormSheetState extends State<AppointmentFormSheet> {
         data: ThemeData.dark().copyWith(
           colorScheme: const ColorScheme.dark(
             primary: Color(0xFF8B5CF6),
-            surface: Color(0xFF1E293B),
+            surface: AppColors.darkCard,
           ),
         ),
         child: child!,
@@ -252,7 +253,7 @@ class _AppointmentFormSheetState extends State<AppointmentFormSheet> {
         data: ThemeData.dark().copyWith(
           colorScheme: const ColorScheme.dark(
             primary: Color(0xFF8B5CF6),
-            surface: Color(0xFF1E293B),
+            surface: AppColors.darkCard,
           ),
         ),
         child: child!,
@@ -331,7 +332,7 @@ class _AppointmentFormSheetState extends State<AppointmentFormSheet> {
       heightFactor: 0.92,
       child: Container(
         decoration: const BoxDecoration(
-          color: Color(0xFF0F172A),
+          color: AppColors.darkBackground,
           borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
         ),
         child: Column(
@@ -374,9 +375,9 @@ class _AppointmentFormSheetState extends State<AppointmentFormSheet> {
                 child: Container(
                   padding: const EdgeInsets.all(10),
                   decoration: BoxDecoration(
-                    color: const Color(0xFFEF4444).withValues(alpha: 0.1),
+                    color: AppColors.error.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(10),
-                    border: Border.all(color: const Color(0xFFEF4444).withValues(alpha: 0.3)),
+                    border: Border.all(color: AppColors.error.withValues(alpha: 0.3)),
                   ),
                   child: Text(
                     _error!,
@@ -580,7 +581,7 @@ class _AppointmentFormSheetState extends State<AppointmentFormSheet> {
                                 child: ElevatedButton(
                                   onPressed: _submitting ? null : _submit,
                                   style: ElevatedButton.styleFrom(
-                                    backgroundColor: const Color(0xFF8B5CF6),
+                                    backgroundColor: AppColors.primary,
                                     foregroundColor: Colors.white,
                                     padding:
                                         const EdgeInsets.symmetric(vertical: 14),
@@ -625,14 +626,14 @@ class _AppointmentFormSheetState extends State<AppointmentFormSheet> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 14),
       decoration: BoxDecoration(
-        color: const Color(0xFF1E293B),
+        color: AppColors.darkCard,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(color: Colors.white12),
       ),
       child: DropdownButtonHideUnderline(
         child: DropdownButton<String>(
           isExpanded: true,
-          dropdownColor: const Color(0xFF1E293B),
+          dropdownColor: AppColors.darkCard,
           hint: Text(hint, style: const TextStyle(color: Colors.white38)),
           value: value,
           items: items,
@@ -657,7 +658,7 @@ class _AppointmentFormSheetState extends State<AppointmentFormSheet> {
         labelText: label,
         labelStyle: const TextStyle(color: Colors.white54),
         filled: true,
-        fillColor: const Color(0xFF1E293B),
+        fillColor: AppColors.darkCard,
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: const BorderSide(color: Colors.white12),
@@ -720,21 +721,21 @@ class _ServiceCheckTile extends StatelessWidget {
         color: inhabilitado
             ? Colors.white.withValues(alpha: 0.03)
             : selected
-                ? const Color(0xFF8B5CF6).withValues(alpha: 0.1)
-                : const Color(0xFF1E293B),
+                ? AppColors.primary.withValues(alpha: 0.1)
+                : AppColors.darkCard,
         borderRadius: BorderRadius.circular(10),
         border: Border.all(
           color: inhabilitado
               ? Colors.white12
               : selected
-                  ? const Color(0xFF8B5CF6).withValues(alpha: 0.5)
+                  ? AppColors.primary.withValues(alpha: 0.5)
                   : Colors.white12,
         ),
       ),
       child: CheckboxListTile(
         value: inhabilitado ? false : selected,
         onChanged: onChanged,
-        activeColor: const Color(0xFF8B5CF6),
+        activeColor: AppColors.primary,
         checkColor: Colors.white,
         title: Text(
           nombre,
@@ -755,7 +756,7 @@ class _ServiceCheckTile extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFEF4444).withValues(alpha: 0.15),
+                  color: AppColors.error.withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(4),
                 ),
                 child: Text(
@@ -792,13 +793,13 @@ class _PickerTile extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
         decoration: BoxDecoration(
-          color: const Color(0xFF1E293B),
+          color: AppColors.darkCard,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(color: Colors.white12),
         ),
         child: Row(
           children: [
-            Icon(icon, color: const Color(0xFF8B5CF6), size: 18),
+            Icon(icon, color: AppColors.primary, size: 18),
             const SizedBox(width: 8),
             Text(label,
                 style:

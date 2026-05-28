@@ -1,4 +1,5 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
+import 'package:mobile1_app/core/theme/app_colors.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:mobile1_app/features/audit/domain/entities/audit_event.dart';
@@ -52,7 +53,7 @@ class _AuditPageState extends State<AuditPage> {
         }
       },
       child: Scaffold(
-        backgroundColor: const Color(0xFF0F172A),
+        backgroundColor: AppColors.darkBackground,
         appBar: AppBar(
           backgroundColor: Colors.transparent,
           elevation: 0,
@@ -111,7 +112,7 @@ class _AuditPageState extends State<AuditPage> {
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: const Color(0xFF1E293B),
+        color: AppColors.darkCard,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(color: Colors.white12),
       ),
@@ -152,7 +153,7 @@ class _AuditPageState extends State<AuditPage> {
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: const Color(0xFF1E293B),
+        color: AppColors.darkCard,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(color: Colors.white12),
       ),
@@ -199,7 +200,7 @@ class _AuditPageState extends State<AuditPage> {
                       );
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF8B5CF6),
+                  backgroundColor: AppColors.primary,
                   foregroundColor: Colors.white,
                 ),
                 icon: const Icon(Icons.filter_alt, size: 16),
@@ -237,7 +238,7 @@ class _AuditPageState extends State<AuditPage> {
         hintText: hint,
         hintStyle: const TextStyle(color: Colors.white54),
         filled: true,
-        fillColor: const Color(0xFF26264A),
+        fillColor: AppColors.darkSurfaceVariant,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10),
           borderSide: const BorderSide(color: Colors.white12),
@@ -285,7 +286,7 @@ class _AuditPageState extends State<AuditPage> {
         child: Container(
           padding: const EdgeInsets.all(14),
           decoration: BoxDecoration(
-            color: const Color(0xFF1E293B),
+            color: AppColors.darkCard,
             borderRadius: BorderRadius.circular(12),
             border: Border.all(color: Colors.white12),
           ),

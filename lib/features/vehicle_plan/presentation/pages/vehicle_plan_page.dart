@@ -1,4 +1,5 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
+import 'package:mobile1_app/core/theme/app_colors.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:mobile1_app/config/env/env_config.dart';
@@ -106,7 +107,7 @@ class _VehiclePlanPageState extends State<VehiclePlanPage> {
         }
       },
       child: Scaffold(
-        backgroundColor: const Color(0xFF0F172A),
+        backgroundColor: AppColors.darkBackground,
         appBar: AppBar(
           backgroundColor: Colors.transparent,
           elevation: 0,
@@ -217,10 +218,10 @@ class _VehiclePlanPageState extends State<VehiclePlanPage> {
       child: Container(
         padding: const EdgeInsets.all(14),
         decoration: BoxDecoration(
-          color: selected ? const Color(0xFF2A3148) : const Color(0xFF1E293B),
+          color: selected ? const Color(0xFF2A3148) : AppColors.darkCard,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
-            color: selected ? const Color(0xFF8B5CF6) : Colors.white12,
+            color: selected ? AppColors.primary : Colors.white12,
           ),
         ),
         child: Column(
@@ -272,7 +273,7 @@ class _VehiclePlanPageState extends State<VehiclePlanPage> {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: const Color(0xFF1E293B),
+        color: AppColors.darkCard,
         borderRadius: BorderRadius.circular(10),
         border: Border.all(color: Colors.white12),
       ),

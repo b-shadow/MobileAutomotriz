@@ -32,6 +32,7 @@ class AppColors {
   static const Color darkSurface = Color(0xFF1A1A2E);
   static const Color darkSurfaceVariant = Color(0xFF252540);
   static const Color darkCard = Color(0xFF16213E);
+  static const Color darkCardBorder = Color(0x1AFFFFFF); // white 10%
 
   // ── Light Theme Surfaces ─────────────────────────────────
   static const Color lightBackground = Color(0xFFF8F9FE);
@@ -50,10 +51,14 @@ class AppColors {
   static const Color lightTextTertiary = Color(0xFF9090A8);
 
   // ── Status Colors ────────────────────────────────────────
-  static const Color success = Color(0xFF00C853);
-  static const Color warning = Color(0xFFFFAB00);
-  static const Color error = Color(0xFFFF5252);
-  static const Color info = Color(0xFF448AFF);
+  static const Color success = Color(0xFF10B981);
+  static const Color successLight = Color(0x2610B981); // 15% opacity
+  static const Color warning = Color(0xFFF59E0B);
+  static const Color warningLight = Color(0x26F59E0B);
+  static const Color error = Color(0xFFEF4444);
+  static const Color errorLight = Color(0x26EF4444);
+  static const Color info = Color(0xFF3B82F6);
+  static const Color infoLight = Color(0x263B82F6);
 
   // ── Note Accent Colors ───────────────────────────────────
   static const List<Color> noteColors = [

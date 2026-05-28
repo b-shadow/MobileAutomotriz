@@ -1,4 +1,5 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
+import 'package:mobile1_app/core/theme/app_colors.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:mobile1_app/features/auth/presentation/cubit/auth_cubit.dart';
@@ -47,12 +48,12 @@ class _WorkshopProgressDetailPageState extends State<WorkshopProgressDetailPage>
       listener: (context, state) {
         if (state is WorkshopProgressError) {
           ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-            backgroundColor: const Color(0xFFEF4444),
+            backgroundColor: AppColors.error,
             content: Text(state.message),
           ));
         } else if (state is WorkshopProgressSuccess) {
           ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-            backgroundColor: const Color(0xFF10B981),
+            backgroundColor: AppColors.success,
             content: Text(state.message),
           ));
         }
@@ -60,7 +61,7 @@ class _WorkshopProgressDetailPageState extends State<WorkshopProgressDetailPage>
       builder: (context, state) {
         if (state is WorkshopProgressLoading && state.activeOrders.isEmpty) {
           return const Scaffold(
-            backgroundColor: Color(0xFF0F172A),
+            backgroundColor: AppColors.darkBackground,
             body: Center(
                 child: CircularProgressIndicator(color: Color(0xFF8B5CF6))),
           );
@@ -77,7 +78,7 @@ class _WorkshopProgressDetailPageState extends State<WorkshopProgressDetailPage>
 
         if (order == null) {
           return Scaffold(
-            backgroundColor: const Color(0xFF0F172A),
+            backgroundColor: AppColors.darkBackground,
             appBar: AppBar(backgroundColor: Colors.transparent, elevation: 0),
             body: const Center(
               child: Text('Cargando orden...',
@@ -89,9 +90,9 @@ class _WorkshopProgressDetailPageState extends State<WorkshopProgressDetailPage>
         final history = state.history;
 
         return Scaffold(
-          backgroundColor: const Color(0xFF0F172A),
+          backgroundColor: AppColors.darkBackground,
           appBar: AppBar(
-            backgroundColor: const Color(0xFF1E293B),
+            backgroundColor: AppColors.darkCard,
             elevation: 0,
             iconTheme: const IconThemeData(color: Colors.white),
             title: Column(
@@ -109,8 +110,8 @@ class _WorkshopProgressDetailPageState extends State<WorkshopProgressDetailPage>
             ),
             bottom: TabBar(
               controller: _tabController,
-              indicatorColor: const Color(0xFF8B5CF6),
-              labelColor: const Color(0xFF8B5CF6),
+              indicatorColor: AppColors.primary,
+              labelColor: AppColors.primary,
               unselectedLabelColor: Colors.white54,
               tabs: const [
                 Tab(text: 'Servicios', icon: Icon(Icons.handyman)),
@@ -193,7 +194,7 @@ class _ServiciosTab extends StatelessWidget {
                     .read<WorkshopProgressCubit>()
                     .finishWorkOrder(order.id),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF10B981),
+                  backgroundColor: AppColors.success,
                   foregroundColor: Colors.white,
                   padding: const EdgeInsets.symmetric(vertical: 16),
                   shape: RoundedRectangleBorder(
@@ -226,7 +227,7 @@ class _HeaderInfo extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: const Color(0xFF1E293B),
+        color: AppColors.darkCard,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
       ),
@@ -247,7 +248,7 @@ class _HeaderInfo extends StatelessWidget {
           LinearProgressIndicator(
             value: total == 0 ? 0 : terminados / total,
             backgroundColor: Colors.white.withValues(alpha: 0.1),
-            color: const Color(0xFF8B5CF6),
+            color: AppColors.primary,
             minHeight: 8,
             borderRadius: BorderRadius.circular(4),
           ),
@@ -308,7 +309,7 @@ class _ServiceProgressItemState extends State<_ServiceProgressItem> {
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: const Color(0xFF1E293B).withValues(alpha: 0.6),
+        color: AppColors.darkCard.withValues(alpha: 0.6),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
       ),
@@ -409,7 +410,7 @@ class _ServiceProgressItemState extends State<_ServiceProgressItem> {
     return Container(
       height: 40,
       decoration: BoxDecoration(
-        color: const Color(0xFF0F172A),
+        color: AppColors.darkBackground,
         borderRadius: BorderRadius.circular(6),
         border: Border.all(color: Colors.white12),
       ),
@@ -445,7 +446,7 @@ class _ServiceProgressItemState extends State<_ServiceProgressItem> {
     if (d.estado == 'POR_HACER' || d.estado == 'PAUSADO') {
       actions.add(_buildActionBtn(
         label: 'Iniciar',
-        color: const Color(0xFF3B82F6),
+        color: AppColors.info,
         onTap: () => cubit.startServiceDetail(widget.orderId, d.id),
       ));
     }
@@ -453,13 +454,13 @@ class _ServiceProgressItemState extends State<_ServiceProgressItem> {
     if (d.estado == 'EN_PROCESO') {
       actions.add(_buildActionBtn(
         label: 'Pausar',
-        color: const Color(0xFFF59E0B),
+        color: AppColors.warning,
         onTap: () => cubit.pauseServiceDetail(
             widget.orderId, d.id, _motivoPausaCtrl.text),
       ));
       actions.add(_buildActionBtn(
         label: 'Finalizar',
-        color: const Color(0xFF10B981),
+        color: AppColors.success,
         onTap: () => cubit.finishServiceDetail(
           widget.orderId,
           d.id,
@@ -472,7 +473,7 @@ class _ServiceProgressItemState extends State<_ServiceProgressItem> {
     if (d.estado != 'FINALIZADO' && d.estado != 'INNECESARIO') {
       actions.add(_buildActionBtn(
         label: 'Innecesario',
-        color: const Color(0xFF64748B),
+        color: AppColors.darkTextTertiary,
         onTap: () => cubit.markServiceUnnecessary(
             widget.orderId, d.id, _motivoInnecesarioCtrl.text),
       ));
@@ -572,7 +573,7 @@ class _RepuestosTab extends StatelessWidget {
                 final user = authState.user;
                 if (user.isAdmin || user.isAsesor) {
                   return FloatingActionButton.extended(
-                    backgroundColor: const Color(0xFFEF4444),
+                    backgroundColor: AppColors.error,
                     onPressed: () => _showSolicitarRepuestosSheet(context),
                     icon: const Icon(Icons.add_shopping_cart, color: Colors.white),
                     label: const Text('Solicitar Repuestos', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
@@ -593,7 +594,7 @@ class _RepuestosTab extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: 8),
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: const Color(0xFF1E293B).withValues(alpha: 0.6),
+        color: AppColors.darkCard.withValues(alpha: 0.6),
         borderRadius: BorderRadius.circular(8),
         border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
       ),
@@ -630,7 +631,7 @@ class _RepuestosTab extends StatelessWidget {
                     );
               },
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF3B82F6),
+                backgroundColor: AppColors.info,
                 padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                 minimumSize: Size.zero,
                 tapTargetSize: MaterialTapTargetSize.shrinkWrap,
@@ -648,7 +649,7 @@ class _RepuestosTab extends StatelessWidget {
     
     showModalBottomSheet(
       context: context,
-      backgroundColor: const Color(0xFF1E293B),
+      backgroundColor: AppColors.darkCard,
       isScrollControlled: true,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
@@ -748,7 +749,7 @@ class _SolicitarRepuestosFormState extends State<_SolicitarRepuestosForm> {
                     Navigator.pop(context);
                   },
                   style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFFEF4444)),
+                      backgroundColor: AppColors.error),
                   child: const Text('Crear Solicitud',
                       style: TextStyle(color: Colors.white)),
                 ),
@@ -769,7 +770,7 @@ class _SolicitarRepuestosFormState extends State<_SolicitarRepuestosForm> {
       margin: const EdgeInsets.only(bottom: 8),
       padding: const EdgeInsets.all(8),
       decoration: BoxDecoration(
-        color: const Color(0xFF0F172A),
+        color: AppColors.darkBackground,
         borderRadius: BorderRadius.circular(8),
         border: Border.all(color: Colors.white12),
       ),
@@ -784,7 +785,7 @@ class _SolicitarRepuestosFormState extends State<_SolicitarRepuestosForm> {
                     value: linea.itemInventarioId.isEmpty ? null : linea.itemInventarioId,
                     hint: const Text('Seleccionar ítem...', style: TextStyle(color: Colors.white54, fontSize: 13)),
                     isExpanded: true,
-                    dropdownColor: const Color(0xFF1E293B),
+                    dropdownColor: AppColors.darkCard,
                     style: const TextStyle(color: Colors.white, fontSize: 13),
                     items: inventoryItems.map((item) {
                       return DropdownMenuItem(
@@ -893,7 +894,7 @@ class _HistorialTab extends StatelessWidget {
           bottom: 16,
           right: 16,
           child: FloatingActionButton(
-            backgroundColor: const Color(0xFF8B5CF6),
+            backgroundColor: AppColors.primary,
             onPressed: () => _showAddProgressSheet(context),
             child: const Icon(Icons.add_comment, color: Colors.white),
           ),
@@ -909,7 +910,7 @@ class _HistorialTab extends StatelessWidget {
 
     showModalBottomSheet(
       context: context,
-      backgroundColor: const Color(0xFF1E293B),
+      backgroundColor: AppColors.darkCard,
       isScrollControlled: true,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
@@ -937,7 +938,7 @@ class _HistorialTab extends StatelessWidget {
                 labelText: 'Mensaje u observación',
                 labelStyle: const TextStyle(color: Colors.white54),
                 filled: true,
-                fillColor: const Color(0xFF0F172A),
+                fillColor: AppColors.darkBackground,
                 border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8),
                     borderSide: BorderSide.none),
@@ -952,7 +953,7 @@ class _HistorialTab extends StatelessWidget {
                 labelText: 'Porcentaje actual estimado (0-100)',
                 labelStyle: const TextStyle(color: Colors.white54),
                 filled: true,
-                fillColor: const Color(0xFF0F172A),
+                fillColor: AppColors.darkBackground,
                 border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8),
                     borderSide: BorderSide.none),
@@ -973,7 +974,7 @@ class _HistorialTab extends StatelessWidget {
                   Navigator.pop(ctx);
                 },
                 style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF8B5CF6),
+                    backgroundColor: AppColors.primary,
                     padding: const EdgeInsets.symmetric(vertical: 14)),
                 child: const Text('Guardar Registro',
                     style: TextStyle(
@@ -1066,16 +1067,16 @@ class _EstadoBadge extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final (color, label) = switch (estado) {
-      'ABIERTA' => (const Color(0xFFF59E0B), 'Abierta'),
+      'ABIERTA' => (AppColors.warning, 'Abierta'),
       'ASIGNADA' => (const Color(0xFF6366F1), 'Asignada'),
-      'EN_PROCESO' => (const Color(0xFF3B82F6), 'En Proceso'),
-      'PAUSADA' => (const Color(0xFFEF4444), 'Pausada'),
-      'FINALIZADA' => (const Color(0xFF10B981), 'Finalizada'),
-      'CERRADA' => (const Color(0xFF64748B), 'Cerrada'),
-      'POR_HACER' => (const Color(0xFF94A3B8), 'Por Hacer'),
-      'FINALIZADO' => (const Color(0xFF10B981), 'Finalizado'),
-      'INNECESARIO' => (const Color(0xFFEF4444), 'Anulado'),
-      'EN PROCESO' => (const Color(0xFF3B82F6), 'En Proceso'),
+      'EN_PROCESO' => (AppColors.info, 'En Proceso'),
+      'PAUSADA' => (AppColors.error, 'Pausada'),
+      'FINALIZADA' => (AppColors.success, 'Finalizada'),
+      'CERRADA' => (AppColors.darkTextTertiary, 'Cerrada'),
+      'POR_HACER' => (AppColors.darkTextTertiary, 'Por Hacer'),
+      'FINALIZADO' => (AppColors.success, 'Finalizado'),
+      'INNECESARIO' => (AppColors.error, 'Anulado'),
+      'EN PROCESO' => (AppColors.info, 'En Proceso'),
       _ => (Colors.grey, estado),
     };
 

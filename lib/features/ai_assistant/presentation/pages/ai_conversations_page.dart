@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
+import 'package:mobile1_app/core/theme/app_colors.dart';
 import '../cubit/ai_conversations_cubit.dart';
 
 class AiConversationsPage extends StatefulWidget {
@@ -21,25 +22,22 @@ class _AiConversationsPageState extends State<AiConversationsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFC),
+      backgroundColor: AppColors.darkBackground,
       appBar: AppBar(
-        title: const Text('Asistente IA', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
-        backgroundColor: const Color(0xFF4F46E5),
-        elevation: 0,
-        iconTheme: const IconThemeData(color: Colors.white),
+        title: const Text('Asistente IA'),
       ),
       body: BlocConsumer<AiConversationsCubit, AiConversationsState>(
         listener: (context, state) {
           if (state is AiConversationsError) {
             ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-              backgroundColor: const Color(0xFFEF4444),
+              backgroundColor: AppColors.error,
               content: Text(state.message),
             ));
           }
         },
         builder: (context, state) {
           if (state is AiConversationsLoading && state is! AiConversationsLoaded) {
-            return const Center(child: CircularProgressIndicator());
+            return const Center(child: CircularProgressIndicator(color: AppColors.primary));
           }
           if (state is AiConversationsLoaded) {
             final conversations = state.conversations;
@@ -55,12 +53,12 @@ class _AiConversationsPageState extends State<AiConversationsPage> {
               },
             );
           }
-          return const Center(child: Text('Error al cargar conversaciones'));
+          return Center(child: Text('Error al cargar conversaciones', style: TextStyle(color: AppColors.darkTextSecondary)));
         },
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => _startNewConversation(context),
-        backgroundColor: const Color(0xFF4F46E5),
+        backgroundColor: AppColors.primary,
         icon: const Icon(Icons.add_comment, color: Colors.white),
         label: const Text('Nuevo Chat', style: TextStyle(color: Colors.white)),
       ),
@@ -72,17 +70,17 @@ class _AiConversationsPageState extends State<AiConversationsPage> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.smart_toy, size: 80, color: Colors.indigo[200]),
+          Icon(Icons.smart_toy, size: 80, color: AppColors.primary.withValues(alpha: 0.5)),
           const SizedBox(height: 24),
           const Text(
             '¡Hola! Soy tu Asistente Inteligente',
-            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white),
           ),
           const SizedBox(height: 12),
           Text(
             'Inicia un nuevo chat para consultarme sobre citas,\nvehículos, presupuestos y más.',
             textAlign: TextAlign.center,
-            style: TextStyle(color: Colors.grey[600], fontSize: 16),
+            style: TextStyle(color: AppColors.darkTextSecondary, fontSize: 16),
           ),
         ],
       ),
@@ -91,15 +89,18 @@ class _AiConversationsPageState extends State<AiConversationsPage> {
 
   Widget _buildConversationCard(dynamic conv, BuildContext context) {
     final dateFormat = DateFormat('dd/MM/yyyy HH:mm');
-    return Card(
-      elevation: 1,
+    return Container(
       margin: const EdgeInsets.only(bottom: 12),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      decoration: BoxDecoration(
+        color: AppColors.darkCard,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: AppColors.darkCardBorder),
+      ),
       child: InkWell(
         onTap: () {
           context.push('/ai/chat/${conv.id}');
         },
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(14),
         child: Padding(
           padding: const EdgeInsets.all(16),
           child: Row(
@@ -108,10 +109,10 @@ class _AiConversationsPageState extends State<AiConversationsPage> {
                 width: 50,
                 height: 50,
                 decoration: BoxDecoration(
-                  color: Colors.indigo.withValues(alpha: 0.1),
+                  color: AppColors.primary.withValues(alpha: 0.15),
                   shape: BoxShape.circle,
                 ),
-                child: const Icon(Icons.smart_toy, color: Colors.indigo),
+                child: const Icon(Icons.smart_toy, color: AppColors.primary),
               ),
               const SizedBox(width: 16),
               Expanded(
@@ -123,37 +124,38 @@ class _AiConversationsPageState extends State<AiConversationsPage> {
                       children: [
                         const Text(
                           'Conversación',
-                          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.white),
                         ),
                         Text(
                           dateFormat.format(conv.updatedAt.toLocal()),
-                          style: TextStyle(color: Colors.grey[500], fontSize: 12),
+                          style: TextStyle(color: AppColors.darkTextTertiary, fontSize: 12),
                         ),
                       ],
                     ),
                     const SizedBox(height: 6),
                     Text(
                       '${conv.numMensajes} mensajes',
-                      style: TextStyle(color: Colors.grey[600], fontSize: 14),
+                      style: TextStyle(color: AppColors.darkTextSecondary, fontSize: 14),
                     ),
                   ],
                 ),
               ),
               const SizedBox(width: 8),
               PopupMenuButton<String>(
+                color: AppColors.darkCard,
                 onSelected: (value) {
                   if (value == 'archivar') {
                     context.read<AiConversationsCubit>().archive(conv.id);
                   }
                 },
                 itemBuilder: (context) => [
-                  const PopupMenuItem(
+                  PopupMenuItem(
                     value: 'archivar',
                     child: Row(
                       children: [
-                        Icon(Icons.archive, size: 20, color: Colors.grey),
-                        SizedBox(width: 8),
-                        Text('Archivar'),
+                        Icon(Icons.archive, size: 20, color: AppColors.darkTextTertiary),
+                        const SizedBox(width: 8),
+                        Text('Archivar', style: TextStyle(color: AppColors.darkTextPrimary)),
                       ],
                     ),
                   ),
