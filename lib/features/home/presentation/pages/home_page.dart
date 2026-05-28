@@ -408,7 +408,7 @@ class HomePage extends StatelessWidget {
           SizedBox(
             width: double.infinity,
             child: ElevatedButton.icon(
-              onPressed: () => context.push('/reports/vehicle'),
+              onPressed: () => context.push('/reports'),
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFF0F766E),
                 foregroundColor: Colors.white,

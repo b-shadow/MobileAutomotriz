@@ -1,11 +1,9 @@
 import '../../../../core/network/api_client.dart';
 import '../../../../core/storage/session_storage.dart';
-import '../../../../core/constants/api_constants.dart';
-import '../models/report_models.dart';
+import '../../domain/entities/report_data.dart';
 
 abstract class ReportsRemoteDataSource {
-  Future<List<TopVehicleModel>> getTopVehicles();
-  Future<VehicleReportDetailModel> getVehicleReport(String placa);
+  Future<ReportData> getReportData(String endpoint, Map<String, dynamic> queryParams);
 }
 
 class ReportsRemoteDataSourceImpl implements ReportsRemoteDataSource {
@@ -27,19 +25,27 @@ class ReportsRemoteDataSourceImpl implements ReportsRemoteDataSource {
   }
 
   @override
-  Future<List<TopVehicleModel>> getTopVehicles() async {
+  Future<ReportData> getReportData(String endpoint, Map<String, dynamic> queryParams) async {
     final slug = await _getTenantSlug();
-    final url = ApiConstants.reportesVehiculo(slug);
+    
+    // Generar string de parametros
+    String queryString = '';
+    if (queryParams.isNotEmpty) {
+      final List<String> paramsList = [];
+      queryParams.forEach((key, value) {
+        if (value != null && value.toString().isNotEmpty) {
+          paramsList.add('$key=${Uri.encodeComponent(value.toString())}');
+        }
+      });
+      if (paramsList.isNotEmpty) {
+        queryString = '?${paramsList.join('&')}';
+      }
+    }
+    
+    // endpoint deberia ser por ejemplo 'global_stats', 'vehiculo', etc.
+    final url = '/api/$slug/comunicacion-control/reportes/$endpoint/$queryString';
     final response = await apiClient.get(url);
-    final data = response.data['top_vehiculos'] as List<dynamic>? ?? [];
-    return data.map((e) => TopVehicleModel.fromJson(e as Map<String, dynamic>)).toList();
-  }
-
-  @override
-  Future<VehicleReportDetailModel> getVehicleReport(String placa) async {
-    final slug = await _getTenantSlug();
-    final url = '${ApiConstants.reportesVehiculo(slug)}?placa=$placa';
-    final response = await apiClient.get(url);
-    return VehicleReportDetailModel.fromJson(response.data as Map<String, dynamic>);
+    
+    return ReportData(response.data as Map<String, dynamic>);
   }
 }

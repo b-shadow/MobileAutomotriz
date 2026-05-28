@@ -42,8 +42,8 @@ import '../../features/ai_assistant/presentation/pages/ai_chat_page.dart';
 import '../../features/ai_assistant/presentation/cubit/ai_conversations_cubit.dart';
 import '../../features/ai_assistant/presentation/cubit/ai_chat_cubit.dart';
 
-import '../../features/reports/presentation/pages/vehicle_reports_page.dart';
-import '../../features/reports/presentation/cubit/vehicle_report_cubit.dart';
+import '../../features/reports/presentation/pages/reports_page.dart';
+import '../../features/reports/presentation/cubit/report_cubit.dart';
 
 import '../../features/auth/presentation/pages/login_page.dart';
 import '../../features/auth/presentation/pages/register_page.dart';
@@ -323,11 +323,11 @@ class AppRouter {
       ),
 
       GoRoute(
-        path: '/reports/vehicle',
-        name: 'reports-vehicle',
+        path: '/reports',
+        name: 'reports',
         builder: (context, state) => BlocProvider(
-          create: (context) => sl<VehicleReportCubit>(),
-          child: const VehicleReportsPage(),
+          create: (context) => sl<ReportCubit>(),
+          child: const ReportsPage(),
         ),
       ),
     ],

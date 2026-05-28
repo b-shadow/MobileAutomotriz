@@ -151,8 +151,8 @@ import 'features/workshop_progress/presentation/cubit/workshop_progress_cubit.da
 import 'features/reports/data/datasources/reports_remote_data_source.dart';
 import 'features/reports/data/repositories/reports_repository_impl.dart';
 import 'features/reports/domain/repositories/reports_repository.dart';
-import 'features/reports/domain/usecases/reports_usecases.dart';
-import 'features/reports/presentation/cubit/vehicle_report_cubit.dart';
+import 'features/reports/domain/usecases/get_report_data.dart';
+import 'features/reports/presentation/cubit/report_cubit.dart';
 
 final sl = GetIt.instance;
 
@@ -713,26 +713,21 @@ Future<void> initDependencies(SharedPreferences prefs) async {
   // ── Reports ───────────────────────────────────────────
 
   // Cubits
-  sl.registerFactory(
-    () => VehicleReportCubit(
-      getTopVehicles: sl(),
-      getVehicleReport: sl(),
-    ),
-  );
+  sl.registerFactory(() => ReportCubit(
+        getReportData: sl(),
+      ));
 
   // Use Cases
-  sl.registerLazySingleton(() => GetTopVehicles(sl()));
-  sl.registerLazySingleton(() => GetVehicleReport(sl()));
+  sl.registerLazySingleton(() => GetReportData(sl()));
 
   // Repository
   sl.registerLazySingleton<ReportsRepository>(
     () => ReportsRepositoryImpl(
       remoteDataSource: sl(),
-      networkInfo: sl(),
     ),
   );
 
-  // DataSource
+  // Data Sources
   sl.registerLazySingleton<ReportsRemoteDataSource>(
     () => ReportsRemoteDataSourceImpl(
       apiClient: sl(),
