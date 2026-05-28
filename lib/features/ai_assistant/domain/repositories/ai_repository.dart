@@ -8,4 +8,5 @@ abstract class AiRepository {
   Future<Result<void>> archiveConversation(String id);
   Future<Result<AiResponse>> sendMessage(String id, String content);
   Future<Result<AiAction>> confirmAction(String id, String accionId);
+  Future<Result<String>> transcribeAudio(String path);
 }

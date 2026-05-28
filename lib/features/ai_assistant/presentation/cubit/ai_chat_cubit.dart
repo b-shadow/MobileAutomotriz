@@ -4,6 +4,8 @@ import '../../domain/entities/ai_conversation.dart';
 import '../../domain/usecases/ai_usecases.dart';
 import '../../../../core/error/result.dart';
 
+import '../../../../core/storage/session_storage.dart';
+
 abstract class AiChatState extends Equatable {
   const AiChatState();
   @override
@@ -52,11 +54,17 @@ class AiChatCubit extends Cubit<AiChatState> {
   final GetAiConversationDetail getAiConversationDetail;
   final SendAiMessage sendAiMessage;
   final ConfirmAiAction confirmAiAction;
+  final TranscribeAiAudio transcribeAiAudio;
+  final SessionStorage sessionStorage;
+  final ArchiveAiConversation archiveAiConversation;
 
   AiChatCubit({
     required this.getAiConversationDetail,
     required this.sendAiMessage,
     required this.confirmAiAction,
+    required this.transcribeAiAudio,
+    required this.sessionStorage,
+    required this.archiveAiConversation,
   }) : super(AiChatInitial());
 
   Future<void> fetchDetail(String id) async {
@@ -64,7 +72,29 @@ class AiChatCubit extends Cubit<AiChatState> {
     final result = await getAiConversationDetail(id);
     switch (result) {
       case Success(:final data):
-        emit(AiChatLoaded(conversation: data));
+        var conversation = data;
+        var suggestedActions = <String>[];
+        if (conversation.mensajes.isEmpty) {
+          final userData = sessionStorage.userData;
+          final userName = userData?['nombres'] ?? 'Usuario';
+          final welcomeMessage = AiMessage(
+            id: 'welcome',
+            sender: 'ai',
+            text: '¡Hola $userName! Bienvenido al asistente de AutoTaller Pro. Estoy listo para ayudarte con tus tareas diarias.',
+            createdAt: DateTime.now(),
+          );
+          conversation = AiConversation(
+            id: conversation.id,
+            estado: conversation.estado,
+            canal: conversation.canal,
+            createdAt: conversation.createdAt,
+            updatedAt: conversation.updatedAt,
+            numMensajes: 1,
+            mensajes: [welcomeMessage],
+          );
+          suggestedActions = ['¿Qué puedes hacer?', 'Registrar Vehículo', 'Agendar Cita'];
+        }
+        emit(AiChatLoaded(conversation: conversation, currentSuggestedActions: suggestedActions));
       case Err(:final failure):
         emit(AiChatError(failure.message));
     }
@@ -131,5 +161,38 @@ class AiChatCubit extends Cubit<AiChatState> {
   Future<void> confirmAction(String conversationId, String accionId) async {
     // Implementación futura si es necesario
     await confirmAiAction(conversationId, accionId);
+  }
+
+  Future<void> sendAudioMessage(String conversationId, String audioPath) async {
+    if (state is! AiChatLoaded) return;
+    final currentState = state as AiChatLoaded;
+
+    emit(currentState.copyWith(isWaitingForAi: true));
+
+    final transcribeResult = await transcribeAiAudio(audioPath);
+    switch (transcribeResult) {
+      case Success(:final data):
+        // If it transcribed successfully but the text is empty, just stop loading
+        if (data.trim().isEmpty) {
+          emit(currentState.copyWith(isWaitingForAi: false));
+          return;
+        }
+        // Send the transcribed text as a normal message
+        await sendMessage(conversationId, data);
+      case Err(:final failure):
+        emit(AiChatError('Error al transcribir audio: ${failure.message}'));
+        emit(currentState.copyWith(isWaitingForAi: false));
+    }
+  }
+
+  Future<bool> clearChat(String conversationId) async {
+    final result = await archiveAiConversation(conversationId);
+    switch (result) {
+      case Success():
+        return true;
+      case Err(:final failure):
+        emit(AiChatError('Error al limpiar chat: ${failure.message}'));
+        return false;
+    }
   }
 }

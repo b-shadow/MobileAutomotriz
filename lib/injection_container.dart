@@ -679,6 +679,9 @@ Future<void> initDependencies(SharedPreferences prefs) async {
       getAiConversationDetail: sl(),
       sendAiMessage: sl(),
       confirmAiAction: sl(),
+      transcribeAiAudio: sl(),
+      sessionStorage: sl(),
+      archiveAiConversation: sl(),
     ),
   );
 
@@ -689,6 +692,7 @@ Future<void> initDependencies(SharedPreferences prefs) async {
   sl.registerLazySingleton(() => ArchiveAiConversation(sl()));
   sl.registerLazySingleton(() => SendAiMessage(sl()));
   sl.registerLazySingleton(() => ConfirmAiAction(sl()));
+  sl.registerLazySingleton(() => TranscribeAiAudio(sl()));
 
   // Repository
   sl.registerLazySingleton<AiRepository>(

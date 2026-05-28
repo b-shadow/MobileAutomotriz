@@ -183,6 +183,7 @@ class ApiConstants {
   static String iaArchivar(String slug, String id) => '/api/$slug/comunicacion-control/ia/$id/archivar/';
   static String iaEnviarMensaje(String slug, String id) => '/api/$slug/comunicacion-control/ia/$id/enviar_mensaje/';
   static String iaConfirmarAccion(String slug, String id) => '/api/$slug/comunicacion-control/ia/$id/confirmar_accion/';
+  static String iaTranscribir(String slug) => '/api/$slug/comunicacion-control/ia/transcribir/';
 
   // ── Reportes ────────────────────────────────────────────
   static String reportesVehiculo(String slug) => '/api/$slug/vehiculos-servicios/reportes/vehiculo/';

@@ -1,7 +1,12 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:mobile1_app/core/theme/app_colors.dart';
+import 'package:flutter_tts/flutter_tts.dart';
+import 'package:record/record.dart';
+import 'package:path_provider/path_provider.dart';
 import '../cubit/ai_chat_cubit.dart';
 
 class AiChatPage extends StatefulWidget {
@@ -16,17 +21,36 @@ class AiChatPage extends StatefulWidget {
 class _AiChatPageState extends State<AiChatPage> {
   final TextEditingController _textController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
+  
+  // Audio & TTS
+  late final AudioRecorder _audioRecorder;
+  final FlutterTts _flutterTts = FlutterTts();
+  bool _isRecording = false;
+  bool _isVoiceEnabled = true;
+  String? _lastSpokenMessageId;
+  String? _recordingPath;
 
   @override
   void initState() {
     super.initState();
+    _audioRecorder = AudioRecorder();
+    _initTts();
     context.read<AiChatCubit>().fetchDetail(widget.conversationId);
+  }
+
+  Future<void> _initTts() async {
+    await _flutterTts.setLanguage("es-ES");
+    await _flutterTts.setSpeechRate(0.5);
+    await _flutterTts.setVolume(1.0);
+    await _flutterTts.setPitch(1.0);
   }
 
   @override
   void dispose() {
     _textController.dispose();
     _scrollController.dispose();
+    _audioRecorder.dispose();
+    _flutterTts.stop();
     super.dispose();
   }
 
@@ -49,6 +73,58 @@ class _AiChatPageState extends State<AiChatPage> {
     }
   }
 
+  Future<void> _startRecording() async {
+    try {
+      if (await _audioRecorder.hasPermission()) {
+        final dir = await getTemporaryDirectory();
+        _recordingPath = '${dir.path}/voice_input_${DateTime.now().millisecondsSinceEpoch}.wav';
+        
+        await _audioRecorder.start(
+          const RecordConfig(encoder: AudioEncoder.wav),
+          path: _recordingPath!,
+        );
+
+        setState(() {
+          _isRecording = true;
+        });
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Permiso de micrófono denegado', style: TextStyle(color: Colors.white)), backgroundColor: AppColors.error),
+        );
+      }
+    } catch (e) {
+      debugPrint('Error starting record: $e');
+    }
+  }
+
+  Future<void> _stopRecording() async {
+    try {
+      final path = await _audioRecorder.stop();
+      setState(() {
+        _isRecording = false;
+      });
+
+      if (path != null) {
+        context.read<AiChatCubit>().sendAudioMessage(widget.conversationId, path);
+        Future.delayed(const Duration(milliseconds: 100), _scrollToBottom);
+      }
+    } catch (e) {
+      debugPrint('Error stopping record: $e');
+      setState(() {
+        _isRecording = false;
+      });
+    }
+  }
+
+  void _toggleVoice() {
+    setState(() {
+      _isVoiceEnabled = !_isVoiceEnabled;
+    });
+    if (!_isVoiceEnabled) {
+      _flutterTts.stop();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -61,6 +137,36 @@ class _AiChatPageState extends State<AiChatPage> {
             Text('Asistente Virtual'),
           ],
         ),
+        actions: [
+          IconButton(
+            icon: Icon(_isVoiceEnabled ? Icons.volume_up : Icons.volume_off),
+            onPressed: _toggleVoice,
+            tooltip: _isVoiceEnabled ? 'Desactivar Voz' : 'Activar Voz',
+          ),
+          PopupMenuButton<String>(
+            color: AppColors.darkCard,
+            onSelected: (value) async {
+              if (value == 'clear') {
+                final success = await context.read<AiChatCubit>().clearChat(widget.conversationId);
+                if (success && context.mounted) {
+                  context.replace('/ai');
+                }
+              }
+            },
+            itemBuilder: (context) => [
+              PopupMenuItem(
+                value: 'clear',
+                child: Row(
+                  children: [
+                    Icon(Icons.cleaning_services, size: 20, color: AppColors.error),
+                    const SizedBox(width: 8),
+                    Text('Limpiar Chat', style: TextStyle(color: AppColors.error)),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ],
       ),
       body: BlocConsumer<AiChatCubit, AiChatState>(
         listener: (context, state) {
@@ -72,6 +178,17 @@ class _AiChatPageState extends State<AiChatPage> {
           }
           if (state is AiChatLoaded) {
             Future.delayed(const Duration(milliseconds: 100), _scrollToBottom);
+            
+            // Speak if voice enabled, it's a new message from AI, and not waiting for AI
+            if (!state.isWaitingForAi && state.conversation.mensajes.isNotEmpty) {
+              final lastMsg = state.conversation.mensajes.last;
+              if (lastMsg.sender == 'ai' && _lastSpokenMessageId != lastMsg.id) {
+                _lastSpokenMessageId = lastMsg.id;
+                if (_isVoiceEnabled) {
+                  _flutterTts.speak(lastMsg.text);
+                }
+              }
+            }
           }
         },
         builder: (context, state) {
@@ -242,8 +359,11 @@ class _AiChatPageState extends State<AiChatPage> {
                 enabled: !isWaiting,
                 style: const TextStyle(color: AppColors.darkTextPrimary, fontSize: 15),
                 decoration: InputDecoration(
-                  hintText: 'Escribe un mensaje...',
-                  hintStyle: TextStyle(color: AppColors.darkTextTertiary),
+                  hintText: _isRecording ? 'Escuchando...' : 'Escribe un mensaje...',
+                  hintStyle: TextStyle(
+                    color: _isRecording ? AppColors.error : AppColors.darkTextTertiary,
+                    fontStyle: _isRecording ? FontStyle.italic : FontStyle.normal,
+                  ),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(24),
                     borderSide: BorderSide.none,
@@ -262,17 +382,34 @@ class _AiChatPageState extends State<AiChatPage> {
                 ),
                 textInputAction: TextInputAction.send,
                 onSubmitted: (_) => _sendMessage(),
+                onChanged: (text) {
+                  setState(() {}); // For rebuilding to switch icon if text is present
+                },
               ),
             ),
             const SizedBox(width: 8),
-            CircleAvatar(
-              backgroundColor: isWaiting ? AppColors.darkTextTertiary : AppColors.primary,
-              radius: 24,
-              child: IconButton(
-                icon: const Icon(Icons.send, color: Colors.white),
-                onPressed: isWaiting ? null : _sendMessage,
-              ),
-            ),
+            _textController.text.isNotEmpty
+              ? CircleAvatar(
+                  backgroundColor: isWaiting ? AppColors.darkTextTertiary : AppColors.primary,
+                  radius: 24,
+                  child: IconButton(
+                    icon: const Icon(Icons.send, color: Colors.white),
+                    onPressed: isWaiting ? null : _sendMessage,
+                  ),
+                )
+              : GestureDetector(
+                  onTapDown: (_) => isWaiting ? null : _startRecording(),
+                  onTapUp: (_) => isWaiting ? null : _stopRecording(),
+                  onTapCancel: () => isWaiting ? null : _stopRecording(),
+                  child: CircleAvatar(
+                    backgroundColor: _isRecording ? AppColors.error : (isWaiting ? AppColors.darkTextTertiary : AppColors.darkSurfaceVariant),
+                    radius: 24,
+                    child: Icon(
+                      Icons.mic, 
+                      color: _isRecording ? Colors.white : AppColors.primary,
+                    ),
+                  ),
+                ),
           ],
         ),
       ),

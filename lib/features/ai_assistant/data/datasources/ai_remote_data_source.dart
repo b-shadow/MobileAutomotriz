@@ -1,3 +1,4 @@
+import 'package:dio/dio.dart';
 import '../../../../core/network/api_client.dart';
 import '../../../../core/storage/session_storage.dart';
 import '../../../../core/constants/api_constants.dart';
@@ -10,6 +11,7 @@ abstract class AiRemoteDataSource {
   Future<void> archiveConversation(String id);
   Future<AiResponseModel> sendMessage(String id, String content);
   Future<AiActionModel> confirmAction(String id, String accionId);
+  Future<String> transcribeAudio(String path);
 }
 
 class AiRemoteDataSourceImpl implements AiRemoteDataSource {
@@ -73,5 +75,20 @@ class AiRemoteDataSourceImpl implements AiRemoteDataSource {
     final url = ApiConstants.iaConfirmarAccion(slug, id);
     final response = await apiClient.post(url, data: {'accion_id': accionId});
     return AiActionModel.fromJson(response.data);
+  }
+
+  @override
+  Future<String> transcribeAudio(String path) async {
+    final slug = await _getTenantSlug();
+    final url = ApiConstants.iaTranscribir(slug);
+    
+    // We use dio's FormData directly since we need multipart/form-data
+    final formData = FormData.fromMap({
+      'audio': await MultipartFile.fromFile(path, filename: 'voice_input.wav'),
+    });
+    
+    // Send using apiClient which uses dio under the hood
+    final response = await apiClient.post(url, data: formData);
+    return response.data['texto'] as String? ?? '';
   }
 }

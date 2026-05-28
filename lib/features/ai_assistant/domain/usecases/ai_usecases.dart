@@ -37,3 +37,9 @@ class ConfirmAiAction {
   ConfirmAiAction(this.repository);
   Future<Result<AiAction>> call(String id, String accionId) => repository.confirmAction(id, accionId);
 }
+
+class TranscribeAiAudio {
+  final AiRepository repository;
+  TranscribeAiAudio(this.repository);
+  Future<Result<String>> call(String path) => repository.transcribeAudio(path);
+}

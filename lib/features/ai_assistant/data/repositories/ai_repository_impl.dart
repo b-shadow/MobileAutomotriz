@@ -91,4 +91,17 @@ class AiRepositoryImpl implements AiRepository {
       return Err(ServerFailure(message: e.toString()));
     }
   }
+
+  @override
+  Future<Result<String>> transcribeAudio(String path) async {
+    if (!await networkInfo.isConnected) {
+      return const Err(NetworkFailure());
+    }
+    try {
+      final text = await remoteDataSource.transcribeAudio(path);
+      return Success(text);
+    } catch (e) {
+      return Err(ServerFailure(message: e.toString()));
+    }
+  }
 }
