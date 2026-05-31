@@ -154,6 +154,26 @@ import 'features/reports/domain/repositories/reports_repository.dart';
 import 'features/reports/domain/usecases/get_report_data.dart';
 import 'features/reports/presentation/cubit/report_cubit.dart';
 
+import 'features/inventory/data/datasources/inventory_remote_data_source.dart';
+import 'features/inventory/data/repositories/inventory_repository_impl.dart';
+import 'features/inventory/domain/repositories/inventory_repository.dart';
+import 'features/inventory/domain/usecases/get_categories.dart';
+import 'features/inventory/domain/usecases/create_category.dart';
+import 'features/inventory/domain/usecases/get_inventory_items.dart' as inv;
+import 'features/inventory/domain/usecases/create_inventory_item.dart';
+import 'features/inventory/domain/usecases/adjust_stock.dart';
+import 'features/inventory/domain/usecases/get_movements.dart';
+import 'features/inventory/presentation/cubit/inventory_cubit.dart';
+
+import 'features/supplier/data/datasources/supplier_remote_data_source.dart';
+import 'features/supplier/data/repositories/supplier_repository_impl.dart';
+import 'features/supplier/domain/repositories/supplier_repository.dart';
+import 'features/supplier/domain/usecases/get_suppliers.dart';
+import 'features/supplier/domain/usecases/create_supplier.dart';
+import 'features/supplier/domain/usecases/update_supplier.dart';
+import 'features/supplier/domain/usecases/delete_supplier.dart';
+import 'features/supplier/presentation/cubit/supplier_cubit.dart';
+
 final sl = GetIt.instance;
 
 /// Initialize all dependencies.
@@ -732,6 +752,62 @@ Future<void> initDependencies(SharedPreferences prefs) async {
     () => ReportsRemoteDataSourceImpl(
       apiClient: sl(),
       sessionStorage: sl(),
+    ),
+  );
+
+  // ── Inventory (Inventario) ─────────────────────────────
+  sl.registerLazySingleton<InventoryRemoteDataSource>(
+    () => InventoryRemoteDataSourceImpl(
+      apiClient: sl(),
+      sessionStorage: sl(),
+    ),
+  );
+  sl.registerLazySingleton<InventoryRepository>(
+    () => InventoryRepositoryImpl(
+      remoteDataSource: sl(),
+      networkInfo: sl(),
+    ),
+  );
+  sl.registerLazySingleton(() => GetCategories(sl()));
+  sl.registerLazySingleton(() => CreateCategory(sl()));
+  sl.registerLazySingleton(() => inv.GetInventoryItems(sl()));
+  sl.registerLazySingleton(() => CreateInventoryItem(sl()));
+  sl.registerLazySingleton(() => AdjustStock(sl()));
+  sl.registerLazySingleton(() => GetMovements(sl()));
+  sl.registerFactory(
+    () => InventoryCubit(
+      getCategories: sl(),
+      createCategory: sl(),
+      getInventoryItems: sl(),
+      createInventoryItem: sl(),
+      adjustStock: sl(),
+      getMovements: sl(),
+    ),
+  );
+
+  // ── Supplier (Proveedores) ─────────────────────────────
+  sl.registerLazySingleton<SupplierRemoteDataSource>(
+    () => SupplierRemoteDataSourceImpl(
+      apiClient: sl(),
+      sessionStorage: sl(),
+    ),
+  );
+  sl.registerLazySingleton<SupplierRepository>(
+    () => SupplierRepositoryImpl(
+      remoteDataSource: sl(),
+      networkInfo: sl(),
+    ),
+  );
+  sl.registerLazySingleton(() => GetSuppliers(sl()));
+  sl.registerLazySingleton(() => CreateSupplier(sl()));
+  sl.registerLazySingleton(() => UpdateSupplier(sl()));
+  sl.registerLazySingleton(() => DeleteSupplier(sl()));
+  sl.registerFactory(
+    () => SupplierCubit(
+      getSuppliers: sl(),
+      createSupplier: sl(),
+      updateSupplier: sl(),
+      deleteSupplier: sl(),
     ),
   );
 }

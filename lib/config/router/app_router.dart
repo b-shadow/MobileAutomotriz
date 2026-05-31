@@ -45,6 +45,12 @@ import '../../features/ai_assistant/presentation/cubit/ai_chat_cubit.dart';
 import '../../features/reports/presentation/pages/reports_page.dart';
 import '../../features/reports/presentation/cubit/report_cubit.dart';
 
+import '../../features/inventory/presentation/pages/inventory_page.dart';
+import '../../features/inventory/presentation/cubit/inventory_cubit.dart';
+
+import '../../features/supplier/presentation/pages/supplier_page.dart';
+import '../../features/supplier/presentation/cubit/supplier_cubit.dart';
+
 import '../../features/auth/presentation/pages/login_page.dart';
 import '../../features/auth/presentation/pages/register_page.dart';
 import '../../features/home/presentation/pages/home_page.dart';
@@ -328,6 +334,24 @@ class AppRouter {
         builder: (context, state) => BlocProvider(
           create: (context) => sl<ReportCubit>(),
           child: const ReportsPage(),
+        ),
+      ),
+
+      GoRoute(
+        path: '/inventory-management',
+        name: 'inventory-management',
+        builder: (context, state) => BlocProvider(
+          create: (context) => sl<InventoryCubit>(),
+          child: const InventoryPage(),
+        ),
+      ),
+
+      GoRoute(
+        path: '/supplier-management',
+        name: 'supplier-management',
+        builder: (context, state) => BlocProvider(
+          create: (context) => sl<SupplierCubit>(),
+          child: const SupplierPage(),
         ),
       ),
     ],

@@ -55,6 +55,9 @@ extension _RoleHelpers on User {
 
   /// ADMIN solamente
   bool get canViewBitacora => isAdmin;
+
+  /// ADMIN, ASESOR DE SERVICIO, ALMACENERO
+  bool get canViewInventario => isAdmin || isAsesor || isAlmacenero;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -291,6 +294,27 @@ class _HomePageState extends State<HomePage> {
             iconColor: Colors.purpleAccent,
             route: '/audit-management',
             visible: user.canViewBitacora,
+          ),
+        ],
+      ),
+      _ModuleSection(
+        title: 'Inventario y Almacén',
+        icon: Icons.inventory_2_rounded,
+        accentColor: const Color(0xFFF59E0B),
+        items: [
+          _ModuleItem(
+            label: 'Gestión de Inventario',
+            icon: Icons.inventory_2_rounded,
+            iconColor: const Color(0xFFF59E0B),
+            route: '/inventory-management',
+            visible: user.canViewInventario,
+          ),
+          _ModuleItem(
+            label: 'Gestión de Proveedores',
+            icon: Icons.storefront_rounded,
+            iconColor: const Color(0xFF8B5CF6),
+            route: '/supplier-management',
+            visible: user.canViewInventario,
           ),
         ],
       ),

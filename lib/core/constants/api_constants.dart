@@ -189,11 +189,18 @@ class ApiConstants {
   static String reportesVehiculo(String slug) => '/api/$slug/vehiculos-servicios/reportes/vehiculo/';
 
   // ── Inventario ───────────────────────────────────────────
+  static String categoriasInventario(String slug) => '/api/$slug/gestion-administrativa/categorias-inventario/';
   static String inventarioItems(String slug) => '/api/$slug/gestion-administrativa/items-inventario/';
   static String inventarioItem(String slug, String id) => '/api/$slug/gestion-administrativa/items-inventario/$id/';
+  static String ajustarStock(String slug, String id) => '/api/$slug/gestion-administrativa/items-inventario/$id/ajustar-stock/';
+  static String movimientosInventario(String slug) => '/api/$slug/gestion-administrativa/movimientos-inventario/';
 
   // ── Solicitudes de Repuestos ─────────────────────────────
   static String solicitudesRepuesto(String slug) => '/api/$slug/gestion-administrativa/solicitudes-repuesto/';
   static String solicitudRepuesto(String slug, String id) => '/api/$slug/gestion-administrativa/solicitudes-repuesto/$id/';
   static String marcarRecibidaTaller(String slug, String id) => '/api/$slug/gestion-administrativa/solicitudes-repuesto/$id/marcar-recibida-taller/';
+
+  // ── Proveedores ──────────────────────────────────────────
+  static String proveedores(String slug) => '/api/$slug/gestion-administrativa/proveedores/';
+  static String proveedor(String slug, String id) => '/api/$slug/gestion-administrativa/proveedores/$id/';
 }
