@@ -90,7 +90,30 @@ class BudgetRepositoryImpl implements BudgetRepository {
   }) async {
     if (!await networkInfo.isConnected) return const Err(NetworkFailure());
     try {
-      final data = await remoteDataSource.changeStatus(id, action, motivo: motivo);
+      final data = await remoteDataSource.changeStatus(
+        id: id,
+        action: action,
+        motivo: motivo,
+      );
+      return Success(data);
+    } on ServerException catch (e) {
+      return Err(ServerFailure(message: e.message, statusCode: e.statusCode));
+    }
+  }
+
+  @override
+  Future<Result<Budget>> registerPayment({
+    required String id,
+    required double monto,
+    required String metodoPago,
+  }) async {
+    if (!await networkInfo.isConnected) return const Err(NetworkFailure());
+    try {
+      final data = await remoteDataSource.registerPayment(
+        id: id,
+        monto: monto,
+        metodoPago: metodoPago,
+      );
       return Success(data);
     } on ServerException catch (e) {
       return Err(ServerFailure(message: e.message, statusCode: e.statusCode));

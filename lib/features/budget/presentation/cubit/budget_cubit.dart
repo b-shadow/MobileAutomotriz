@@ -4,6 +4,7 @@ import 'package:mobile1_app/core/usecases/usecase.dart';
 import 'package:mobile1_app/features/budget/domain/entities/budget.dart';
 import 'package:mobile1_app/features/budget/domain/usecases/change_budget_status.dart';
 import 'package:mobile1_app/features/budget/domain/usecases/create_budget.dart';
+import 'package:mobile1_app/features/budget/domain/usecases/register_budget_payment.dart';
 import 'package:mobile1_app/features/budget/domain/usecases/get_budget_detail.dart';
 import 'package:mobile1_app/features/budget/domain/usecases/get_budgets.dart';
 import 'package:mobile1_app/features/budget/domain/usecases/update_budget.dart';
@@ -15,6 +16,7 @@ class BudgetCubit extends Cubit<BudgetState> {
   final CreateBudget _createBudget;
   final UpdateBudget _updateBudget;
   final ChangeBudgetStatus _changeBudgetStatus;
+  final RegisterBudgetPayment _registerBudgetPayment;
 
   List<Budget> _budgets = const [];
 
@@ -24,11 +26,13 @@ class BudgetCubit extends Cubit<BudgetState> {
     required CreateBudget createBudget,
     required UpdateBudget updateBudget,
     required ChangeBudgetStatus changeBudgetStatus,
+    required RegisterBudgetPayment registerBudgetPayment,
   })  : _getBudgets = getBudgets,
         _getBudgetDetail = getBudgetDetail,
         _createBudget = createBudget,
         _updateBudget = updateBudget,
         _changeBudgetStatus = changeBudgetStatus,
+        _registerBudgetPayment = registerBudgetPayment,
         super(const BudgetInitial());
 
   Future<void> fetchBudgets() async {
@@ -122,6 +126,30 @@ class BudgetCubit extends Cubit<BudgetState> {
         if (action == 'rechazar') msg = 'Presupuesto rechazado.';
         if (action == 'cerrar') msg = 'Presupuesto cerrado.';
         emit(BudgetSuccess(budgets: _budgets, message: msg, budget: data));
+      case Err(:final failure):
+        emit(BudgetError(budgets: _budgets, message: failure.message));
+    }
+  }
+
+  Future<void> registerPayment({
+    required String id,
+    required double monto,
+    required String metodoPago,
+  }) async {
+    emit(BudgetLoading(budgets: _budgets));
+    final result = await _registerBudgetPayment(
+      id: id,
+      monto: monto,
+      metodoPago: metodoPago,
+    );
+    switch (result) {
+      case Success(:final data):
+        _updateList(data);
+        emit(BudgetSuccess(
+          budgets: _budgets,
+          message: 'Pago registrado exitosamente.',
+          budget: data,
+        ));
       case Err(:final failure):
         emit(BudgetError(budgets: _budgets, message: failure.message));
     }

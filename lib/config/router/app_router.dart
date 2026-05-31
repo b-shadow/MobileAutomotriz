@@ -51,6 +51,17 @@ import '../../features/inventory/presentation/cubit/inventory_cubit.dart';
 import '../../features/supplier/presentation/pages/supplier_page.dart';
 import '../../features/supplier/presentation/cubit/supplier_cubit.dart';
 
+import '../../features/spare_parts/presentation/pages/spare_parts_page.dart';
+import '../../features/spare_parts/presentation/cubit/spare_parts_cubit.dart';
+
+import '../../features/purchases/presentation/pages/purchases_page.dart';
+import '../../features/purchases/presentation/pages/create_purchase_page.dart';
+import '../../features/purchases/presentation/cubit/purchases_cubit.dart';
+
+import '../../features/store_sales/presentation/pages/store_sales_page.dart';
+import '../../features/store_sales/presentation/pages/create_store_sale_page.dart';
+import '../../features/store_sales/presentation/cubit/store_sales_cubit.dart';
+
 import '../../features/auth/presentation/pages/login_page.dart';
 import '../../features/auth/presentation/pages/register_page.dart';
 import '../../features/home/presentation/pages/home_page.dart';
@@ -353,6 +364,53 @@ class AppRouter {
           create: (context) => sl<SupplierCubit>(),
           child: const SupplierPage(),
         ),
+      ),
+
+      GoRoute(
+        path: '/spare-parts-management',
+        name: 'spare-parts-management',
+        builder: (context, state) => BlocProvider(
+          create: (context) => sl<SparePartsCubit>(),
+          child: const SparePartsPage(),
+        ),
+      ),
+
+      GoRoute(
+        path: '/purchases-management',
+        name: 'purchases-management',
+        builder: (context, state) => BlocProvider(
+          create: (context) => sl<PurchasesCubit>(),
+          child: const PurchasesPage(),
+        ),
+        routes: [
+          GoRoute(
+            path: 'new',
+            name: 'create-purchase',
+            builder: (context, state) => BlocProvider(
+              create: (context) => sl<PurchasesCubit>()..fetchAll(),
+              child: const CreatePurchasePage(),
+            ),
+          ),
+        ],
+      ),
+
+      GoRoute(
+        path: '/store-sales',
+        name: 'store-sales',
+        builder: (context, state) => BlocProvider(
+          create: (context) => sl<StoreSalesCubit>(),
+          child: const StoreSalesPage(),
+        ),
+        routes: [
+          GoRoute(
+            path: 'new',
+            name: 'create-store-sale',
+            builder: (context, state) => BlocProvider(
+              create: (context) => sl<StoreSalesCubit>()..fetchAll(),
+              child: const CreateStoreSalePage(),
+            ),
+          ),
+        ],
       ),
     ],
   );

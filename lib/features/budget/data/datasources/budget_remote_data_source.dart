@@ -10,7 +10,17 @@ abstract class BudgetRemoteDataSource {
   Future<BudgetModel> getBudgetDetail(String id);
   Future<BudgetModel> createBudget(Map<String, dynamic> data);
   Future<BudgetModel> updateBudget(String id, Map<String, dynamic> data);
-  Future<BudgetModel> changeStatus(String id, String action, {String? motivo});
+  Future<BudgetModel> changeStatus({
+    required String id,
+    required String action,
+    String? motivo,
+  });
+
+  Future<BudgetModel> registerPayment({
+    required String id,
+    required double monto,
+    required String metodoPago,
+  });
 }
 
 class BudgetRemoteDataSourceImpl implements BudgetRemoteDataSource {
@@ -93,7 +103,11 @@ class BudgetRemoteDataSourceImpl implements BudgetRemoteDataSource {
   }
 
   @override
-  Future<BudgetModel> changeStatus(String id, String action, {String? motivo}) async {
+  Future<BudgetModel> changeStatus({
+    required String id,
+    required String action,
+    String? motivo,
+  }) async {
     try {
       String url;
       switch (action) {
@@ -111,6 +125,28 @@ class BudgetRemoteDataSourceImpl implements BudgetRemoteDataSource {
       }
 
       final response = await apiClient.post(url, data: data);
+      return BudgetModel.fromJson(response.data as Map<String, dynamic>);
+    } on ServerException {
+      rethrow;
+    } catch (e) {
+      throw ServerException(message: e.toString());
+    }
+  }
+
+  @override
+  Future<BudgetModel> registerPayment({
+    required String id,
+    required double monto,
+    required String metodoPago,
+  }) async {
+    try {
+      final response = await apiClient.post(
+        '/api/$_slug/atencion-tecnica/presupuestos-cita/$id/marcar-pagado/',
+        data: {
+          'monto': monto,
+          'metodo_pago': metodoPago,
+        },
+      );
       return BudgetModel.fromJson(response.data as Map<String, dynamic>);
     } on ServerException {
       rethrow;

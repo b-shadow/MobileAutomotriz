@@ -117,11 +117,12 @@ import 'features/reception/presentation/cubit/reception_cubit.dart';
 import 'features/budget/data/datasources/budget_remote_data_source.dart';
 import 'features/budget/data/repositories/budget_repository_impl.dart';
 import 'features/budget/domain/repositories/budget_repository.dart';
-import 'features/budget/domain/usecases/create_budget.dart';
-import 'features/budget/domain/usecases/get_budgets.dart';
-import 'features/budget/domain/usecases/get_budget_detail.dart';
-import 'features/budget/domain/usecases/update_budget.dart';
 import 'features/budget/domain/usecases/change_budget_status.dart';
+import 'features/budget/domain/usecases/create_budget.dart';
+import 'features/budget/domain/usecases/get_budget_detail.dart';
+import 'features/budget/domain/usecases/get_budgets.dart';
+import 'features/budget/domain/usecases/update_budget.dart';
+import 'features/budget/domain/usecases/register_budget_payment.dart';
 import 'features/budget/presentation/cubit/budget_cubit.dart';
 
 import 'features/work_order/data/datasources/work_order_remote_data_source.dart';
@@ -173,6 +174,28 @@ import 'features/supplier/domain/usecases/create_supplier.dart';
 import 'features/supplier/domain/usecases/update_supplier.dart';
 import 'features/supplier/domain/usecases/delete_supplier.dart';
 import 'features/supplier/presentation/cubit/supplier_cubit.dart';
+
+import 'features/spare_parts/data/datasources/spare_parts_remote_data_source.dart';
+import 'features/spare_parts/data/repositories/spare_parts_repository_impl.dart';
+import 'features/spare_parts/domain/repositories/spare_parts_repository.dart';
+import 'features/spare_parts/domain/usecases/get_solicitudes.dart';
+import 'features/spare_parts/domain/usecases/aprobar_solicitud.dart';
+import 'features/spare_parts/domain/usecases/en_proceso_almacen.dart';
+import 'features/spare_parts/domain/usecases/marcar_entregada.dart';
+import 'features/spare_parts/domain/usecases/asignar_proveedor_eta.dart';
+import 'features/spare_parts/presentation/cubit/spare_parts_cubit.dart';
+
+import 'features/purchases/data/datasources/purchases_remote_data_source.dart';
+import 'features/purchases/data/repositories/purchases_repository_impl.dart';
+import 'features/purchases/domain/repositories/purchases_repository.dart';
+import 'features/purchases/domain/usecases/purchases_usecases.dart';
+import 'features/purchases/presentation/cubit/purchases_cubit.dart';
+
+import 'features/store_sales/data/datasources/store_sales_remote_data_source.dart';
+import 'features/store_sales/data/repositories/store_sales_repository_impl.dart';
+import 'features/store_sales/domain/repositories/store_sales_repository.dart';
+import 'features/store_sales/domain/usecases/store_sales_usecases.dart';
+import 'features/store_sales/presentation/cubit/store_sales_cubit.dart';
 
 final sl = GetIt.instance;
 
@@ -560,6 +583,7 @@ Future<void> initDependencies(SharedPreferences prefs) async {
   sl.registerLazySingleton(() => CreateBudget(sl()));
   sl.registerLazySingleton(() => UpdateBudget(sl()));
   sl.registerLazySingleton(() => ChangeBudgetStatus(sl()));
+  sl.registerLazySingleton(() => RegisterBudgetPayment(sl()));
   sl.registerFactory(
     () => BudgetCubit(
       getBudgets: sl(),
@@ -567,6 +591,7 @@ Future<void> initDependencies(SharedPreferences prefs) async {
       createBudget: sl(),
       updateBudget: sl(),
       changeBudgetStatus: sl(),
+      registerBudgetPayment: sl(),
     ),
   );
 
@@ -808,6 +833,86 @@ Future<void> initDependencies(SharedPreferences prefs) async {
       createSupplier: sl(),
       updateSupplier: sl(),
       deleteSupplier: sl(),
+    ),
+  );
+
+  // ── Spare Parts (Abastecimiento por Faltante) ────────────────
+  sl.registerLazySingleton<SparePartsRemoteDataSource>(
+    () => SparePartsRemoteDataSourceImpl(
+      apiClient: sl(),
+      sessionStorage: sl(),
+    ),
+  );
+  sl.registerLazySingleton<SparePartsRepository>(
+    () => SparePartsRepositoryImpl(
+      remoteDataSource: sl(),
+      networkInfo: sl(),
+    ),
+  );
+  sl.registerLazySingleton(() => GetSolicitudes(sl()));
+  sl.registerLazySingleton(() => AprobarSolicitud(sl()));
+  sl.registerLazySingleton(() => EnProcesoAlmacen(sl()));
+  sl.registerLazySingleton(() => MarcarEntregada(sl()));
+  sl.registerLazySingleton(() => AsignarProveedorEta(sl()));
+  sl.registerFactory(
+    () => SparePartsCubit(
+      getSolicitudes: sl(),
+      aprobarSolicitud: sl(),
+      enProcesoAlmacen: sl(),
+      marcarEntregada: sl(),
+      asignarProveedorEta: sl(),
+      getSuppliers: sl(),
+    ),
+  );
+
+  // ── Purchases (Compras de Insumos) ──────────────────────────
+  sl.registerLazySingleton<PurchasesRemoteDataSource>(
+    () => PurchasesRemoteDataSourceImpl(
+      apiClient: sl(),
+      sessionStorage: sl(),
+    ),
+  );
+  sl.registerLazySingleton<PurchasesRepository>(
+    () => PurchasesRepositoryImpl(
+      remoteDataSource: sl(),
+      networkInfo: sl(),
+    ),
+  );
+  sl.registerLazySingleton(() => GetPurchases(sl()));
+  sl.registerLazySingleton(() => CreatePurchase(sl()));
+  sl.registerLazySingleton(() => MarkPurchaseReceived(sl()));
+  sl.registerFactory(
+    () => PurchasesCubit(
+      getPurchases: sl(),
+      createPurchase: sl(),
+      markPurchaseReceived: sl(),
+      getSuppliers: sl(),
+      getInventoryItems: sl(),
+    ),
+  );
+
+  // ── Store Sales (Ventas Presenciales) ─────────────────────────
+  sl.registerLazySingleton<StoreSalesRemoteDataSource>(
+    () => StoreSalesRemoteDataSourceImpl(
+      apiClient: sl(),
+      sessionStorage: sl(),
+    ),
+  );
+  sl.registerLazySingleton<StoreSalesRepository>(
+    () => StoreSalesRepositoryImpl(
+      remoteDataSource: sl(),
+      networkInfo: sl(),
+    ),
+  );
+  sl.registerLazySingleton(() => GetStoreSales(sl()));
+  sl.registerLazySingleton(() => CreateStoreSale(sl()));
+  sl.registerLazySingleton(() => ConfirmStoreSale(sl()));
+  sl.registerFactory(
+    () => StoreSalesCubit(
+      getStoreSales: sl(),
+      createStoreSale: sl(),
+      confirmStoreSale: sl(),
+      getInventoryItems: sl(),
     ),
   );
 }

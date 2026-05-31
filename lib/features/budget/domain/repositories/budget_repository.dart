@@ -25,4 +25,10 @@ abstract class BudgetRepository {
     required String action, // comunicar, aprobar, rechazar, ajustar, cerrar
     String? motivo, // Solo para rechazar
   });
+
+  Future<Result<Budget>> registerPayment({
+    required String id,
+    required double monto,
+    required String metodoPago,
+  });
 }

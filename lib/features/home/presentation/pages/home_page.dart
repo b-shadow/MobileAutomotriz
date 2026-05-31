@@ -316,6 +316,27 @@ class _HomePageState extends State<HomePage> {
             route: '/supplier-management',
             visible: user.canViewInventario,
           ),
+          _ModuleItem(
+            label: 'Abastecimiento por Faltante',
+            icon: Icons.assignment_outlined,
+            iconColor: const Color(0xFF10B981),
+            route: '/spare-parts-management',
+            visible: user.canViewInventario,
+          ),
+          _ModuleItem(
+            label: 'Compras de Insumos',
+            icon: Icons.receipt_long,
+            iconColor: const Color(0xFFE11D48),
+            route: '/purchases-management',
+            visible: user.canViewInventario,
+          ),
+          _ModuleItem(
+            label: 'Ventas Presenciales',
+            icon: Icons.point_of_sale,
+            iconColor: const Color(0xFF8B5CF6),
+            route: '/store-sales',
+            visible: user.canViewInventario,
+          ),
         ],
       ),
     ];

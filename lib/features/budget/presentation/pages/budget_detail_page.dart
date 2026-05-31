@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:mobile1_app/core/theme/app_colors.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mobile1_app/features/budget/domain/entities/budget.dart';
@@ -136,9 +136,31 @@ class _BudgetDetailPageState extends State<BudgetDetailPage> {
                     ],
                   ),
                 ),
-                const SizedBox(height: 24),
                 // Botones de acción según estado
                 _AccionesPresupuesto(budget: budget),
+                
+                // Si hay saldo pendiente, mostrar botón de Registrar Pago
+                if (budget.saldoPendiente > 0 && budget.estado == 'APROBADO') ...[
+                  const SizedBox(height: 16),
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton.icon(
+                      onPressed: () => _mostrarDialogoPago(context, budget!),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.info,
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                      icon: const Icon(Icons.payment, size: 20),
+                      label: const Text('Registrar Pago',
+                          style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
+                    ),
+                  ),
+                ],
+
                 const SizedBox(height: 24),
                 // Lista de servicios (detalles)
                 const Text('Servicios y Repuestos',
@@ -171,6 +193,121 @@ class _BudgetDetailPageState extends State<BudgetDetailPage> {
                 fontSize: 15,
                 fontWeight: FontWeight.w600)),
       ],
+    );
+  }
+
+  void _mostrarDialogoPago(BuildContext context, Budget budget) {
+    final montoCtrl = TextEditingController(text: budget.saldoPendiente.toStringAsFixed(2));
+    String metodoPago = 'QR';
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: AppColors.darkCard,
+      shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
+      builder: (ctx) => StatefulBuilder(
+        builder: (context, setStateModal) {
+          return Padding(
+            padding: EdgeInsets.only(
+                bottom: MediaQuery.of(ctx).viewInsets.bottom,
+                left: 16,
+                right: 16,
+                top: 16),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text('Registrar Pago',
+                    style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold)),
+                const SizedBox(height: 8),
+                Text('Pendiente: Bs ${budget.saldoPendiente.toStringAsFixed(2)}',
+                    style: const TextStyle(color: Colors.white54, fontSize: 14)),
+                const SizedBox(height: 16),
+                const Text('Monto a pagar',
+                    style: TextStyle(color: Colors.white70, fontSize: 12)),
+                const SizedBox(height: 4),
+                TextField(
+                  controller: montoCtrl,
+                  keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                  style: const TextStyle(color: Colors.white),
+                  decoration: InputDecoration(
+                    filled: true,
+                    fillColor: Colors.white.withValues(alpha: 0.05),
+                    border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                        borderSide: BorderSide.none),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                const Text('Método de pago',
+                    style: TextStyle(color: Colors.white70, fontSize: 12)),
+                const SizedBox(height: 4),
+                DropdownButtonFormField<String>(
+                  value: metodoPago,
+                  dropdownColor: AppColors.darkCard,
+                  style: const TextStyle(color: Colors.white),
+                  decoration: InputDecoration(
+                    filled: true,
+                    fillColor: Colors.white.withValues(alpha: 0.05),
+                    border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                        borderSide: BorderSide.none),
+                  ),
+                  items: const [
+                    DropdownMenuItem(value: 'QR', child: Text('QR')),
+                    DropdownMenuItem(value: 'EFECTIVO', child: Text('Efectivo')),
+                    DropdownMenuItem(value: 'TARJETA', child: Text('Tarjeta (Stripe)')),
+                  ],
+                  onChanged: (v) {
+                    if (v != null) {
+                      setStateModal(() => metodoPago = v);
+                    }
+                  },
+                ),
+                const SizedBox(height: 24),
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.info,
+                      padding: const EdgeInsets.symmetric(vertical: 14),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10)),
+                    ),
+                    onPressed: () {
+                      final monto = double.tryParse(montoCtrl.text);
+                      if (monto == null || monto <= 0) {
+                        ScaffoldMessenger.of(ctx).showSnackBar(const SnackBar(
+                            content: Text('Monto inválido.')));
+                        return;
+                      }
+                      if (monto > budget.saldoPendiente) {
+                        ScaffoldMessenger.of(ctx).showSnackBar(const SnackBar(
+                            content: Text('El monto excede el saldo pendiente.')));
+                        return;
+                      }
+                      Navigator.pop(ctx);
+                      this.context.read<BudgetCubit>().registerPayment(
+                            id: budget.id,
+                            monto: monto,
+                            metodoPago: metodoPago,
+                          );
+                    },
+                    child: const Text('Confirmar Pago',
+                        style: TextStyle(
+                            color: Colors.white, fontWeight: FontWeight.bold)),
+                  ),
+                ),
+                const SizedBox(height: 24),
+              ],
+            ),
+          );
+        },
+      ),
     );
   }
 }
