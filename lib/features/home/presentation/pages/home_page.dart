@@ -58,17 +58,64 @@ extension _RoleHelpers on User {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
+// Data classes for module sections
+// ─────────────────────────────────────────────────────────────────────────────
+
+class _ModuleItem {
+  final String label;
+  final IconData icon;
+  final Color iconColor;
+  final String route;
+  final bool visible;
+
+  const _ModuleItem({
+    required this.label,
+    required this.icon,
+    required this.iconColor,
+    required this.route,
+    required this.visible,
+  });
+}
+
+class _ModuleSection {
+  final String title;
+  final IconData icon;
+  final Color accentColor;
+  final List<_ModuleItem> items;
+
+  const _ModuleSection({
+    required this.title,
+    required this.icon,
+    required this.accentColor,
+    required this.items,
+  });
+
+  List<_ModuleItem> get visibleItems =>
+      items.where((item) => item.visible).toList();
+
+  bool get hasVisibleItems => visibleItems.isNotEmpty;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
 
 /// Home page — muestra los módulos visibles según el rol del usuario autenticado.
-class HomePage extends StatelessWidget {
+class HomePage extends StatefulWidget {
   const HomePage({super.key});
+
+  @override
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  // Track which sections are expanded (first one starts expanded)
+  final Map<int, bool> _expandedSections = {0: true};
 
   @override
   Widget build(BuildContext context) {
     return BlocListener<AuthCubit, AuthState>(
       listener: (context, state) {
         if (state is AuthUnauthenticated) {
-          // Navigate handled by router redirect
+          context.go('/login');
         }
       },
       child: Scaffold(
@@ -104,7 +151,156 @@ class HomePage extends StatelessWidget {
     );
   }
 
+  /// Build the list of module sections based on user roles.
+  List<_ModuleSection> _buildSections(User user) {
+    return [
+      _ModuleSection(
+        title: 'Gestión de Usuarios',
+        icon: Icons.people_rounded,
+        accentColor: AppColors.primary,
+        items: [
+          _ModuleItem(
+            label: 'Editar Perfil de Usuario',
+            icon: Icons.edit_rounded,
+            iconColor: AppColors.primary,
+            route: '/profile',
+            visible: true,
+          ),
+          _ModuleItem(
+            label: 'Gestionar Empresa',
+            icon: Icons.business_rounded,
+            iconColor: Colors.blueAccent,
+            route: '/company-management',
+            visible: user.canManageCompany,
+          ),
+          _ModuleItem(
+            label: 'Gestionar Usuarios y Roles',
+            icon: Icons.manage_accounts,
+            iconColor: Colors.yellowAccent,
+            route: '/user-management',
+            visible: user.canManageUsers,
+          ),
+          _ModuleItem(
+            label: 'Gestionar Suscripción',
+            icon: Icons.receipt_long,
+            iconColor: Colors.amberAccent,
+            route: '/subscription-management',
+            visible: user.canManageSuscription,
+          ),
+        ],
+      ),
+      _ModuleSection(
+        title: 'Vehículos, Servicios y Citas',
+        icon: Icons.directions_car_rounded,
+        accentColor: Colors.greenAccent,
+        items: [
+          _ModuleItem(
+            label: 'Gestionar Vehículos',
+            icon: Icons.directions_car,
+            iconColor: Colors.greenAccent,
+            route: '/vehicle-management',
+            visible: user.canViewVehiculos,
+          ),
+          _ModuleItem(
+            label: 'Plan de Vehículo',
+            icon: Icons.assignment_turned_in,
+            iconColor: Colors.lightBlueAccent,
+            route: '/vehicle-plan-management',
+            visible: user.canViewPlanVehiculo,
+          ),
+          _ModuleItem(
+            label: 'Catálogo de Servicios',
+            icon: Icons.build_circle_outlined,
+            iconColor: Colors.orangeAccent,
+            route: '/service-catalog-management',
+            visible: user.canViewServiciosCatalogo,
+          ),
+          _ModuleItem(
+            label: 'Espacios de Trabajo',
+            icon: Icons.warehouse_outlined,
+            iconColor: Colors.cyanAccent,
+            route: '/workspace-management',
+            visible: user.canViewEspaciosTrabajo,
+          ),
+          _ModuleItem(
+            label: 'Gestionar Citas',
+            icon: Icons.calendar_today_rounded,
+            iconColor: AppColors.primary,
+            route: '/appointment-management',
+            visible: user.canViewCitas,
+          ),
+        ],
+      ),
+      _ModuleSection(
+        title: 'Atención Técnica',
+        icon: Icons.build_rounded,
+        accentColor: AppColors.success,
+        items: [
+          _ModuleItem(
+            label: 'Recepción e Inspección',
+            icon: Icons.car_repair_rounded,
+            iconColor: AppColors.success,
+            route: '/reception-management',
+            visible: user.canViewRecepcionVehiculo,
+          ),
+          _ModuleItem(
+            label: 'Gestión de Presupuestos',
+            icon: Icons.request_quote_rounded,
+            iconColor: AppColors.warning,
+            route: '/budget-management',
+            visible: user.canViewPresupuestos,
+          ),
+          _ModuleItem(
+            label: 'Órdenes de Trabajo',
+            icon: Icons.handyman_rounded,
+            iconColor: AppColors.success,
+            route: '/work-orders',
+            visible: user.canViewOrdenesTrabajo,
+          ),
+          _ModuleItem(
+            label: 'Avance en Taller',
+            icon: Icons.garage_rounded,
+            iconColor: AppColors.primary,
+            route: '/workshop-progress',
+            visible: user.canViewTallerInterno,
+          ),
+          _ModuleItem(
+            label: 'Avance General Vehículo',
+            icon: Icons.directions_car,
+            iconColor: AppColors.info,
+            route: '/vehicle-progress',
+            visible: user.canViewAvanceVehiculo,
+          ),
+        ],
+      ),
+      _ModuleSection(
+        title: 'Reportes y Estadísticas',
+        icon: Icons.analytics_rounded,
+        accentColor: const Color(0xFF0F766E),
+        items: [
+          _ModuleItem(
+            label: 'Reportes de Vehículo',
+            icon: Icons.analytics_rounded,
+            iconColor: const Color(0xFF0F766E),
+            route: '/reports',
+            visible: true,
+          ),
+          _ModuleItem(
+            label: 'Visualizar Bitácora',
+            icon: Icons.history,
+            iconColor: Colors.purpleAccent,
+            route: '/audit-management',
+            visible: user.canViewBitacora,
+          ),
+        ],
+      ),
+    ];
+  }
+
   Widget _buildContent(BuildContext context, User user) {
+    final sections =
+        _buildSections(user).where((s) => s.hasVisibleItems).toList();
+
     return SingleChildScrollView(
       padding: const EdgeInsets.all(24),
       child: Column(
@@ -160,7 +356,7 @@ class HomePage extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: 32),
+          const SizedBox(height: 24),
 
           // ── User Info Card ──────────────────────────
           _buildInfoCard(
@@ -174,341 +370,254 @@ class HomePage extends StatelessWidget {
               _InfoItem('Rol', user.rolNombre),
             ],
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: 24),
 
-          // ── Quick Stats ─────────────────────────────
-          _buildInfoCard(
-            context,
-            icon: Icons.dashboard_rounded,
-            title: 'Panel Principal',
-            items: [
-              _InfoItem('Empresa', user.empresaNombre),
-              _InfoItem('Estado', user.isActive ? 'Activo' : 'Inactivo'),
-              _InfoItem('Tipo', user.isAdmin ? 'Administrador' : 'Usuario'),
-            ],
-          ),
-          const SizedBox(height: 32),
-
-          // ── Módulos de Gestión de Usuarios (solo ADMIN) ─
-          if (user.canManageCompany) ...[
-            _buildModuleButton(
-              context,
-              label: 'Gestionar Empresa',
-              icon: Icons.business_rounded,
-              iconColor: Colors.blueAccent,
-              route: '/company-management',
-            ),
-            const SizedBox(height: 12),
-          ],
-
-          if (user.canManageSuscription) ...[
-            _buildModuleButton(
-              context,
-              label: 'Gestionar Suscripcion',
-              icon: Icons.receipt_long,
-              iconColor: Colors.amberAccent,
-              route: '/subscription-management',
-            ),
-            const SizedBox(height: 12),
-          ],
-
-          if (user.canManageUsers) ...[
-            _buildModuleButton(
-              context,
-              label: 'Gestionar Usuarios y Roles',
-              icon: Icons.manage_accounts,
-              iconColor: Colors.yellowAccent,
-              route: '/user-management',
-            ),
-            const SizedBox(height: 12),
-          ],
-
-          if (user.canViewBitacora) ...[
-            _buildModuleButton(
-              context,
-              label: 'Gestionar Bitacora',
-              icon: Icons.history,
-              iconColor: Colors.purpleAccent,
-              route: '/audit-management',
-            ),
-            const SizedBox(height: 12),
-          ],
-
-          // ── Editar Perfil (todos) ────────────────────
-          SizedBox(
-            width: double.infinity,
-            child: ElevatedButton.icon(
-              onPressed: () => context.push('/profile'),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.primary,
-                foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(vertical: 16),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
+          // ── Section title ─────────────────────────────
+          Text(
+            'Módulos',
+            style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: 0.5,
                 ),
-              ),
-              icon: const Icon(Icons.edit_rounded, size: 20),
-              label: const Text(
-                'Editar Perfil de Usuario',
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-              ),
-            ),
           ),
           const SizedBox(height: 12),
 
-          // ── Vehículos y Servicios ────────────────────
-          if (user.canViewVehiculos) ...[
-            _buildModuleButton(
-              context,
-              label: 'Gestionar Vehiculos',
-              icon: Icons.directions_car,
-              iconColor: Colors.greenAccent,
-              route: '/vehicle-management',
-            ),
-            const SizedBox(height: 12),
-          ],
+          // ── Collapsible Module Sections ────────────────
+          ...List.generate(sections.length, (index) {
+            final section = sections[index];
+            final isExpanded = _expandedSections[index] ?? false;
 
-          if (user.canViewServiciosCatalogo) ...[
-            _buildModuleButton(
-              context,
-              label: 'Gestionar Catalogo de Servicios',
-              icon: Icons.build_circle_outlined,
-              iconColor: Colors.orangeAccent,
-              route: '/service-catalog-management',
-            ),
-            const SizedBox(height: 12),
-          ],
+            return Padding(
+              padding: const EdgeInsets.only(bottom: 12),
+              child: _buildSection(
+                context,
+                section: section,
+                isExpanded: isExpanded,
+                onToggle: () {
+                  setState(() {
+                    _expandedSections[index] =
+                        !(_expandedSections[index] ?? false);
+                  });
+                },
+              ),
+            );
+          }),
 
-          if (user.canViewEspaciosTrabajo) ...[
-            _buildModuleButton(
-              context,
-              label: 'Configurar Espacios de Trabajo',
-              icon: Icons.warehouse_outlined,
-              iconColor: Colors.cyanAccent,
-              route: '/workspace-management',
+          // ── Asistente IA (botón directo, no necesita sección) ──
+          Container(
+            decoration: BoxDecoration(
+              color: Colors.white.withValues(alpha: 0.05),
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(
+                color: AppColors.accent.withValues(alpha: 0.3),
+              ),
             ),
-            const SizedBox(height: 12),
-          ],
-
-          if (user.canViewPlanVehiculo) ...[
-            _buildModuleButton(
-              context,
-              label: 'Gestionar Plan de Vehiculo',
-              icon: Icons.assignment_turned_in,
-              iconColor: Colors.lightBlueAccent,
-              route: '/vehicle-plan-management',
-            ),
-            const SizedBox(height: 12),
-          ],
-
-          if (user.canViewCitas) ...[
-            _buildModuleButton(
-              context,
-              label: 'Gestionar Citas',
-              icon: Icons.calendar_today_rounded,
-              iconColor: AppColors.primary,
-              route: '/appointment-management',
-              borderColor: AppColors.primary,
-            ),
-            const SizedBox(height: 12),
-          ],
-
-          // ── Atención Técnica ─────────────────────────
-          if (user.canViewRecepcionVehiculo) ...[
-            _buildModuleButton(
-              context,
-              label: 'Recepción e Inspección',
-              icon: Icons.car_repair_rounded,
-              iconColor: AppColors.success,
-              route: '/reception-management',
-              borderColor: AppColors.success,
-            ),
-            const SizedBox(height: 12),
-          ],
-
-          if (user.canViewPresupuestos) ...[
-            _buildModuleButton(
-              context,
-              label: 'Gestión de Presupuestos',
-              icon: Icons.request_quote_rounded,
-              iconColor: AppColors.warning,
-              route: '/budget-management',
-              borderColor: AppColors.warning,
-            ),
-            const SizedBox(height: 12),
-          ],
-
-          if (user.canViewOrdenesTrabajo) ...[
-            _buildModuleButton(
-              context,
-              label: 'Órdenes de Trabajo',
-              icon: Icons.handyman_rounded,
-              iconColor: AppColors.success,
-              route: '/work-orders',
-              borderColor: AppColors.success,
-            ),
-            const SizedBox(height: 12),
-          ],
-
-          if (user.canViewTallerInterno) ...[
-            _buildModuleButton(
-              context,
-              label: 'Avance en Taller',
-              icon: Icons.garage_rounded,
-              iconColor: AppColors.primary,
-              route: '/workshop-progress',
-              borderColor: AppColors.primary,
-            ),
-            const SizedBox(height: 12),
-          ],
-
-          if (user.canViewAvanceVehiculo) ...[
-            _buildModuleButton(
-              context,
-              label: 'Avance General Vehículo',
-              icon: Icons.directions_car,
-              iconColor: AppColors.info,
-              route: '/vehicle-progress',
-              borderColor: AppColors.info,
-            ),
-            const SizedBox(height: 12),
-          ],
-
-          // ── Inteligencia Artificial (todos) ──────────
-          SizedBox(
-            width: double.infinity,
-            child: ElevatedButton.icon(
-              onPressed: () => context.push('/ai'),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.primary,
-                foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(vertical: 16),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
+            clipBehavior: Clip.antiAlias,
+            child: Material(
+              color: Colors.transparent,
+              child: InkWell(
+                onTap: () => context.push('/ai'),
+                child: Padding(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                  child: Row(
+                    children: [
+                      Container(
+                        width: 36,
+                        height: 36,
+                        decoration: BoxDecoration(
+                          color: AppColors.accent.withValues(alpha: 0.15),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: const Icon(
+                          Icons.smart_toy_rounded,
+                          size: 20,
+                          color: AppColors.accent,
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      const Expanded(
+                        child: Text(
+                          'Asistente Virtual con IA',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                            letterSpacing: 0.3,
+                          ),
+                        ),
+                      ),
+                      Icon(
+                        Icons.chevron_right_rounded,
+                        size: 18,
+                        color: Colors.white.withValues(alpha: 0.3),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-              icon: const Icon(
-                Icons.smart_toy,
-                size: 20,
-                color: Colors.white,
-              ),
-              label: const Text(
-                'Asistente Virtual con IA',
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-              ),
-            ),
-          ),
-          const SizedBox(height: 12),
-
-          // ── Reportes (todos) ─────────────────────────
-          SizedBox(
-            width: double.infinity,
-            child: ElevatedButton.icon(
-              onPressed: () => context.push('/reports'),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF0F766E),
-                foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(vertical: 16),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-              ),
-              icon: const Icon(
-                Icons.analytics_rounded,
-                size: 20,
-                color: Colors.white,
-              ),
-              label: const Text(
-                'Reportes de Vehículo',
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
               ),
             ),
           ),
 
-          const SizedBox(height: 32),
+          const SizedBox(height: 16),
+        ],
+      ),
+    );
+  }
 
-          // ── Placeholder message ─────────────────────
-          Center(
-            child: Container(
-              padding: const EdgeInsets.all(24),
+  /// Builds a collapsible module section (like a sidebar group).
+  Widget _buildSection(
+    BuildContext context, {
+    required _ModuleSection section,
+    required bool isExpanded,
+    required VoidCallback onToggle,
+  }) {
+    final visibleItems = section.visibleItems;
+
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.05),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: isExpanded
+              ? section.accentColor.withValues(alpha: 0.3)
+              : Colors.white.withValues(alpha: 0.06),
+        ),
+      ),
+      clipBehavior: Clip.antiAlias,
+      child: Column(
+        children: [
+          // ── Section Header ──────────────────────────
+          Material(
+            color: Colors.transparent,
+            child: InkWell(
+              onTap: onToggle,
+              child: Padding(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                child: Row(
+                  children: [
+                    // Icon container
+                    Container(
+                      width: 36,
+                      height: 36,
+                      decoration: BoxDecoration(
+                        color: section.accentColor.withValues(alpha: 0.15),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Icon(
+                        section.icon,
+                        size: 20,
+                        color: section.accentColor,
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+
+                    // Title + item count
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            section.title,
+                            style: TextStyle(
+                              color: isExpanded
+                                  ? Colors.white
+                                  : Colors.white70,
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600,
+                              letterSpacing: 0.3,
+                            ),
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            '${visibleItems.length} ${visibleItems.length == 1 ? 'opción' : 'opciones'}',
+                            style: TextStyle(
+                              color: Colors.white.withValues(alpha: 0.35),
+                              fontSize: 11,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+
+                    // Expand/collapse chevron
+                    AnimatedRotation(
+                      turns: isExpanded ? 0.5 : 0,
+                      duration: const Duration(milliseconds: 250),
+                      child: Icon(
+                        Icons.keyboard_arrow_down_rounded,
+                        color: Colors.white.withValues(alpha: 0.4),
+                        size: 22,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+
+          // ── Expanded Items ─────────────────────────
+          AnimatedCrossFade(
+            firstChild: const SizedBox.shrink(),
+            secondChild: Container(
               decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.05),
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(
-                  color: Colors.white.withValues(alpha: 0.08),
+                color: Colors.black.withValues(alpha: 0.15),
+                border: Border(
+                  top: BorderSide(
+                    color: Colors.white.withValues(alpha: 0.04),
+                  ),
                 ),
               ),
               child: Column(
-                children: [
-                  Icon(
-                    Icons.build_rounded,
-                    size: 48,
-                    color: AppColors.primary.withValues(alpha: 0.6),
-                  ),
-                  const SizedBox(height: 16),
-                  Text(
-                    'Módulos en desarrollo',
-                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                          color: Colors.white70,
-                          fontWeight: FontWeight.w600,
-                        ),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    'Los módulos de vehículos, citas, inventario y más se irán agregando próximamente.',
-                    textAlign: TextAlign.center,
-                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: Colors.white38,
-                          height: 1.5,
-                        ),
-                  ),
-                ],
+                children: visibleItems.map((item) {
+                  return _buildModuleItem(context, item: item);
+                }).toList(),
               ),
             ),
+            crossFadeState: isExpanded
+                ? CrossFadeState.showSecond
+                : CrossFadeState.showFirst,
+            duration: const Duration(milliseconds: 250),
+            sizeCurve: Curves.easeInOut,
           ),
         ],
       ),
     );
   }
 
-  /// Botón de módulo genérico con restricción de rol.
-  Widget _buildModuleButton(
-    BuildContext context, {
-    required String label,
-    required IconData icon,
-    required Color iconColor,
-    required String route,
-    Color? borderColor,
-  }) {
-    return SizedBox(
-      width: double.infinity,
-      child: ElevatedButton.icon(
-        onPressed: () => context.push(route),
-        style: ElevatedButton.styleFrom(
-          backgroundColor: AppColors.darkCard,
-          foregroundColor: Colors.white,
-          padding: const EdgeInsets.symmetric(vertical: 16),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-            side: BorderSide(
-              color: borderColor != null
-                  ? borderColor.withValues(alpha: 0.4)
-                  : Colors.white.withValues(alpha: 0.1),
-            ),
+  /// Individual module item inside a section.
+  Widget _buildModuleItem(BuildContext context, {required _ModuleItem item}) {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: () => context.push(item.route),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          child: Row(
+            children: [
+              Icon(item.icon, size: 20, color: item.iconColor),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Text(
+                  item.label,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    color: Colors.white70,
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ),
+              Icon(
+                Icons.chevron_right_rounded,
+                size: 18,
+                color: Colors.white.withValues(alpha: 0.2),
+              ),
+            ],
           ),
-        ),
-        icon: Icon(icon, size: 20, color: iconColor),
-        label: Text(
-          label,
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
-          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
         ),
       ),
     );
