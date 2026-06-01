@@ -203,4 +203,8 @@ class ApiConstants {
   // ── Proveedores ──────────────────────────────────────────
   static String proveedores(String slug) => '/api/$slug/gestion-administrativa/proveedores/';
   static String proveedor(String slug, String id) => '/api/$slug/gestion-administrativa/proveedores/$id/';
+
+  // ── Facturas y Recibos ────────────────────────────────────
+  static String listInvoices(String slug) => '/api/$slug/gestion-administrativa/facturas/';
 }
+

@@ -9,6 +9,13 @@ abstract class StoreSalesRemoteDataSource {
   Future<List<StoreSaleModel>> getSales();
   Future<StoreSaleModel> createSale(StoreSaleInput input);
   Future<StoreSaleModel> confirmSale(String saleId);
+  Future<void> markPaymentReceived(String pagoId);
+  Future<void> createInvoice(String pagoId);
+  Future<String> createPaymentTaller({
+    required String saleId,
+    required double total,
+    required String metodoPago,
+  });
 }
 
 class StoreSalesRemoteDataSourceImpl implements StoreSalesRemoteDataSource {
@@ -76,6 +83,64 @@ class StoreSalesRemoteDataSourceImpl implements StoreSalesRemoteDataSource {
         '/api/$_slug/gestion-administrativa/ventas-mostrador/$saleId/confirmar/',
       );
       return StoreSaleModel.fromJson(response.data as Map<String, dynamic>);
+    } on ServerException {
+      rethrow;
+    } catch (e) {
+      throw ServerException(message: e.toString());
+    }
+  }
+
+  @override
+  Future<void> markPaymentReceived(String pagoId) async {
+    try {
+      await apiClient.post(
+          '/api/$_slug/gestion-administrativa/pagos-taller/$pagoId/marcar-recibido/');
+    } on ServerException {
+      rethrow;
+    } catch (e) {
+      throw ServerException(message: e.toString());
+    }
+  }
+
+  @override
+  Future<void> createInvoice(String pagoId) async {
+    try {
+      await apiClient.post(
+        '/api/$_slug/gestion-administrativa/facturas/',
+        data: {'pago_taller': pagoId},
+      );
+    } on ServerException {
+      rethrow;
+    } catch (e) {
+      throw ServerException(message: e.toString());
+    }
+  }
+
+  @override
+  Future<String> createPaymentTaller({
+    required String saleId,
+    required double total,
+    required String metodoPago,
+  }) async {
+    try {
+      final response = await apiClient.post(
+        '/api/$_slug/gestion-administrativa/pagos-taller/',
+        data: {
+          'tipo_origen': 'VENTA',
+          'venta': saleId,
+          'tipo_destino': 'VENTA',
+          'id_destino': saleId,
+          'estado': 'PENDIENTE',
+          'monto_total': total,
+          'monto_real': total,
+          'monto_cobrado': total,
+          'metodo_pago': metodoPago,
+          'moneda': 'BOB',
+          'descripcion': 'Pago venta mostrador $saleId',
+        },
+      );
+      final data = response.data as Map<String, dynamic>;
+      return (data['id'] ?? '').toString();
     } on ServerException {
       rethrow;
     } catch (e) {

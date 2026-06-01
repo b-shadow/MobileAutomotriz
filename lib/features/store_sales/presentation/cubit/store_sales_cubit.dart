@@ -11,6 +11,9 @@ class StoreSalesCubit extends Cubit<StoreSalesState> {
   final GetStoreSales _getStoreSales;
   final CreateStoreSale _createStoreSale;
   final ConfirmStoreSale _confirmStoreSale;
+  final MarkPaymentReceived _markPaymentReceived;
+  final CreateInvoice _createInvoice;
+  final CreatePaymentTaller _createPaymentTaller;
   final GetInventoryItems _getInventoryItems;
 
   List<StoreSale> _sales = const [];
@@ -20,10 +23,16 @@ class StoreSalesCubit extends Cubit<StoreSalesState> {
     required GetStoreSales getStoreSales,
     required CreateStoreSale createStoreSale,
     required ConfirmStoreSale confirmStoreSale,
+    required MarkPaymentReceived markPaymentReceived,
+    required CreateInvoice createInvoice,
+    required CreatePaymentTaller createPaymentTaller,
     required GetInventoryItems getInventoryItems,
   })  : _getStoreSales = getStoreSales,
         _createStoreSale = createStoreSale,
         _confirmStoreSale = confirmStoreSale,
+        _markPaymentReceived = markPaymentReceived,
+        _createInvoice = createInvoice,
+        _createPaymentTaller = createPaymentTaller,
         _getInventoryItems = getInventoryItems,
         super(const StoreSalesInitial());
 
@@ -68,26 +77,77 @@ class StoreSalesCubit extends Cubit<StoreSalesState> {
     _sales = _sales.map((s) => s.id == updated.id ? updated : s).toList();
   }
 
-  Future<void> create(StoreSaleInput input) async {
+  Future<void> create(StoreSaleInput input, String metodoPago) async {
     emit(StoreSalesLoading(sales: _sales, items: _items));
 
-    final result = await _createStoreSale(input);
-
-    switch (result) {
-      case Success(:final data):
-        _sales = [data, ..._sales];
-        emit(StoreSalesSuccess(
-          sales: _sales,
-          items: _items,
-          message: 'Venta registrada exitosamente.',
-        ));
-      case Err(:final failure):
-        emit(StoreSalesError(
-          sales: _sales,
-          items: _items,
-          message: failure.message,
-        ));
+    // 1. Registrar venta
+    final resultSale = await _createStoreSale(input);
+    if (resultSale is Err<StoreSale>) {
+      emit(StoreSalesError(
+        sales: _sales,
+        items: _items,
+        message: resultSale.failure.message,
+      ));
+      return;
     }
+    final sale = (resultSale as Success<StoreSale>).data;
+
+    // 2. Confirmar venta (descuenta stock)
+    final resultConfirm = await _confirmStoreSale(sale.id);
+    if (resultConfirm is Err<StoreSale>) {
+      emit(StoreSalesError(
+        sales: _sales,
+        items: _items,
+        message: resultConfirm.failure.message,
+      ));
+      return;
+    }
+    final confirmedSale = (resultConfirm as Success<StoreSale>).data;
+
+    // 3. Crear pago taller
+    final resultPayment = await _createPaymentTaller(
+      saleId: confirmedSale.id,
+      total: confirmedSale.total,
+      metodoPago: metodoPago,
+    );
+    if (resultPayment is Err<String>) {
+      emit(StoreSalesError(
+        sales: _sales,
+        items: _items,
+        message: resultPayment.failure.message,
+      ));
+      return;
+    }
+    final pagoId = (resultPayment as Success<String>).data;
+
+    // 4. Marcar pago recibido
+    final resultRec = await _markPaymentReceived(pagoId);
+    if (resultRec is Err<void>) {
+      emit(StoreSalesError(
+        sales: _sales,
+        items: _items,
+        message: resultRec.failure.message,
+      ));
+      return;
+    }
+
+    // 5. Emitir factura/recibo
+    final resultInv = await _createInvoice(pagoId);
+    if (resultInv is Err<void>) {
+      emit(StoreSalesError(
+        sales: _sales,
+        items: _items,
+        message: resultInv.failure.message,
+      ));
+      return;
+    }
+
+    _sales = [confirmedSale, ..._sales];
+    emit(StoreSalesSuccess(
+      sales: _sales,
+      items: _items,
+      message: 'Venta registrada y pagada correctamente.',
+    ));
   }
 
   Future<void> confirm(String saleId) async {
@@ -102,6 +162,48 @@ class StoreSalesCubit extends Cubit<StoreSalesState> {
           sales: _sales,
           items: _items,
           message: 'Venta confirmada exitosamente.',
+        ));
+      case Err(:final failure):
+        emit(StoreSalesError(
+          sales: _sales,
+          items: _items,
+          message: failure.message,
+        ));
+    }
+  }
+
+  Future<void> markPaymentReceived(String pagoId) async {
+    emit(StoreSalesLoading(sales: _sales, items: _items));
+
+    final result = await _markPaymentReceived(pagoId);
+
+    switch (result) {
+      case Success():
+        emit(StoreSalesSuccess(
+          sales: _sales,
+          items: _items,
+          message: 'Pago marcado como recibido.',
+        ));
+      case Err(:final failure):
+        emit(StoreSalesError(
+          sales: _sales,
+          items: _items,
+          message: failure.message,
+        ));
+    }
+  }
+
+  Future<void> createInvoice(String pagoId) async {
+    emit(StoreSalesLoading(sales: _sales, items: _items));
+
+    final result = await _createInvoice(pagoId);
+
+    switch (result) {
+      case Success():
+        emit(StoreSalesSuccess(
+          sales: _sales,
+          items: _items,
+          message: 'Factura/Recibo emitido exitosamente.',
         ));
       case Err(:final failure):
         emit(StoreSalesError(

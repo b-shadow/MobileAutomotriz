@@ -5,6 +5,7 @@ import 'package:mobile1_app/core/theme/app_colors.dart';
 import 'package:mobile1_app/features/store_sales/domain/entities/store_sale_entity.dart';
 import 'package:mobile1_app/features/store_sales/presentation/cubit/store_sales_cubit.dart';
 import 'package:mobile1_app/features/store_sales/presentation/cubit/store_sales_state.dart';
+import 'package:mobile1_app/features/workshop_progress/domain/entities/spare_part_entities.dart';
 
 class CreateStoreSalePage extends StatefulWidget {
   const CreateStoreSalePage({super.key});
@@ -20,6 +21,7 @@ class _CreateStoreSalePageState extends State<CreateStoreSalePage> {
   final _clienteDocumentoCtrl = TextEditingController();
   
   final List<StoreSaleDetailInput> _detalles = [];
+  String _metodoPago = 'EFECTIVO';
 
   @override
   void dispose() {
@@ -43,7 +45,7 @@ class _CreateStoreSalePageState extends State<CreateStoreSalePage> {
       detalles: _detalles,
     );
 
-    context.read<StoreSalesCubit>().create(input);
+    context.read<StoreSalesCubit>().create(input, _metodoPago);
   }
 
   @override
@@ -113,10 +115,10 @@ class _CreateStoreSalePageState extends State<CreateStoreSalePage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text('Datos del Cliente', style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
+          const Text('Datos de la Venta', style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
           const SizedBox(height: 16),
           
-          const Text('Nombre (Opcional)', style: TextStyle(color: Colors.white70, fontSize: 12)),
+          const Text('Nombre del Cliente (Opcional)', style: TextStyle(color: Colors.white70, fontSize: 12)),
           const SizedBox(height: 4),
           TextFormField(
             controller: _clienteNombreCtrl,
@@ -132,12 +134,32 @@ class _CreateStoreSalePageState extends State<CreateStoreSalePage> {
             style: const TextStyle(color: Colors.white, fontSize: 14),
             decoration: _inputDecoration(),
           ),
+          const SizedBox(height: 12),
+
+          const Text('Método de Pago *', style: TextStyle(color: Colors.white70, fontSize: 12)),
+          const SizedBox(height: 4),
+          DropdownButtonFormField<String>(
+            value: _metodoPago,
+            dropdownColor: AppColors.darkCard,
+            style: const TextStyle(color: Colors.white, fontSize: 14),
+            decoration: _inputDecoration(),
+            items: const [
+              DropdownMenuItem(value: 'EFECTIVO', child: Text('Efectivo')),
+              DropdownMenuItem(value: 'QR', child: Text('QR')),
+              DropdownMenuItem(value: 'TARJETA', child: Text('Tarjeta (Stripe)')),
+            ],
+            onChanged: (v) {
+              if (v != null) {
+                setState(() => _metodoPago = v);
+              }
+            },
+          ),
         ],
       ),
     );
   }
 
-  Widget _buildItemsSection(List items) {
+  Widget _buildItemsSection(List<InventoryItem> items) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -174,7 +196,8 @@ class _CreateStoreSalePageState extends State<CreateStoreSalePage> {
               itemCount: _detalles.length,
               itemBuilder: (ctx, i) {
                 final d = _detalles[i];
-                final itemName = items.firstWhere((x) => x.id == d.itemInventarioId, orElse: () => null)?.nombre ?? 'Item';
+                final idxMatch = items.indexWhere((x) => x.id == d.itemInventarioId);
+                final itemName = idxMatch >= 0 ? items[idxMatch].nombre : 'Item';
                 return ListTile(
                   contentPadding: EdgeInsets.zero,
                   title: Text(itemName, style: const TextStyle(color: Colors.white, fontSize: 14)),
@@ -191,7 +214,7 @@ class _CreateStoreSalePageState extends State<CreateStoreSalePage> {
     );
   }
 
-  void _showAddItemModal(List items) {
+  void _showAddItemModal(List<InventoryItem> items) {
     String? selectedItemId;
     final qtyCtrl = TextEditingController(text: '1');
     final costCtrl = TextEditingController();

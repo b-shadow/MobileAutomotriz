@@ -7,6 +7,7 @@ import 'package:mobile1_app/features/spare_parts/domain/usecases/asignar_proveed
 import 'package:mobile1_app/features/spare_parts/domain/usecases/en_proceso_almacen.dart';
 import 'package:mobile1_app/features/spare_parts/domain/usecases/get_solicitudes.dart';
 import 'package:mobile1_app/features/spare_parts/domain/usecases/marcar_entregada.dart';
+import 'package:mobile1_app/features/spare_parts/domain/usecases/marcar_recibida_taller.dart';
 import 'package:mobile1_app/features/supplier/domain/entities/supplier.dart';
 import 'package:mobile1_app/features/supplier/domain/usecases/get_suppliers.dart';
 import 'spare_parts_state.dart';
@@ -17,6 +18,7 @@ class SparePartsCubit extends Cubit<SparePartsState> {
   final EnProcesoAlmacen _enProcesoAlmacen;
   final MarcarEntregada _marcarEntregada;
   final AsignarProveedorEta _asignarProveedorEta;
+  final MarcarRecibidaTaller _marcarRecibidaTaller;
   final GetSuppliers _getSuppliers;
 
   List<SparePartRequestEntity> _solicitudes = const [];
@@ -28,12 +30,14 @@ class SparePartsCubit extends Cubit<SparePartsState> {
     required EnProcesoAlmacen enProcesoAlmacen,
     required MarcarEntregada marcarEntregada,
     required AsignarProveedorEta asignarProveedorEta,
+    required MarcarRecibidaTaller marcarRecibidaTaller,
     required GetSuppliers getSuppliers,
   })  : _getSolicitudes = getSolicitudes,
         _aprobarSolicitud = aprobarSolicitud,
         _enProcesoAlmacen = enProcesoAlmacen,
         _marcarEntregada = marcarEntregada,
         _asignarProveedorEta = asignarProveedorEta,
+        _marcarRecibidaTaller = marcarRecibidaTaller,
         _getSuppliers = getSuppliers,
         super(const SparePartsInitial());
 
@@ -189,6 +193,35 @@ class SparePartsCubit extends Cubit<SparePartsState> {
           solicitudes: _solicitudes,
           proveedores: _proveedores,
           message: 'Proveedor y ETA asignados.',
+        ));
+      case Err(:final failure):
+        emit(SparePartsError(
+          solicitudes: _solicitudes,
+          proveedores: _proveedores,
+          message: failure.message,
+        ));
+    }
+  }
+
+  Future<void> marcarRecibidaTaller(
+    String solicitudId,
+    List<Map<String, dynamic>> detalles,
+  ) async {
+    emit(SparePartsLoading(
+        solicitudes: _solicitudes, proveedores: _proveedores));
+
+    final result = await _marcarRecibidaTaller(
+      solicitudId: solicitudId,
+      detalles: detalles,
+    );
+
+    switch (result) {
+      case Success(:final data):
+        _replaceInList(data);
+        emit(SparePartsSuccess(
+          solicitudes: _solicitudes,
+          proveedores: _proveedores,
+          message: 'Recepción en taller confirmada.',
         ));
       case Err(:final failure):
         emit(SparePartsError(

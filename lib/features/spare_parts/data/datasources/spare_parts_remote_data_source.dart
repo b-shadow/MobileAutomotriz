@@ -19,6 +19,9 @@ abstract class SparePartsRemoteDataSource {
 
   Future<SparePartRequestModel> asignarProveedorEta(
       String solicitudId, Map<String, dynamic> data);
+
+  Future<SparePartRequestModel> marcarRecibidaTaller(
+      String solicitudId, Map<String, dynamic> data);
 }
 
 class SparePartsRemoteDataSourceImpl implements SparePartsRemoteDataSource {
@@ -122,6 +125,22 @@ class SparePartsRemoteDataSourceImpl implements SparePartsRemoteDataSource {
     try {
       final url =
           '${ApiConstants.solicitudRepuesto(_slug, solicitudId)}asignar-proveedor-eta/';
+      final response = await apiClient.post(url, data: data);
+      return SparePartRequestModel.fromJson(
+          response.data as Map<String, dynamic>);
+    } on ServerException {
+      rethrow;
+    } catch (e) {
+      throw ServerException(message: e.toString());
+    }
+  }
+
+  @override
+  Future<SparePartRequestModel> marcarRecibidaTaller(
+      String solicitudId, Map<String, dynamic> data) async {
+    try {
+      final url =
+          '${ApiConstants.solicitudRepuesto(_slug, solicitudId)}marcar-recibida-taller/';
       final response = await apiClient.post(url, data: data);
       return SparePartRequestModel.fromJson(
           response.data as Map<String, dynamic>);

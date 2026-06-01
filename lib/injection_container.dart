@@ -183,6 +183,7 @@ import 'features/spare_parts/domain/usecases/aprobar_solicitud.dart';
 import 'features/spare_parts/domain/usecases/en_proceso_almacen.dart';
 import 'features/spare_parts/domain/usecases/marcar_entregada.dart';
 import 'features/spare_parts/domain/usecases/asignar_proveedor_eta.dart';
+import 'features/spare_parts/domain/usecases/marcar_recibida_taller.dart';
 import 'features/spare_parts/presentation/cubit/spare_parts_cubit.dart';
 
 import 'features/purchases/data/datasources/purchases_remote_data_source.dart';
@@ -196,6 +197,12 @@ import 'features/store_sales/data/repositories/store_sales_repository_impl.dart'
 import 'features/store_sales/domain/repositories/store_sales_repository.dart';
 import 'features/store_sales/domain/usecases/store_sales_usecases.dart';
 import 'features/store_sales/presentation/cubit/store_sales_cubit.dart';
+
+import 'features/invoices/data/datasources/invoices_remote_data_source.dart';
+import 'features/invoices/data/repositories/invoices_repository_impl.dart';
+import 'features/invoices/domain/repositories/invoices_repository.dart';
+import 'features/invoices/domain/usecases/get_invoices.dart';
+import 'features/invoices/presentation/cubit/invoices_cubit.dart';
 
 final sl = GetIt.instance;
 
@@ -854,6 +861,7 @@ Future<void> initDependencies(SharedPreferences prefs) async {
   sl.registerLazySingleton(() => EnProcesoAlmacen(sl()));
   sl.registerLazySingleton(() => MarcarEntregada(sl()));
   sl.registerLazySingleton(() => AsignarProveedorEta(sl()));
+  sl.registerLazySingleton(() => MarcarRecibidaTaller(sl()));
   sl.registerFactory(
     () => SparePartsCubit(
       getSolicitudes: sl(),
@@ -861,6 +869,7 @@ Future<void> initDependencies(SharedPreferences prefs) async {
       enProcesoAlmacen: sl(),
       marcarEntregada: sl(),
       asignarProveedorEta: sl(),
+      marcarRecibidaTaller: sl(),
       getSuppliers: sl(),
     ),
   );
@@ -907,12 +916,39 @@ Future<void> initDependencies(SharedPreferences prefs) async {
   sl.registerLazySingleton(() => GetStoreSales(sl()));
   sl.registerLazySingleton(() => CreateStoreSale(sl()));
   sl.registerLazySingleton(() => ConfirmStoreSale(sl()));
+  sl.registerLazySingleton(() => MarkPaymentReceived(sl()));
+  sl.registerLazySingleton(() => CreateInvoice(sl()));
+  sl.registerLazySingleton(() => CreatePaymentTaller(sl()));
   sl.registerFactory(
     () => StoreSalesCubit(
       getStoreSales: sl(),
       createStoreSale: sl(),
       confirmStoreSale: sl(),
+      markPaymentReceived: sl(),
+      createInvoice: sl(),
+      createPaymentTaller: sl(),
       getInventoryItems: sl(),
     ),
   );
+
+  // ── Invoices (Facturas y Recibos) ───────────────────────────
+  sl.registerLazySingleton<InvoicesRemoteDataSource>(
+    () => InvoicesRemoteDataSourceImpl(
+      apiClient: sl(),
+      sessionStorage: sl(),
+    ),
+  );
+  sl.registerLazySingleton<InvoicesRepository>(
+    () => InvoicesRepositoryImpl(
+      remoteDataSource: sl(),
+      networkInfo: sl(),
+    ),
+  );
+  sl.registerLazySingleton(() => GetInvoices(sl()));
+  sl.registerFactory(
+    () => InvoicesCubit(
+      getInvoices: sl(),
+    ),
+  );
 }
+

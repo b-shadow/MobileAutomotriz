@@ -58,6 +58,9 @@ extension _RoleHelpers on User {
 
   /// ADMIN, ASESOR DE SERVICIO, ALMACENERO
   bool get canViewInventario => isAdmin || isAsesor || isAlmacenero;
+
+  /// ADMIN, ADMINISTRATIVO
+  bool get canViewFacturas => isAdmin || isAdministrativo;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -336,6 +339,13 @@ class _HomePageState extends State<HomePage> {
             iconColor: const Color(0xFF8B5CF6),
             route: '/store-sales',
             visible: user.canViewInventario,
+          ),
+          _ModuleItem(
+            label: 'Facturas y Recibos',
+            icon: Icons.receipt_long_rounded,
+            iconColor: const Color(0xFFF59E0B),
+            route: '/invoices-management',
+            visible: user.canViewFacturas,
           ),
         ],
       ),

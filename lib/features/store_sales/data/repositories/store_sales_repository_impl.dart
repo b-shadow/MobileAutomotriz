@@ -47,4 +47,45 @@ class StoreSalesRepositoryImpl implements StoreSalesRepository {
       return Err(ServerFailure(message: e.message, statusCode: e.statusCode));
     }
   }
+
+  @override
+  Future<Result<void>> markPaymentReceived(String pagoId) async {
+    if (!await networkInfo.isConnected) return const Err(NetworkFailure());
+    try {
+      await remoteDataSource.markPaymentReceived(pagoId);
+      return const Success(null);
+    } on ServerException catch (e) {
+      return Err(ServerFailure(message: e.message, statusCode: e.statusCode));
+    }
+  }
+
+  @override
+  Future<Result<void>> createInvoice(String pagoId) async {
+    if (!await networkInfo.isConnected) return const Err(NetworkFailure());
+    try {
+      await remoteDataSource.createInvoice(pagoId);
+      return const Success(null);
+    } on ServerException catch (e) {
+      return Err(ServerFailure(message: e.message, statusCode: e.statusCode));
+    }
+  }
+
+  @override
+  Future<Result<String>> createPaymentTaller({
+    required String saleId,
+    required double total,
+    required String metodoPago,
+  }) async {
+    if (!await networkInfo.isConnected) return const Err(NetworkFailure());
+    try {
+      final id = await remoteDataSource.createPaymentTaller(
+        saleId: saleId,
+        total: total,
+        metodoPago: metodoPago,
+      );
+      return Success(id);
+    } on ServerException catch (e) {
+      return Err(ServerFailure(message: e.message, statusCode: e.statusCode));
+    }
+  }
 }

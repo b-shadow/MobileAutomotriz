@@ -62,6 +62,9 @@ import '../../features/store_sales/presentation/pages/store_sales_page.dart';
 import '../../features/store_sales/presentation/pages/create_store_sale_page.dart';
 import '../../features/store_sales/presentation/cubit/store_sales_cubit.dart';
 
+import '../../features/invoices/presentation/pages/invoices_page.dart';
+import '../../features/invoices/presentation/cubit/invoices_cubit.dart';
+
 import '../../features/auth/presentation/pages/login_page.dart';
 import '../../features/auth/presentation/pages/register_page.dart';
 import '../../features/home/presentation/pages/home_page.dart';
@@ -411,6 +414,15 @@ class AppRouter {
             ),
           ),
         ],
+      ),
+
+      GoRoute(
+        path: '/invoices-management',
+        name: 'invoices-management',
+        builder: (context, state) => BlocProvider(
+          create: (context) => sl<InvoicesCubit>(),
+          child: const InvoicesPage(),
+        ),
       ),
     ],
   );

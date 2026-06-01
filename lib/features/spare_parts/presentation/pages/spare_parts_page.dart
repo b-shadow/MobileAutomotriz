@@ -418,6 +418,17 @@ class _DetalleRow extends StatelessWidget {
               ),
             ),
           ],
+          if (detalle.cantidadRecibidaTaller > 0) ...[
+            const SizedBox(width: 8),
+            Text(
+              'Rec: ${detalle.cantidadRecibidaTaller}',
+              style: const TextStyle(
+                color: Color(0xFF10B981),
+                fontSize: 11,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ],
         ],
       ),
     );
@@ -475,6 +486,15 @@ class _ActionButtons extends StatelessWidget {
         label: 'Entregar',
         color: const Color(0xFF3B82F6),
         onTap: () => _showEntregarSheet(context),
+      ));
+    }
+
+    if (solicitud.estado == 'ENTREGADA') {
+      actions.add(_ActionBtn(
+        icon: Icons.check_circle_rounded,
+        label: 'Recibir en Taller',
+        color: const Color(0xFF10B981),
+        onTap: () => _showRecibirTallerSheet(context),
       ));
     }
 
@@ -841,6 +861,215 @@ class _ActionButtons extends StatelessWidget {
                         ),
                         child: const Text(
                           'Confirmar Entrega',
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 15),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
+  void _showRecibirTallerSheet(BuildContext context) {
+    final cantidades = <String, int>{};
+    for (final d in solicitud.detalles) {
+      cantidades[d.id] = d.cantidadEntregada;
+    }
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: AppColors.darkCard,
+      shape: const RoundedRectangleBorder(
+        borderRadius:
+            BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (sheetCtx) {
+        return StatefulBuilder(
+          builder: (builderCtx, setSheetState) {
+            return Padding(
+              padding: EdgeInsets.only(
+                left: 20,
+                right: 20,
+                top: 20,
+                bottom: MediaQuery.of(builderCtx)
+                        .viewInsets
+                        .bottom +
+                    20,
+              ),
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Handle bar
+                    Center(
+                      child: Container(
+                        width: 40,
+                        height: 4,
+                        decoration: BoxDecoration(
+                          color: Colors.white
+                              .withValues(alpha: 0.2),
+                          borderRadius: BorderRadius.circular(2),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+
+                    const Text(
+                      'Confirmar Recepción en Taller',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      'Confirme las cantidades recibidas para cada item.',
+                      style: TextStyle(
+                        color: Colors.white.withValues(alpha: 0.45),
+                        fontSize: 13,
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+
+                    ...solicitud.detalles.where((d) => d.cantidadEntregada > 0).map((d) {
+                      return Padding(
+                        padding:
+                            const EdgeInsets.only(bottom: 12),
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment:
+                                    CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    d.itemNombre ??
+                                        'Item desconocido',
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 13,
+                                    ),
+                                  ),
+                                  Text(
+                                    'Entregado: ${d.cantidadEntregada}',
+                                    style: TextStyle(
+                                      color: Colors.white
+                                          .withValues(
+                                              alpha: 0.4),
+                                      fontSize: 11,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            SizedBox(
+                              width: 80,
+                              child: TextFormField(
+                                initialValue:
+                                    '${cantidades[d.id]}',
+                                keyboardType:
+                                    TextInputType.number,
+                                onChanged: (v) =>
+                                    setSheetState(() {
+                                  cantidades[d.id] =
+                                      int.tryParse(v) ?? 0;
+                                }),
+                                style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 14),
+                                textAlign: TextAlign.center,
+                                decoration: InputDecoration(
+                                  filled: true,
+                                  fillColor: Colors.white
+                                      .withValues(
+                                          alpha: 0.07),
+                                  border: OutlineInputBorder(
+                                    borderRadius:
+                                        BorderRadius.circular(
+                                            10),
+                                    borderSide: BorderSide(
+                                        color: Colors.white
+                                            .withValues(
+                                                alpha:
+                                                    0.1)),
+                                  ),
+                                  enabledBorder:
+                                      OutlineInputBorder(
+                                    borderRadius:
+                                        BorderRadius.circular(
+                                            10),
+                                    borderSide: BorderSide(
+                                        color: Colors.white
+                                            .withValues(
+                                                alpha:
+                                                    0.1)),
+                                  ),
+                                  focusedBorder:
+                                      OutlineInputBorder(
+                                    borderRadius:
+                                        BorderRadius.circular(
+                                            10),
+                                    borderSide:
+                                        const BorderSide(
+                                            color: Color(0xFF10B981)),
+                                  ),
+                                  contentPadding:
+                                      const EdgeInsets
+                                          .symmetric(
+                                          vertical: 8),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    }),
+
+                    const SizedBox(height: 10),
+
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton(
+                        onPressed: () {
+                          final detalles = solicitud.detalles
+                              .where((d) => d.cantidadEntregada > 0)
+                              .map((d) => {
+                                    'detalle_id': d.id,
+                                    'cantidad_recibida':
+                                        cantidades[d.id] ?? 0,
+                                  })
+                              .toList();
+                          Navigator.of(sheetCtx).pop();
+                          context
+                              .read<SparePartsCubit>()
+                              .marcarRecibidaTaller(
+                                solicitud.id,
+                                detalles,
+                              );
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor:
+                              const Color(0xFF10B981),
+                          foregroundColor: Colors.white,
+                          shape: RoundedRectangleBorder(
+                            borderRadius:
+                                BorderRadius.circular(12),
+                          ),
+                          padding: const EdgeInsets.symmetric(
+                              vertical: 14),
+                        ),
+                        child: const Text(
+                          'Confirmar Recepción',
                           style: TextStyle(
                               fontWeight: FontWeight.bold,
                               fontSize: 15),

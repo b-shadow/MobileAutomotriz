@@ -7,4 +7,14 @@ abstract class StoreSalesRepository {
   Future<Result<StoreSale>> createSale(StoreSaleInput input);
 
   Future<Result<StoreSale>> confirmSale(String saleId);
+
+  Future<Result<void>> markPaymentReceived(String pagoId);
+
+  Future<Result<void>> createInvoice(String pagoId);
+
+  Future<Result<String>> createPaymentTaller({
+    required String saleId,
+    required double total,
+    required String metodoPago,
+  });
 }

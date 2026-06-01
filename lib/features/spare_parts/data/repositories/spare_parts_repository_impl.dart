@@ -94,4 +94,20 @@ class SparePartsRepositoryImpl implements SparePartsRepository {
       return Err(ServerFailure(message: e.message, statusCode: e.statusCode));
     }
   }
+
+  @override
+  Future<Result<SparePartRequestEntity>> marcarRecibidaTaller({
+    required String solicitudId,
+    required List<Map<String, dynamic>> detalles,
+  }) async {
+    if (!await networkInfo.isConnected) return const Err(NetworkFailure());
+    try {
+      final data = await remoteDataSource.marcarRecibidaTaller(solicitudId, {
+        'detalles': detalles,
+      });
+      return Success(data);
+    } on ServerException catch (e) {
+      return Err(ServerFailure(message: e.message, statusCode: e.statusCode));
+    }
+  }
 }

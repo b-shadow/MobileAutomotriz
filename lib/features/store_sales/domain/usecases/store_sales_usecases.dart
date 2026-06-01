@@ -3,6 +3,9 @@ import 'package:mobile1_app/core/usecases/usecase.dart';
 import 'package:mobile1_app/features/store_sales/domain/entities/store_sale_entity.dart';
 import 'package:mobile1_app/features/store_sales/domain/repositories/store_sales_repository.dart';
 
+export 'mark_payment_received.dart';
+export 'create_invoice.dart';
+
 class GetStoreSales implements UseCase<List<StoreSale>, NoParams> {
   final StoreSalesRepository repository;
   GetStoreSales(this.repository);
@@ -24,4 +27,19 @@ class ConfirmStoreSale {
   ConfirmStoreSale(this.repository);
 
   Future<Result<StoreSale>> call(String saleId) => repository.confirmSale(saleId);
+}
+
+class CreatePaymentTaller {
+  final StoreSalesRepository repository;
+  CreatePaymentTaller(this.repository);
+
+  Future<Result<String>> call({
+    required String saleId,
+    required double total,
+    required String metodoPago,
+  }) => repository.createPaymentTaller(
+        saleId: saleId,
+        total: total,
+        metodoPago: metodoPago,
+      );
 }

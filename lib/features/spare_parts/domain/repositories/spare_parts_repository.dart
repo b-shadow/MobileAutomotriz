@@ -25,4 +25,9 @@ abstract class SparePartsRepository {
     String? eta,
     String? observaciones,
   });
+
+  Future<Result<SparePartRequestEntity>> marcarRecibidaTaller({
+    required String solicitudId,
+    required List<Map<String, dynamic>> detalles,
+  });
 }
