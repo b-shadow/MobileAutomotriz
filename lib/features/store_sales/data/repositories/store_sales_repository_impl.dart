@@ -88,4 +88,48 @@ class StoreSalesRepositoryImpl implements StoreSalesRepository {
       return Err(ServerFailure(message: e.message, statusCode: e.statusCode));
     }
   }
+
+  @override
+  Future<Result<Map<String, dynamic>>> createQRPayment(Map<String, dynamic> data) async {
+    if (!await networkInfo.isConnected) return const Err(NetworkFailure());
+    try {
+      final result = await remoteDataSource.createQRPayment(data);
+      return Success(result);
+    } on ServerException catch (e) {
+      return Err(ServerFailure(message: e.message, statusCode: e.statusCode));
+    }
+  }
+
+  @override
+  Future<Result<Map<String, dynamic>>> simularConfirmacionQR(String pagoId) async {
+    if (!await networkInfo.isConnected) return const Err(NetworkFailure());
+    try {
+      final result = await remoteDataSource.simularConfirmacionQR(pagoId);
+      return Success(result);
+    } on ServerException catch (e) {
+      return Err(ServerFailure(message: e.message, statusCode: e.statusCode));
+    }
+  }
+
+  @override
+  Future<Result<Map<String, dynamic>>> consultarEstadoQR(String pagoId) async {
+    if (!await networkInfo.isConnected) return const Err(NetworkFailure());
+    try {
+      final result = await remoteDataSource.consultarEstadoQR(pagoId);
+      return Success(result);
+    } on ServerException catch (e) {
+      return Err(ServerFailure(message: e.message, statusCode: e.statusCode));
+    }
+  }
+
+  @override
+  Future<Result<Map<String, dynamic>>> iniciarPagoTarjeta(Map<String, dynamic> data) async {
+    if (!await networkInfo.isConnected) return const Err(NetworkFailure());
+    try {
+      final result = await remoteDataSource.iniciarPagoTarjeta(data);
+      return Success(result);
+    } on ServerException catch (e) {
+      return Err(ServerFailure(message: e.message, statusCode: e.statusCode));
+    }
+  }
 }

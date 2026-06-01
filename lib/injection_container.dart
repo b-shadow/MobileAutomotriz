@@ -204,6 +204,12 @@ import 'features/invoices/domain/repositories/invoices_repository.dart';
 import 'features/invoices/domain/usecases/get_invoices.dart';
 import 'features/invoices/presentation/cubit/invoices_cubit.dart';
 
+import 'features/payments/data/datasources/payments_remote_data_source.dart';
+import 'features/payments/data/repositories/payments_repository_impl.dart';
+import 'features/payments/domain/repositories/payments_repository.dart';
+import 'features/payments/domain/usecases/payment_usecases.dart';
+import 'features/payments/presentation/cubit/payments_cubit.dart';
+
 final sl = GetIt.instance;
 
 /// Initialize all dependencies.
@@ -928,6 +934,7 @@ Future<void> initDependencies(SharedPreferences prefs) async {
       createInvoice: sl(),
       createPaymentTaller: sl(),
       getInventoryItems: sl(),
+      repository: sl(),
     ),
   );
 
@@ -948,6 +955,30 @@ Future<void> initDependencies(SharedPreferences prefs) async {
   sl.registerFactory(
     () => InvoicesCubit(
       getInvoices: sl(),
+    ),
+  );
+
+  // ── Payments (Pagos de Taller) ──────────────────────────────
+  sl.registerLazySingleton<PaymentsRemoteDataSource>(
+    () => PaymentsRemoteDataSourceImpl(
+      apiClient: sl(),
+      sessionStorage: sl(),
+    ),
+  );
+  sl.registerLazySingleton<PaymentsRepository>(
+    () => PaymentsRepositoryImpl(
+      remoteDataSource: sl(),
+      networkInfo: sl(),
+    ),
+  );
+  sl.registerLazySingleton(() => GetPayments(sl()));
+  sl.registerLazySingleton(() => CreatePaymentTallerUseCase(sl()));
+  sl.registerLazySingleton(() => MarkPaymentReceivedUseCase(sl()));
+  sl.registerFactory(
+    () => PaymentsCubit(
+      getPayments: sl(),
+      createPayment: sl(),
+      markReceived: sl(),
     ),
   );
 }

@@ -17,4 +17,12 @@ abstract class StoreSalesRepository {
     required double total,
     required String metodoPago,
   });
+
+  Future<Result<Map<String, dynamic>>> createQRPayment(Map<String, dynamic> data);
+
+  Future<Result<Map<String, dynamic>>> simularConfirmacionQR(String pagoId);
+
+  Future<Result<Map<String, dynamic>>> consultarEstadoQR(String pagoId);
+
+  Future<Result<Map<String, dynamic>>> iniciarPagoTarjeta(Map<String, dynamic> data);
 }

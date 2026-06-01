@@ -341,6 +341,13 @@ class _HomePageState extends State<HomePage> {
             visible: user.canViewInventario,
           ),
           _ModuleItem(
+            label: 'Pagos de Taller',
+            icon: Icons.payments_rounded,
+            iconColor: const Color(0xFF10B981),
+            route: '/payments-management',
+            visible: user.canViewInventario,
+          ),
+          _ModuleItem(
             label: 'Facturas y Recibos',
             icon: Icons.receipt_long_rounded,
             iconColor: const Color(0xFFF59E0B),

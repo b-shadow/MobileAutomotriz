@@ -16,6 +16,10 @@ abstract class StoreSalesRemoteDataSource {
     required double total,
     required String metodoPago,
   });
+  Future<Map<String, dynamic>> createQRPayment(Map<String, dynamic> data);
+  Future<Map<String, dynamic>> simularConfirmacionQR(String pagoId);
+  Future<Map<String, dynamic>> consultarEstadoQR(String pagoId);
+  Future<Map<String, dynamic>> iniciarPagoTarjeta(Map<String, dynamic> data);
 }
 
 class StoreSalesRemoteDataSourceImpl implements StoreSalesRemoteDataSource {
@@ -35,6 +39,15 @@ class StoreSalesRemoteDataSourceImpl implements StoreSalesRemoteDataSource {
       if (slug != null && slug.isNotEmpty) return slug;
     }
     return EnvConfig.tenantSlug;
+  }
+
+  String? get _empresaId {
+    final userData = sessionStorage.userData;
+    if (userData != null && userData['tenant'] is Map<String, dynamic>) {
+      final tenant = userData['tenant'] as Map<String, dynamic>;
+      return tenant['id']?.toString();
+    }
+    return null;
   }
 
   @override
@@ -107,7 +120,7 @@ class StoreSalesRemoteDataSourceImpl implements StoreSalesRemoteDataSource {
     try {
       await apiClient.post(
         '/api/$_slug/gestion-administrativa/facturas/',
-        data: {'pago_taller': pagoId},
+        data: {'pago_taller': pagoId, 'empresa': _empresaId},
       );
     } on ServerException {
       rethrow;
@@ -126,6 +139,7 @@ class StoreSalesRemoteDataSourceImpl implements StoreSalesRemoteDataSource {
       final response = await apiClient.post(
         '/api/$_slug/gestion-administrativa/pagos-taller/',
         data: {
+          'empresa': _empresaId,
           'tipo_origen': 'VENTA',
           'venta': saleId,
           'tipo_destino': 'VENTA',
@@ -141,6 +155,65 @@ class StoreSalesRemoteDataSourceImpl implements StoreSalesRemoteDataSource {
       );
       final data = response.data as Map<String, dynamic>;
       return (data['id'] ?? '').toString();
+    } on ServerException {
+      rethrow;
+    } catch (e) {
+      throw ServerException(message: e.toString());
+    }
+  }
+
+  @override
+  Future<Map<String, dynamic>> createQRPayment(Map<String, dynamic> data) async {
+    try {
+      final response = await apiClient.post(
+        '/api/$_slug/gestion-administrativa/pagos-taller/crear-qr/',
+        data: data,
+      );
+      return response.data as Map<String, dynamic>;
+    } on ServerException {
+      rethrow;
+    } catch (e) {
+      throw ServerException(message: e.toString());
+    }
+  }
+
+  @override
+  Future<Map<String, dynamic>> simularConfirmacionQR(String pagoId) async {
+    try {
+      final response = await apiClient.post(
+        '/api/$_slug/gestion-administrativa/pagos-taller/$pagoId/simular-confirmacion/',
+        data: {'accion': 'confirmar'},
+      );
+      return response.data as Map<String, dynamic>;
+    } on ServerException {
+      rethrow;
+    } catch (e) {
+      throw ServerException(message: e.toString());
+    }
+  }
+
+  @override
+  Future<Map<String, dynamic>> consultarEstadoQR(String pagoId) async {
+    try {
+      final response = await apiClient.get(
+        '/api/$_slug/gestion-administrativa/pagos-taller/$pagoId/estado-qr/',
+      );
+      return response.data as Map<String, dynamic>;
+    } on ServerException {
+      rethrow;
+    } catch (e) {
+      throw ServerException(message: e.toString());
+    }
+  }
+
+  @override
+  Future<Map<String, dynamic>> iniciarPagoTarjeta(Map<String, dynamic> data) async {
+    try {
+      final response = await apiClient.post(
+        '/api/$_slug/gestion-administrativa/ventas-mostrador/iniciar-pago-tarjeta/',
+        data: data,
+      );
+      return response.data as Map<String, dynamic>;
     } on ServerException {
       rethrow;
     } catch (e) {

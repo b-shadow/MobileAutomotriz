@@ -57,11 +57,21 @@ class PaymentsRemoteDataSourceImpl implements PaymentsRemoteDataSource {
     }
   }
 
+  String? get _empresaId {
+    final userData = sessionStorage.userData;
+    if (userData != null && userData['tenant'] is Map<String, dynamic>) {
+      final tenant = userData['tenant'] as Map<String, dynamic>;
+      return tenant['id']?.toString();
+    }
+    return null;
+  }
+
   @override
   Future<PaymentTallerModel> createPayment(Map<String, dynamic> data) async {
     try {
+      final payload = {...data, 'empresa': _empresaId};
       final response = await apiClient
-          .post('/api/$_slug/gestion-administrativa/pagos-taller/', data: data);
+          .post('/api/$_slug/gestion-administrativa/pagos-taller/', data: payload);
       return PaymentTallerModel.fromJson(
           response.data as Map<String, dynamic>);
     } on ServerException {

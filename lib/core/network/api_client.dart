@@ -163,10 +163,16 @@ class ApiClient {
     }
 
     if (data is Map<String, dynamic>) {
-      // Format 1: { "detail": "message" }
+      // Format 1: { "detail": "message" } or { "error": "message" }
       if (data.containsKey('detail')) {
         return ServerException(
           message: data['detail'].toString(),
+          statusCode: statusCode,
+        );
+      }
+      if (data.containsKey('error')) {
+        return ServerException(
+          message: data['error'].toString(),
           statusCode: statusCode,
         );
       }
