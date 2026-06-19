@@ -4,6 +4,7 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:intl/intl.dart';
 import 'package:mobile1_app/core/theme/app_colors.dart';
 import '../cubit/report_cubit.dart';
+import 'ia_reports_page.dart';
 
 class ReportsPage extends StatefulWidget {
   const ReportsPage({super.key});
@@ -13,6 +14,7 @@ class ReportsPage extends StatefulWidget {
 }
 
 class _ReportsPageState extends State<ReportsPage> {
+  String _mainMode = 'clasico'; // 'clasico' or 'ia'
   String _activeTab = 'GLOBAL';
   final _tabs = [
     {'id': 'GLOBAL', 'label': 'Estadísticas Globales', 'icon': Icons.show_chart},
@@ -101,34 +103,151 @@ class _ReportsPageState extends State<ReportsPage> {
       ),
       body: Column(
         children: [
-          _buildTabs(),
-          _buildFilters(),
-          Expanded(
-            child: BlocBuilder<ReportCubit, ReportState>(
-              builder: (context, state) {
-                if (state is ReportLoading) {
-                  return const Center(child: CircularProgressIndicator(color: AppColors.primary));
-                }
-                if (state is ReportError) {
-                  return Center(child: Text(state.message, style: const TextStyle(color: AppColors.error)));
-                }
-                if (state is ReportLoaded) {
-                  final data = state.reportData.data;
-                  switch (state.activeTab) {
-                    case 'GLOBAL':
-                      return _buildGlobalTab(data);
-                    case 'VEHICULO':
-                      return _buildVehiculoTab(data);
-                    case 'PRESUPUESTO':
-                      return _buildPresupuestoTab(data);
-                    case 'INVENTARIO':
-                      return _buildInventarioTab(data);
-                    default:
-                      return const SizedBox.shrink();
+          // ── Mode Toggle ──────────────────────────────
+          _buildModeToggle(),
+
+          // ── Content based on mode ───────────────────
+          if (_mainMode == 'ia')
+            const Expanded(child: IaReportsPage())
+          else ...[
+            _buildTabs(),
+            _buildFilters(),
+            Expanded(
+              child: BlocBuilder<ReportCubit, ReportState>(
+                builder: (context, state) {
+                  if (state is ReportLoading) {
+                    return const Center(child: CircularProgressIndicator(color: AppColors.primary));
                   }
-                }
-                return const SizedBox.shrink();
-              },
+                  if (state is ReportError) {
+                    return Center(child: Text(state.message, style: const TextStyle(color: AppColors.error)));
+                  }
+                  if (state is ReportLoaded) {
+                    final data = state.reportData.data;
+                    switch (state.activeTab) {
+                      case 'GLOBAL':
+                        return _buildGlobalTab(data);
+                      case 'VEHICULO':
+                        return _buildVehiculoTab(data);
+                      case 'PRESUPUESTO':
+                        return _buildPresupuestoTab(data);
+                      case 'INVENTARIO':
+                        return _buildInventarioTab(data);
+                      default:
+                        return const SizedBox.shrink();
+                    }
+                  }
+                  return const SizedBox.shrink();
+                },
+              ),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Widget _buildModeToggle() {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      padding: const EdgeInsets.all(4),
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.06),
+        borderRadius: BorderRadius.circular(14),
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: GestureDetector(
+              onTap: () => setState(() => _mainMode = 'clasico'),
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 250),
+                padding: const EdgeInsets.symmetric(vertical: 10),
+                decoration: BoxDecoration(
+                  color: _mainMode == 'clasico'
+                      ? AppColors.darkCard
+                      : Colors.transparent,
+                  borderRadius: BorderRadius.circular(10),
+                  boxShadow: _mainMode == 'clasico'
+                      ? [
+                          BoxShadow(
+                            color: Colors.black.withValues(alpha: 0.3),
+                            blurRadius: 6,
+                          ),
+                        ]
+                      : [],
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.bar_chart_rounded,
+                      size: 18,
+                      color: _mainMode == 'clasico'
+                          ? const Color(0xFF10B981)
+                          : AppColors.darkTextSecondary,
+                    ),
+                    const SizedBox(width: 6),
+                    Text(
+                      'Clásicos',
+                      style: TextStyle(
+                        color: _mainMode == 'clasico'
+                            ? Colors.white
+                            : AppColors.darkTextSecondary,
+                        fontWeight: FontWeight.w600,
+                        fontSize: 13,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+          Expanded(
+            child: GestureDetector(
+              onTap: () => setState(() => _mainMode = 'ia'),
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 250),
+                padding: const EdgeInsets.symmetric(vertical: 10),
+                decoration: BoxDecoration(
+                  gradient: _mainMode == 'ia'
+                      ? const LinearGradient(
+                          colors: [AppColors.primary, Color(0xFF6366F1)],
+                        )
+                      : null,
+                  borderRadius: BorderRadius.circular(10),
+                  boxShadow: _mainMode == 'ia'
+                      ? [
+                          BoxShadow(
+                            color: AppColors.primary.withValues(alpha: 0.4),
+                            blurRadius: 8,
+                          ),
+                        ]
+                      : [],
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.smart_toy_rounded,
+                      size: 18,
+                      color: _mainMode == 'ia'
+                          ? Colors.white
+                          : AppColors.darkTextSecondary,
+                    ),
+                    const SizedBox(width: 6),
+                    Text(
+                      'Reportes con IA',
+                      style: TextStyle(
+                        color: _mainMode == 'ia'
+                            ? Colors.white
+                            : AppColors.darkTextSecondary,
+                        fontWeight: FontWeight.w600,
+                        fontSize: 13,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ),
           ),
         ],

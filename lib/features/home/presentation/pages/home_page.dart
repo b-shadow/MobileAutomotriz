@@ -285,7 +285,7 @@ class _HomePageState extends State<HomePage> {
         accentColor: const Color(0xFF0F766E),
         items: [
           _ModuleItem(
-            label: 'Reportes de Vehículo',
+            label: 'Reportes y Estadísticas',
             icon: Icons.analytics_rounded,
             iconColor: const Color(0xFF0F766E),
             route: '/reports',

@@ -44,6 +44,7 @@ import '../../features/ai_assistant/presentation/cubit/ai_chat_cubit.dart';
 
 import '../../features/reports/presentation/pages/reports_page.dart';
 import '../../features/reports/presentation/cubit/report_cubit.dart';
+import '../../features/reports/presentation/cubit/ia_report_cubit.dart';
 
 import '../../features/inventory/presentation/pages/inventory_page.dart';
 import '../../features/inventory/presentation/cubit/inventory_cubit.dart';
@@ -348,8 +349,11 @@ class AppRouter {
       GoRoute(
         path: '/reports',
         name: 'reports',
-        builder: (context, state) => BlocProvider(
-          create: (context) => sl<ReportCubit>(),
+        builder: (context, state) => MultiBlocProvider(
+          providers: [
+            BlocProvider(create: (context) => sl<ReportCubit>()),
+            BlocProvider(create: (context) => sl<IaReportCubit>()),
+          ],
           child: const ReportsPage(),
         ),
       ),

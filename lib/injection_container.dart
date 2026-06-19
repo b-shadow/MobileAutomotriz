@@ -150,10 +150,14 @@ import 'features/workshop_progress/domain/usecases/workshop_progress_usecases.da
 import 'features/workshop_progress/presentation/cubit/workshop_progress_cubit.dart';
 
 import 'features/reports/data/datasources/reports_remote_data_source.dart';
+import 'features/reports/data/datasources/ia_report_remote_data_source.dart';
 import 'features/reports/data/repositories/reports_repository_impl.dart';
 import 'features/reports/domain/repositories/reports_repository.dart';
 import 'features/reports/domain/usecases/get_report_data.dart';
+import 'features/reports/domain/usecases/ask_ia_report.dart';
+import 'features/reports/domain/usecases/transcribe_report_audio.dart';
 import 'features/reports/presentation/cubit/report_cubit.dart';
+import 'features/reports/presentation/cubit/ia_report_cubit.dart';
 
 import 'features/inventory/data/datasources/inventory_remote_data_source.dart';
 import 'features/inventory/data/repositories/inventory_repository_impl.dart';
@@ -774,20 +778,33 @@ Future<void> initDependencies(SharedPreferences prefs) async {
   sl.registerFactory(() => ReportCubit(
         getReportData: sl(),
       ));
+  sl.registerFactory(() => IaReportCubit(
+        askIaReport: sl(),
+        transcribeReportAudio: sl(),
+      ));
 
   // Use Cases
   sl.registerLazySingleton(() => GetReportData(sl()));
+  sl.registerLazySingleton(() => AskIaReport(sl()));
+  sl.registerLazySingleton(() => TranscribeReportAudio(sl()));
 
   // Repository
   sl.registerLazySingleton<ReportsRepository>(
     () => ReportsRepositoryImpl(
       remoteDataSource: sl(),
+      iaRemoteDataSource: sl(),
     ),
   );
 
   // Data Sources
   sl.registerLazySingleton<ReportsRemoteDataSource>(
     () => ReportsRemoteDataSourceImpl(
+      apiClient: sl(),
+      sessionStorage: sl(),
+    ),
+  );
+  sl.registerLazySingleton<IaReportRemoteDataSource>(
+    () => IaReportRemoteDataSourceImpl(
       apiClient: sl(),
       sessionStorage: sl(),
     ),
