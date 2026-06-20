@@ -165,11 +165,18 @@ class _HomePageState extends State<HomePage> {
         icon: Icons.people_rounded,
         accentColor: AppColors.primary,
         items: [
-          _ModuleItem(
+          const _ModuleItem(
             label: 'Editar Perfil de Usuario',
             icon: Icons.edit_rounded,
             iconColor: AppColors.primary,
             route: '/profile',
+            visible: true,
+          ),
+          const _ModuleItem(
+            label: 'Centro de Notificaciones',
+            icon: Icons.notifications_active_rounded,
+            iconColor: Colors.lightBlueAccent,
+            route: '/notifications',
             visible: true,
           ),
           _ModuleItem(
@@ -284,10 +291,10 @@ class _HomePageState extends State<HomePage> {
         icon: Icons.analytics_rounded,
         accentColor: const Color(0xFF0F766E),
         items: [
-          _ModuleItem(
+          const _ModuleItem(
             label: 'Reportes y Estadísticas',
             icon: Icons.analytics_rounded,
-            iconColor: const Color(0xFF0F766E),
+            iconColor: Color(0xFF0F766E),
             route: '/reports',
             visible: true,
           ),

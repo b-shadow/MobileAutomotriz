@@ -40,7 +40,7 @@ class ProfileRemoteDataSourceImpl implements ProfileRemoteDataSource {
     required String? telefono,
   }) async {
     try {
-      final response = await apiClient.patch(
+      await apiClient.patch(
         ApiConstants.usuario(_slug, id),
         data: {
           'nombres': nombres,
@@ -101,22 +101,28 @@ class ProfileRemoteDataSourceImpl implements ProfileRemoteDataSource {
       // but the API constants has `preferenciasNotificacion(String slug)` without ID.
       // E.g. /api/{slug}/usuarios/preferencias-notificacion/
       // Backend likely infers user from JWT.
-      final response = await apiClient.patch(
+      await apiClient.patch(
         ApiConstants.preferenciasNotificacion(_slug),
         data: {
           'noti_email': notiEmail,
           'noti_push': notiPush,
         },
       );
-      
-      // Usually preferences endpoint returns the updated preferences or the user.
-      // If it doesn't return the full user, we might need to fetch the user or just PATCH the main user endpoint.
-      // Assuming it acts similarly and returns the usuario format, or I fallback to patching the user endpoint.
-      
-      // Wait, let's just PATCH the main user endpoint for safety, as preferences are fields on UsuarioModel.
-      // Or we can use the specific endpoint. We will use the specific if it returns the user properly.
-      // If it fails, we need to adapt.
-      return UsuarioModel.fromJson(response.data as Map<String, dynamic>);
+
+      return UsuarioModel(
+        id: id,
+        email: '',
+        nombres: '',
+        apellidos: '',
+        telefono: null,
+        rolId: '',
+        rolNombre: '',
+        empresaId: '',
+        empresaNombre: '',
+        empresaSlug: '',
+        notiEmail: notiEmail,
+        notiPush: notiPush,
+      );
     } on ServerException {
       rethrow;
     } catch (e) {

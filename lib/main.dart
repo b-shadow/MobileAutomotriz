@@ -6,6 +6,7 @@ import 'package:flutter_stripe/flutter_stripe.dart';
 
 import 'app.dart';
 import 'config/env/env_config.dart';
+import 'core/notifications/push_notification_service.dart';
 import 'features/auth/presentation/cubit/auth_cubit.dart';
 import 'injection_container.dart';
 
@@ -37,20 +38,24 @@ void main() async {
     try {
       await Stripe.instance.applySettings();
     } catch (e) {
-      print('Stripe applySettings error (ignoring on web): $e');
+      debugPrint('Stripe applySettings error (ignoring on web): $e');
     }
 
     // Initialize dependency injection
     await initDependencies(prefs);
 
+    // Initialize mobile push infrastructure if Firebase is configured.
+    await sl<PushNotificationService>().initialize();
+
     // Check auth session
     sl<AuthCubit>().checkAuthStatus();
+    await sl<PushNotificationService>().syncIfPermissionGranted();
 
   } catch (e, stackTrace) {
-    print('====================== ERROR IN MAIN ======================');
-    print(e);
-    print(stackTrace);
-    print('===========================================================');
+    debugPrint('====================== ERROR IN MAIN ======================');
+    debugPrint('$e');
+    debugPrint('$stackTrace');
+    debugPrint('===========================================================');
   } finally {
     // Ensure runApp is always called so the app doesn't hang on the splash screen
     runApp(const App());

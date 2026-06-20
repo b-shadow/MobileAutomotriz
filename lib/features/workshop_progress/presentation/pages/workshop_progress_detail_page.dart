@@ -678,7 +678,7 @@ class _SolicitarRepuestosForm extends StatefulWidget {
 
 class _SolicitarRepuestosFormState extends State<_SolicitarRepuestosForm> {
   String _motivo = '';
-  List<SparePartRequestLine> _lineas = [SparePartRequestLine()];
+  final List<SparePartRequestLine> _lineas = [SparePartRequestLine()];
 
   @override
   Widget build(BuildContext context) {

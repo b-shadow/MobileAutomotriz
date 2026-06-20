@@ -105,8 +105,8 @@ class _PurchasesPageState extends State<PurchasesPage> {
                     child: ListView.separated(
                       padding: const EdgeInsets.fromLTRB(16, 8, 16, 80),
                       itemCount: filtered.length,
-                      separatorBuilder: (_, __) => const SizedBox(height: 10),
-                      itemBuilder: (_, i) => _PurchaseCard(purchase: filtered[i]),
+                      separatorBuilder: (context, index) => const SizedBox(height: 10),
+                      itemBuilder: (context, i) => _PurchaseCard(purchase: filtered[i]),
                     ),
                   );
                 },

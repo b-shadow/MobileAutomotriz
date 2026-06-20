@@ -401,7 +401,7 @@ class _AppointmentFormSheetState extends State<AppointmentFormSheet> {
                         ),
                         children: [
                           // ── Vehículo ──────────────────────────────
-                          _SectionTitle('1. Vehículo'),
+                          const _SectionTitle('1. Vehículo'),
                           const SizedBox(height: 8),
                           _buildDropdown(
                             hint: 'Selecciona un vehículo',
@@ -425,7 +425,7 @@ class _AppointmentFormSheetState extends State<AppointmentFormSheet> {
                           // ── Servicios del Plan ───────────────────
                           if (_vehiculoId != null) ...[
                             const SizedBox(height: 16),
-                            _SectionTitle('2. Servicios a Realizar'),
+                            const _SectionTitle('2. Servicios a Realizar'),
                             const SizedBox(height: 8),
                             if (_planDetalles.isEmpty && _planServicioId == null)
                               const Padding(
@@ -490,7 +490,7 @@ class _AppointmentFormSheetState extends State<AppointmentFormSheet> {
 
                           // ── Espacio de trabajo ───────────────────
                           const SizedBox(height: 16),
-                          _SectionTitle('3. Espacio de Trabajo'),
+                          const _SectionTitle('3. Espacio de Trabajo'),
                           const SizedBox(height: 8),
                           _buildDropdown(
                             hint: 'Selecciona un espacio',
@@ -512,7 +512,7 @@ class _AppointmentFormSheetState extends State<AppointmentFormSheet> {
 
                           // ── Fecha y Hora ─────────────────────────
                           const SizedBox(height: 16),
-                          _SectionTitle('4. Fecha y Hora de Inicio'),
+                          const _SectionTitle('4. Fecha y Hora de Inicio'),
                           const SizedBox(height: 8),
                           Row(
                             children: [
@@ -539,7 +539,7 @@ class _AppointmentFormSheetState extends State<AppointmentFormSheet> {
 
                           // ── Motivo y Observaciones ───────────────
                           const SizedBox(height: 16),
-                          _SectionTitle('5. Detalles Adicionales'),
+                          const _SectionTitle('5. Detalles Adicionales'),
                           const SizedBox(height: 8),
                           _buildTextField(
                             controller: _motivoCtrl,

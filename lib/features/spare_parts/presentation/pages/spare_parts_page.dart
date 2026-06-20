@@ -108,9 +108,9 @@ class _SparePartsPageState extends State<SparePartsPage> {
                       padding:
                           const EdgeInsets.fromLTRB(16, 8, 16, 30),
                       itemCount: filtered.length,
-                      separatorBuilder: (_, __) =>
+                      separatorBuilder: (context, index) =>
                           const SizedBox(height: 10),
-                      itemBuilder: (_, i) => _SolicitudCard(
+                      itemBuilder: (context, i) => _SolicitudCard(
                         solicitud: filtered[i],
                         proveedores: state.proveedores,
                       ),

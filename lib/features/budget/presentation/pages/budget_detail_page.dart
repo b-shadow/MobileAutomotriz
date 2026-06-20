@@ -112,9 +112,9 @@ class _BudgetDetailPageState extends State<BudgetDetailPage> {
                         ],
                       ),
                       const Divider(color: Colors.white10, height: 24),
-                      _TotalesRow('Subtotal', budget.subtotal),
+                      _totalesRow('Subtotal', budget.subtotal),
                       const SizedBox(height: 8),
-                      _TotalesRow('Descuento', budget.descuento,
+                      _totalesRow('Descuento', budget.descuento,
                           color: AppColors.warning),
                       const SizedBox(height: 8),
                       const Divider(color: Colors.white10, height: 24),
@@ -182,7 +182,7 @@ class _BudgetDetailPageState extends State<BudgetDetailPage> {
     );
   }
 
-  Widget _TotalesRow(String label, double value, {Color? color}) {
+  Widget _totalesRow(String label, double value, {Color? color}) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -247,7 +247,7 @@ class _BudgetDetailPageState extends State<BudgetDetailPage> {
                     style: TextStyle(color: Colors.white70, fontSize: 12)),
                 const SizedBox(height: 4),
                 DropdownButtonFormField<String>(
-                  value: metodoPago,
+                  initialValue: metodoPago,
                   dropdownColor: AppColors.darkCard,
                   style: const TextStyle(color: Colors.white),
                   decoration: InputDecoration(

@@ -1,3 +1,5 @@
+// ignore_for_file: prefer_const_constructors
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mobile1_app/core/theme/app_colors.dart';
@@ -73,7 +75,7 @@ class _VehicleProgressDetailPageState extends State<VehicleProgressDetailPage> w
           final history = _getHistoryFromState(state);
 
           if (detail == null) {
-            return Center(child: Text('No se pudo cargar el detalle', style: TextStyle(color: AppColors.darkTextSecondary)));
+            return const Center(child: Text('No se pudo cargar el detalle', style: TextStyle(color: AppColors.darkTextSecondary)));
           }
 
           return TabBarView(
@@ -130,8 +132,8 @@ class _VehicleProgressDetailPageState extends State<VehicleProgressDetailPage> w
                   ],
                 ),
                 const SizedBox(height: 8),
-                Text('${detail.vehiculoMarca} ${detail.vehiculoModelo}', style: TextStyle(color: AppColors.darkTextSecondary, fontSize: 16)),
-                Divider(height: 24, color: AppColors.darkSurfaceVariant),
+                Text('${detail.vehiculoMarca} ${detail.vehiculoModelo}', style: const TextStyle(color: AppColors.darkTextSecondary, fontSize: 16)),
+                const Divider(height: 24, color: AppColors.darkSurfaceVariant),
                 _buildInfoRow(Icons.person, 'Cliente', detail.clienteNombres),
                 if (detail.asesorNombres != null) ...[
                   const SizedBox(height: 8),
@@ -180,10 +182,10 @@ class _VehicleProgressDetailPageState extends State<VehicleProgressDetailPage> w
                       color: AppColors.darkSurfaceVariant,
                       borderRadius: BorderRadius.circular(12),
                     ),
-                    child: Row(
+                    child: const Row(
                       children: [
                         Icon(Icons.info_outline, color: AppColors.darkTextTertiary),
-                        const SizedBox(width: 12),
+                        SizedBox(width: 12),
                         Expanded(child: Text('No hay acciones globales disponibles para el estado actual.', style: TextStyle(color: AppColors.darkTextSecondary))),
                       ],
                     ),
@@ -202,9 +204,9 @@ class _VehicleProgressDetailPageState extends State<VehicleProgressDetailPage> w
                 border: Border.all(color: AppColors.darkCardBorder),
               ),
               child: ListTile(
-                leading: Icon(Icons.build, color: AppColors.darkTextTertiary),
+                leading: const Icon(Icons.build, color: AppColors.darkTextTertiary),
                 title: Text(servicio.servicioNombre, style: const TextStyle(color: Colors.white)),
-                subtitle: Text('${servicio.tiempoEstandarMin} min', style: TextStyle(color: AppColors.darkTextSecondary)),
+                subtitle: Text('${servicio.tiempoEstandarMin} min', style: const TextStyle(color: AppColors.darkTextSecondary)),
                 trailing: Text(servicio.estado, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 12, color: AppColors.primary)),
               ),
             )).toList(),
@@ -221,7 +223,7 @@ class _VehicleProgressDetailPageState extends State<VehicleProgressDetailPage> w
         title: const Text('Vehículo Devuelto', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
         content: Text('¿Estás seguro de marcar el vehículo como devuelto al cliente? Esta acción finaliza el ciclo de atención.', style: TextStyle(color: AppColors.darkTextSecondary)),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx), child: Text('Cancelar', style: TextStyle(color: AppColors.darkTextTertiary))),
+          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cancelar', style: TextStyle(color: AppColors.darkTextTertiary))),
           ElevatedButton(
             onPressed: () {
               Navigator.pop(ctx);
@@ -262,7 +264,7 @@ class _VehicleProgressDetailPageState extends State<VehicleProgressDetailPage> w
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(label, style: TextStyle(color: AppColors.darkTextTertiary, fontSize: 12)),
+              Text(label, style: const TextStyle(color: AppColors.darkTextTertiary, fontSize: 12)),
               Text(value, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w500, color: Colors.white)),
             ],
           ),
@@ -300,12 +302,12 @@ class _VehicleProgressDetailPageState extends State<VehicleProgressDetailPage> w
         if (isLoading && history.isEmpty)
           const Center(child: CircularProgressIndicator(color: AppColors.primary))
         else if (history.isEmpty)
-          Center(
+          const Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Icon(Icons.history_toggle_off, size: 64, color: AppColors.darkTextTertiary),
-                const SizedBox(height: 16),
+                SizedBox(height: 16),
                 Text('No hay registros en el historial', style: TextStyle(color: AppColors.darkTextSecondary, fontSize: 16)),
               ],
             ),
@@ -373,18 +375,18 @@ class _VehicleProgressDetailPageState extends State<VehicleProgressDetailPage> w
                       ),
                       Text(
                         dateFormat.format(log.createdAt.toLocal()),
-                        style: TextStyle(color: AppColors.darkTextTertiary, fontSize: 12),
+                        style: const TextStyle(color: AppColors.darkTextTertiary, fontSize: 12),
                       ),
                     ],
                   ),
                   const SizedBox(height: 8),
                   if (log.mensaje.isNotEmpty)
-                    Text(log.mensaje, style: TextStyle(color: AppColors.darkTextSecondary)),
+                    Text(log.mensaje, style: const TextStyle(color: AppColors.darkTextSecondary)),
                   const SizedBox(height: 8),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text('Por: ${log.registradoPorNombre ?? "Sistema"}', style: TextStyle(color: AppColors.darkTextTertiary, fontSize: 12, fontStyle: FontStyle.italic)),
+                      Text('Por: ${log.registradoPorNombre ?? "Sistema"}', style: const TextStyle(color: AppColors.darkTextTertiary, fontSize: 12, fontStyle: FontStyle.italic)),
                       if (log.porcentajeAvance != null)
                         Text('${log.porcentajeAvance}%', style: const TextStyle(color: AppColors.primary, fontWeight: FontWeight.bold, fontSize: 12)),
                     ],
@@ -411,12 +413,12 @@ class _VehicleProgressDetailPageState extends State<VehicleProgressDetailPage> w
           style: const TextStyle(color: Colors.white),
           decoration: InputDecoration(
             hintText: 'Ingrese observaciones o actualización general...',
-            hintStyle: TextStyle(color: AppColors.darkTextTertiary),
+            hintStyle: const TextStyle(color: AppColors.darkTextTertiary),
             filled: true,
             fillColor: AppColors.darkSurfaceVariant,
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(10),
-              borderSide: BorderSide(color: AppColors.darkCardBorder),
+              borderSide: const BorderSide(color: AppColors.darkCardBorder),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(10),
@@ -425,7 +427,7 @@ class _VehicleProgressDetailPageState extends State<VehicleProgressDetailPage> w
           ),
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx), child: Text('Cancelar', style: TextStyle(color: AppColors.darkTextTertiary))),
+          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cancelar', style: TextStyle(color: AppColors.darkTextTertiary))),
           ElevatedButton(
             onPressed: () {
               if (_noteController.text.trim().isNotEmpty) {

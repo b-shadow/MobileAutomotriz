@@ -42,12 +42,12 @@ class _AiConversationsPageState extends State<AiConversationsPage> {
           }
         },
         builder: (context, state) {
-          return Center(
+          return const Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const CircularProgressIndicator(color: AppColors.primary),
-                const SizedBox(height: 24),
+                CircularProgressIndicator(color: AppColors.primary),
+                SizedBox(height: 24),
                 Text(
                   'Conectando con IA...',
                   style: TextStyle(color: AppColors.darkTextSecondary, fontSize: 16),

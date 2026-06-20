@@ -1,5 +1,6 @@
 import 'package:mobile1_app/core/error/exceptions.dart';
 import 'package:mobile1_app/core/error/failures.dart';
+import 'package:mobile1_app/core/notifications/push_notification_service.dart';
 import 'package:mobile1_app/core/error/result.dart';
 import 'package:mobile1_app/core/network/api_client.dart';
 import 'package:mobile1_app/core/network/network_info.dart';
@@ -16,12 +17,14 @@ class AuthRepositoryImpl implements AuthRepository {
   final SessionStorage sessionStorage;
   final ApiClient apiClient;
   final NetworkInfo networkInfo;
+  final PushNotificationService pushNotificationService;
 
   const AuthRepositoryImpl({
     required this.remoteDataSource,
     required this.sessionStorage,
     required this.apiClient,
     required this.networkInfo,
+    required this.pushNotificationService,
   });
 
   @override
@@ -60,6 +63,8 @@ class AuthRepositoryImpl implements AuthRepository {
         refreshToken: response.refreshToken,
         userData: userWithTenant.toJson(),
       );
+
+      await pushNotificationService.requestPermissionAndRegisterToken();
 
       return Success(AuthSession(
         token: response.accessToken,
@@ -107,6 +112,8 @@ class AuthRepositoryImpl implements AuthRepository {
         refreshToken: response.refreshToken,
         userData: fullUser.toJson(),
       );
+
+      await pushNotificationService.requestPermissionAndRegisterToken();
 
       return Success(AuthSession(
         token: response.accessToken,

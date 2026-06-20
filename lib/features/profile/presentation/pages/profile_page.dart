@@ -1,9 +1,11 @@
-﻿import 'package:flutter/cupertino.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:mobile1_app/core/theme/app_colors.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:mobile1_app/core/notifications/push_notification_service.dart';
+import 'package:mobile1_app/core/theme/app_colors.dart';
 import 'package:mobile1_app/features/auth/presentation/cubit/auth_cubit.dart';
 import 'package:mobile1_app/features/auth/presentation/cubit/auth_state.dart';
+import 'package:mobile1_app/injection_container.dart';
 
 import '../cubit/profile_cubit.dart';
 import '../cubit/profile_state.dart';
@@ -59,18 +61,24 @@ class ProfilePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocListener<ProfileCubit, ProfileState>(
       listener: (context, state) {
-        if (state is ProfileLoading) {
-          // Show loading indication if needed
-        } else if (state is ProfileError) {
+        if (state is ProfileError) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(state.message, style: const TextStyle(color: Colors.white)), backgroundColor: Colors.red),
+            SnackBar(
+              content: Text(
+                state.message,
+                style: const TextStyle(color: Colors.white),
+              ),
+              backgroundColor: Colors.red,
+            ),
           );
         } else if (state is ProfileSuccess) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(state.message), backgroundColor: Colors.green),
+            SnackBar(
+              content: Text(state.message),
+              backgroundColor: Colors.green,
+            ),
           );
           if (state.updatedUser != null) {
-            // Update the global auth session
             context.read<AuthCubit>().updateUser(state.updatedUser!);
           }
         }
@@ -91,7 +99,14 @@ class ProfilePage extends StatelessWidget {
                 children: [
                   Icon(Icons.edit, color: Colors.redAccent, size: 20),
                   SizedBox(width: 8),
-                  Text('Editar Mi Perfil', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18)),
+                  Text(
+                    'Editar Mi Perfil',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 18,
+                    ),
+                  ),
                 ],
               ),
               Text(
@@ -110,11 +125,10 @@ class ProfilePage extends StatelessWidget {
             final user = authState.user;
 
             return SingleChildScrollView(
-              padding: const EdgeInsets.all(16.0),
+              padding: const EdgeInsets.all(16),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  // 1. Información Personal
                   _buildCard(
                     title: 'Información Personal',
                     action: ElevatedButton.icon(
@@ -122,7 +136,9 @@ class ProfilePage extends StatelessWidget {
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppColors.primary,
                         foregroundColor: Colors.white,
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
                       ),
                       icon: const Icon(Icons.edit, size: 16),
                       label: const Text('Editar'),
@@ -132,34 +148,48 @@ class ProfilePage extends StatelessWidget {
                       children: [
                         Row(
                           children: [
-                            Expanded(child: _buildInfoItem('Nombres', user.nombres)),
-                            Expanded(child: _buildInfoItem('Apellidos', user.apellidos)),
+                            Expanded(
+                              child: _buildInfoItem('Nombres', user.nombres),
+                            ),
+                            Expanded(
+                              child: _buildInfoItem('Apellidos', user.apellidos),
+                            ),
                           ],
                         ),
                         const SizedBox(height: 16),
                         Row(
                           children: [
-                            Expanded(child: _buildInfoItem('Email (No editable)', user.email)),
-                            Expanded(child: _buildInfoItem('Teléfono', user.telefono ?? 'No especificado')),
+                            Expanded(
+                              child: _buildInfoItem(
+                                'Email (No editable)',
+                                user.email,
+                              ),
+                            ),
+                            Expanded(
+                              child: _buildInfoItem(
+                                'Teléfono',
+                                user.telefono ?? 'No especificado',
+                              ),
+                            ),
                           ],
                         ),
                       ],
                     ),
                   ),
                   const SizedBox(height: 16),
-
-                  // 2. Seguridad
                   _buildCard(
                     title: 'Seguridad',
                     titleIcon: Icons.lock,
                     titleIconColor: Colors.amber,
-                    backgroundColor: const Color(0xFF281F1E), // Slightly brownish for security
+                    backgroundColor: const Color(0xFF281F1E),
                     action: OutlinedButton.icon(
                       onPressed: () => _showChangePassword(context, authState),
                       style: OutlinedButton.styleFrom(
                         foregroundColor: AppColors.primary,
                         side: const BorderSide(color: Color(0xFF8B5CF6)),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
                       ),
                       icon: const Icon(Icons.key, size: 16),
                       label: const Text('Cambiar Contraseña'),
@@ -170,8 +200,6 @@ class ProfilePage extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 16),
-
-                  // 3. Preferencias de Notificación
                   _buildCard(
                     title: 'Preferencias de Notificación',
                     titleIcon: Icons.notifications,
@@ -180,14 +208,15 @@ class ProfilePage extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         const Text(
-                          'Controla cómo deseas recibir notificaciones en el futuro. Estos canales estarán disponibles cuando se implemente el sistema de notificaciones.',
+                          'Controla cómo deseas recibir notificaciones operativas y alertas del taller.',
                           style: TextStyle(color: Colors.grey, fontSize: 13),
                         ),
                         const SizedBox(height: 16),
                         _buildNotificationToggle(
                           icon: Icons.email,
                           title: 'Notificaciones por Email',
-                          subtitle: 'Recibe actualizaciones por correo electrónico',
+                          subtitle:
+                              'Recibe actualizaciones por correo electrónico',
                           value: user.notiEmail,
                           onChanged: (val) {
                             context.read<ProfileCubit>().updatePreferences(
@@ -201,14 +230,31 @@ class ProfilePage extends StatelessWidget {
                         _buildNotificationToggle(
                           icon: Icons.notifications_active,
                           title: 'Notificaciones Push',
-                          subtitle: 'Recibe notificaciones instantáneas en el navegador',
+                          subtitle:
+                              'Recibe notificaciones instantáneas en tu dispositivo móvil',
                           value: user.notiPush,
-                          onChanged: (val) {
+                          onChanged: (val) async {
                             context.read<ProfileCubit>().updatePreferences(
                                   id: user.id,
                                   notiEmail: user.notiEmail,
                                   notiPush: val,
                                 );
+
+                            if (val) {
+                              final result = await sl<PushNotificationService>()
+                                  .requestPermissionAndRegisterToken();
+                              if (!context.mounted ||
+                                  result.registered ||
+                                  result.message == null) {
+                                return;
+                              }
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(result.message!),
+                                  backgroundColor: Colors.orange,
+                                ),
+                              );
+                            }
                           },
                         ),
                         const SizedBox(height: 16),
@@ -221,12 +267,19 @@ class ProfilePage extends StatelessWidget {
                           ),
                           child: const Row(
                             children: [
-                              Icon(Icons.lightbulb, color: Colors.amber, size: 16),
+                              Icon(
+                                Icons.lightbulb,
+                                color: Colors.amber,
+                                size: 16,
+                              ),
                               SizedBox(width: 8),
                               Expanded(
                                 child: Text(
-                                  'Nota: Estos son solo tus canales preferidos. El sistema de envío de notificaciones se implementará en el futuro.',
-                                  style: TextStyle(color: Colors.grey, fontSize: 12),
+                                  'Nota: aunque desactives noti_push, el dispositivo puede seguir registrado; esa preferencia solo controla si el backend debe enviarte alertas push.',
+                                  style: TextStyle(
+                                    color: Colors.grey,
+                                    fontSize: 12,
+                                  ),
                                 ),
                               ),
                             ],
@@ -236,8 +289,6 @@ class ProfilePage extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 16),
-
-                  // 4. Información Adicional
                   _buildCard(
                     title: 'Información Adicional',
                     titleIcon: Icons.info,
@@ -245,9 +296,22 @@ class ProfilePage extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('Rol en ${user.empresaNombre}', style: const TextStyle(color: Colors.grey, fontSize: 12)),
+                        Text(
+                          'Rol en ${user.empresaNombre}',
+                          style: const TextStyle(
+                            color: Colors.grey,
+                            fontSize: 12,
+                          ),
+                        ),
                         const SizedBox(height: 4),
-                        Text(user.rolNombre, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
+                        Text(
+                          user.rolNombre,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                          ),
+                        ),
                       ],
                     ),
                   ),
@@ -290,7 +354,11 @@ class ProfilePage extends StatelessWidget {
                   ],
                   Text(
                     title,
-                    style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ],
               ),
@@ -308,9 +376,19 @@ class ProfilePage extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: const TextStyle(color: Colors.grey, fontSize: 12)),
+        Text(
+          label,
+          style: const TextStyle(color: Colors.grey, fontSize: 12),
+        ),
         const SizedBox(height: 4),
-        Text(value, style: const TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.w500)),
+        Text(
+          value,
+          style: const TextStyle(
+            color: Colors.white,
+            fontSize: 15,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
       ],
     );
   }
@@ -343,8 +421,17 @@ class ProfilePage extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(title, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w500)),
-                Text(subtitle, style: const TextStyle(color: Colors.grey, fontSize: 12)),
+                Text(
+                  title,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+                Text(
+                  subtitle,
+                  style: const TextStyle(color: Colors.grey, fontSize: 12),
+                ),
               ],
             ),
           ),

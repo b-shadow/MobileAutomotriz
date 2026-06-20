@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -39,7 +38,7 @@ class _AiChatPageState extends State<AiChatPage> {
   }
 
   Future<void> _initTts() async {
-    await _flutterTts.setLanguage("es-ES");
+    await _flutterTts.setLanguage('es-ES');
     await _flutterTts.setSpeechRate(0.5);
     await _flutterTts.setVolume(1.0);
     await _flutterTts.setPitch(1.0);
@@ -88,6 +87,7 @@ class _AiChatPageState extends State<AiChatPage> {
           _isRecording = true;
         });
       } else {
+        if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Permiso de micrófono denegado', style: TextStyle(color: Colors.white)), backgroundColor: AppColors.error),
         );
@@ -105,6 +105,7 @@ class _AiChatPageState extends State<AiChatPage> {
       });
 
       if (path != null) {
+        if (!mounted) return;
         context.read<AiChatCubit>().sendAudioMessage(widget.conversationId, path);
         Future.delayed(const Duration(milliseconds: 100), _scrollToBottom);
       }
@@ -154,12 +155,12 @@ class _AiChatPageState extends State<AiChatPage> {
               }
             },
             itemBuilder: (context) => [
-              PopupMenuItem(
+              const PopupMenuItem(
                 value: 'clear',
                 child: Row(
                   children: [
                     Icon(Icons.cleaning_services, size: 20, color: AppColors.error),
-                    const SizedBox(width: 8),
+                    SizedBox(width: 8),
                     Text('Limpiar Chat', style: TextStyle(color: AppColors.error)),
                   ],
                 ),
@@ -223,7 +224,12 @@ class _AiChatPageState extends State<AiChatPage> {
             );
           }
 
-          return Center(child: Text('Error al cargar la conversación', style: TextStyle(color: AppColors.darkTextSecondary)));
+          return const Center(
+            child: Text(
+              'Error al cargar la conversación',
+              style: TextStyle(color: AppColors.darkTextSecondary),
+            ),
+          );
         },
       ),
     );
@@ -235,24 +241,30 @@ class _AiChatPageState extends State<AiChatPage> {
       child: Container(
         margin: const EdgeInsets.only(bottom: 12),
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-        decoration: BoxDecoration(
+        decoration: const BoxDecoration(
           color: AppColors.darkCard,
-          borderRadius: const BorderRadius.only(
+          borderRadius: BorderRadius.only(
             topLeft: Radius.circular(16),
             topRight: Radius.circular(16),
             bottomRight: Radius.circular(16),
           ),
         ),
-        child: Row(
+        child: const Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const SizedBox(
+            SizedBox(
               width: 12,
               height: 12,
               child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.primary),
             ),
-            const SizedBox(width: 8),
-            Text('Escribiendo...', style: TextStyle(color: AppColors.darkTextTertiary, fontStyle: FontStyle.italic)),
+            SizedBox(width: 8),
+            Text(
+              'Escribiendo...',
+              style: TextStyle(
+                color: AppColors.darkTextTertiary,
+                fontStyle: FontStyle.italic,
+              ),
+            ),
           ],
         ),
       ),

@@ -195,7 +195,7 @@ class _CreateStoreSalePageState extends State<CreateStoreSalePage> {
           const Text('Método de Pago *', style: TextStyle(color: Colors.white70, fontSize: 12)),
           const SizedBox(height: 4),
           DropdownButtonFormField<String>(
-            value: _metodoPago,
+            initialValue: _metodoPago,
             dropdownColor: AppColors.darkCard,
             style: const TextStyle(color: Colors.white, fontSize: 14),
             decoration: _inputDecoration(),
@@ -348,7 +348,7 @@ class _CreateStoreSalePageState extends State<CreateStoreSalePage> {
                   width: 220,
                   height: 220,
                   fit: BoxFit.contain,
-                  errorBuilder: (_, __, ___) => const SizedBox(
+                  errorBuilder: (context, error, stackTrace) => const SizedBox(
                     width: 220,
                     height: 220,
                     child: Center(child: Text('Error al cargar QR', style: TextStyle(color: Colors.red))),

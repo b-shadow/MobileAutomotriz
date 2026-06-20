@@ -99,7 +99,7 @@ class VehicleProgressRemoteDataSourceImpl implements VehicleProgressRemoteDataSo
         'tipo': type,
         'estado_nuevo': status,
         'mensaje': message,
-        if (percentage != null) 'porcentaje_avance': percentage,
+        'porcentaje_avance': percentage,
       },
     );
   }

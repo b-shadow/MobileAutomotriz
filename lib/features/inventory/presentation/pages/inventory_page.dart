@@ -231,9 +231,9 @@ class _ItemsTab extends StatelessWidget {
                       child: ListView.separated(
                         padding: const EdgeInsets.fromLTRB(16, 8, 16, 30),
                         itemCount: items.length,
-                        separatorBuilder: (_, __) =>
+                        separatorBuilder: (context, index) =>
                             const SizedBox(height: 10),
-                        itemBuilder: (_, i) =>
+                        itemBuilder: (context, i) =>
                             _ItemCard(item: items[i]),
                       ),
                     ),
@@ -460,9 +460,9 @@ class _CategoriesTab extends StatelessWidget {
                       child: ListView.separated(
                         padding: const EdgeInsets.fromLTRB(16, 8, 16, 30),
                         itemCount: state.categories.length,
-                        separatorBuilder: (_, __) =>
+                        separatorBuilder: (context, index) =>
                             const SizedBox(height: 8),
-                        itemBuilder: (_, i) =>
+                        itemBuilder: (context, i) =>
                             _CategoryCard(cat: state.categories[i]),
                       ),
                     ),
@@ -594,8 +594,8 @@ class _MovementsTab extends StatelessWidget {
           child: ListView.separated(
             padding: const EdgeInsets.fromLTRB(16, 12, 16, 30),
             itemCount: state.movements.length,
-            separatorBuilder: (_, __) => const SizedBox(height: 8),
-            itemBuilder: (_, i) =>
+            separatorBuilder: (context, index) => const SizedBox(height: 8),
+            itemBuilder: (context, i) =>
                 _MovementCard(mov: state.movements[i]),
           ),
         );

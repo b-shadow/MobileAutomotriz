@@ -178,9 +178,9 @@ class _SupplierPageState extends State<SupplierPage> {
                       padding:
                           const EdgeInsets.fromLTRB(16, 8, 16, 90),
                       itemCount: filtered.length,
-                      separatorBuilder: (_, __) =>
+                      separatorBuilder: (context, index) =>
                           const SizedBox(height: 10),
-                      itemBuilder: (_, i) => _SupplierCard(
+                      itemBuilder: (context, i) => _SupplierCard(
                         supplier: filtered[i],
                         onEdit: () => _showCreateEditSheet(
                             context, filtered[i]),

@@ -537,6 +537,8 @@ class _CreateSpaceSheetState extends State<_CreateSpaceSheet> {
   Widget build(BuildContext context) {
     return _BaseSheet(
       title: 'Agregar espacio',
+      submitting: _submitting,
+      onSubmit: _submit,
       child: Form(
         key: _formKey,
         child: ListView(
@@ -574,8 +576,6 @@ class _CreateSpaceSheetState extends State<_CreateSpaceSheet> {
           ],
         ),
       ),
-      submitting: _submitting,
-      onSubmit: _submit,
     );
   }
 }
@@ -657,6 +657,8 @@ class _ScheduleFormSheetState extends State<_ScheduleFormSheet> {
 
     return _BaseSheet(
       title: isEditing ? 'Editar horario' : 'Agregar horario',
+      submitting: _submitting,
+      onSubmit: _submit,
       child: Form(
         key: _formKey,
         child: ListView(
@@ -703,8 +705,6 @@ class _ScheduleFormSheetState extends State<_ScheduleFormSheet> {
           ],
         ),
       ),
-      submitting: _submitting,
-      onSubmit: _submit,
     );
   }
 

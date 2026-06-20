@@ -131,7 +131,7 @@ class AiChatCubit extends Cubit<AiChatState> {
     switch (result) {
       case Success(:final data):
         final aiMessage = AiMessage(
-          id: DateTime.now().millisecondsSinceEpoch.toString() + "_ai",
+          id: '${DateTime.now().millisecondsSinceEpoch}_ai',
           sender: 'ai',
           text: data.mensajeIa,
           createdAt: DateTime.now(),

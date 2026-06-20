@@ -12,6 +12,7 @@ class SessionStorage {
   static const _accessTokenKey = 'access_token';
   static const _refreshTokenKey = 'refresh_token';
   static const _userKey = 'user_data';
+  static const _pushTokenKey = 'push_token';
 
   SessionStorage(this._prefs);
 
@@ -51,6 +52,15 @@ class SessionStorage {
     } catch (_) {
       return null;
     }
+  }
+
+  Future<void> savePushToken(String token) async {
+    await _prefs.setString(_pushTokenKey, token);
+  }
+
+  String? get pushToken => _prefs.getString(_pushTokenKey);
+
+  Future<void> clearPushToken() async {
   }
 
   // ── Session Management ─────────────────────────────────

@@ -4,6 +4,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'core/network/api_client.dart';
 import 'core/network/network_info.dart';
+import 'core/notifications/push_notification_service.dart';
 import 'core/storage/session_storage.dart';
 import 'features/auth/data/datasources/auth_remote_data_source.dart';
 import 'features/auth/data/repositories/auth_repository_impl.dart';
@@ -20,6 +21,14 @@ import 'features/profile/domain/usecases/change_password.dart';
 import 'features/profile/domain/usecases/update_notification_prefs.dart';
 import 'features/profile/domain/usecases/update_personal_info.dart';
 import 'features/profile/presentation/cubit/profile_cubit.dart';
+import 'features/notifications/data/datasources/notifications_remote_data_source.dart';
+import 'features/notifications/data/repositories/notifications_repository_impl.dart';
+import 'features/notifications/domain/repositories/notifications_repository.dart';
+import 'features/notifications/domain/usecases/get_notification_summary.dart';
+import 'features/notifications/domain/usecases/get_notifications.dart';
+import 'features/notifications/domain/usecases/mark_all_notifications_read.dart';
+import 'features/notifications/domain/usecases/mark_notification_read.dart';
+import 'features/notifications/presentation/cubit/notifications_cubit.dart';
 
 import 'features/company/data/datasources/company_remote_data_source.dart';
 import 'features/company/data/repositories/company_repository_impl.dart';
@@ -223,6 +232,12 @@ Future<void> initDependencies(SharedPreferences prefs) async {
   // ── Core ──────────────────────────────────────────────
   sl.registerLazySingleton<SessionStorage>(() => SessionStorage(prefs));
   sl.registerLazySingleton<ApiClient>(() => ApiClient());
+  sl.registerLazySingleton<PushNotificationService>(
+    () => PushNotificationService(
+      apiClient: sl(),
+      sessionStorage: sl(),
+    ),
+  );
   sl.registerLazySingleton<NetworkInfo>(
     () => NetworkInfoImpl(connectivity: Connectivity()),
   );
@@ -241,6 +256,7 @@ Future<void> initDependencies(SharedPreferences prefs) async {
       sessionStorage: sl(),
       apiClient: sl(),
       networkInfo: sl(),
+      pushNotificationService: sl(),
     ),
   );
 
@@ -996,6 +1012,31 @@ Future<void> initDependencies(SharedPreferences prefs) async {
       getPayments: sl(),
       createPayment: sl(),
       markReceived: sl(),
+    ),
+  );
+
+  sl.registerLazySingleton<NotificationsRemoteDataSource>(
+    () => NotificationsRemoteDataSourceImpl(
+      apiClient: sl(),
+      sessionStorage: sl(),
+    ),
+  );
+  sl.registerLazySingleton<NotificationsRepository>(
+    () => NotificationsRepositoryImpl(
+      remoteDataSource: sl(),
+      networkInfo: sl(),
+    ),
+  );
+  sl.registerLazySingleton(() => GetNotifications(sl()));
+  sl.registerLazySingleton(() => GetNotificationSummary(sl()));
+  sl.registerLazySingleton(() => MarkNotificationRead(sl()));
+  sl.registerLazySingleton(() => MarkAllNotificationsRead(sl()));
+  sl.registerFactory(
+    () => NotificationsCubit(
+      getNotifications: sl(),
+      getNotificationSummary: sl(),
+      markNotificationRead: sl(),
+      markAllNotificationsRead: sl(),
     ),
   );
 }

@@ -110,9 +110,9 @@ class IaReportExportService {
             pw.SizedBox(height: 4),
             pw.Container(
               padding: const pw.EdgeInsets.all(8),
-              decoration: pw.BoxDecoration(
+              decoration: const pw.BoxDecoration(
                 color: PdfColors.grey100,
-                borderRadius: const pw.BorderRadius.all(pw.Radius.circular(4)),
+                borderRadius: pw.BorderRadius.all(pw.Radius.circular(4)),
               ),
               child: pw.Text(result.sql!, style: const pw.TextStyle(fontSize: 7, color: PdfColors.grey700)),
             ),

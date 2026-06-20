@@ -99,9 +99,9 @@ class _PaymentsPageState extends State<PaymentsPage> {
                     child: ListView.separated(
                       padding: const EdgeInsets.fromLTRB(16, 8, 16, 30),
                       itemCount: filtered.length,
-                      separatorBuilder: (_, __) =>
+                      separatorBuilder: (context, index) =>
                           const SizedBox(height: 10),
-                      itemBuilder: (_, i) =>
+                      itemBuilder: (context, i) =>
                           _PaymentCard(payment: filtered[i]),
                     ),
                   );
@@ -139,7 +139,7 @@ class _PaymentsPageState extends State<PaymentsPage> {
                       ? color
                       : Colors.white.withValues(alpha: 0.1)),
               checkmarkColor: Colors.white,
-              onSelected: (_) => setState(() => _filterEstado = e),
+              onSelected: (selected) => setState(() => _filterEstado = e),
             ),
           );
         }).toList(),

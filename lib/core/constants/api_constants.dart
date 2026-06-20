@@ -33,6 +33,10 @@ class ApiConstants {
       '/api/$slug/administracion/usuarios/$id/cambiar-contrasena/';
   static String preferenciasNotificacion(String slug) =>
       '/api/$slug/administracion/usuarios/preferencias-notificacion/';
+  static String registrarTokenPush(String slug) =>
+      '/api/$slug/administracion/usuarios/registrar-token-push/';
+  static String desactivarTokenPush(String slug) =>
+      '/api/$slug/administracion/usuarios/desactivar-token-push/';
 
   // ── Vehículos ───────────────────────────────────────────
   static String vehiculos(String slug) => '/api/$slug/vehiculos-servicios/vehiculos/';
@@ -176,6 +180,12 @@ class ApiConstants {
       '/api/$slug/administracion/auditoria/resumen/';
 
   static String notificaciones(String slug) => '/api/$slug/comunicacion-control/notificaciones/';
+  static String notificacionesResumen(String slug) =>
+      '/api/$slug/comunicacion-control/notificaciones/resumen/';
+  static String marcarNotificacionLeida(String slug, String id) =>
+      '/api/$slug/comunicacion-control/notificaciones/$id/marcar-leida/';
+  static String marcarTodasNotificacionesLeidas(String slug) =>
+      '/api/$slug/comunicacion-control/notificaciones/marcar-todas-leidas/';
 
   // ── Inteligencia Artificial ─────────────────────────────
   static String iaConversaciones(String slug) => '/api/$slug/comunicacion-control/ia/';

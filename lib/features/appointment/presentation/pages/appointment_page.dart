@@ -138,7 +138,7 @@ class _AppointmentPageState extends State<AppointmentPage> {
                       physics: const AlwaysScrollableScrollPhysics(),
                       padding: const EdgeInsets.fromLTRB(16, 8, 16, 100),
                       itemCount: appointments.length,
-                      separatorBuilder: (_, __) => const SizedBox(height: 12),
+                      separatorBuilder: (context, index) => const SizedBox(height: 12),
                       itemBuilder: (ctx, i) => _AppointmentCard(
                         appointment: appointments[i],
                         canManage: _canManage,
@@ -190,12 +190,12 @@ class _AppointmentPageState extends State<AppointmentPage> {
       context: context,
       builder: (dlg) => AlertDialog(
         backgroundColor: AppColors.darkCard,
-        title: Row(
+        title: const Row(
           children: [
-            const Icon(Icons.person_off_outlined,
+            Icon(Icons.person_off_outlined,
                 color: Color(0xFF64748B), size: 22),
-            const SizedBox(width: 10),
-            const Text('Marcar Inasistencia',
+            SizedBox(width: 10),
+            Text('Marcar Inasistencia',
                 style: TextStyle(
                     color: Colors.white, fontWeight: FontWeight.bold)),
           ],
@@ -454,8 +454,8 @@ class _EstadoFilterBar extends StatelessWidget {
             scrollDirection: Axis.horizontal,
             padding: const EdgeInsets.symmetric(horizontal: 16),
             itemCount: _kEstados.length,
-            separatorBuilder: (_, __) => const SizedBox(width: 8),
-            itemBuilder: (_, i) {
+            separatorBuilder: (context, index) => const SizedBox(width: 8),
+            itemBuilder: (context, i) {
               final (valor, label) = _kEstados[i];
               final selected = filtroActual == valor;
               return GestureDetector(

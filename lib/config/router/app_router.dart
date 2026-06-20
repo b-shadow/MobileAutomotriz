@@ -68,6 +68,8 @@ import '../../features/invoices/presentation/cubit/invoices_cubit.dart';
 
 import '../../features/payments/presentation/pages/payments_page.dart';
 import '../../features/payments/presentation/cubit/payments_cubit.dart';
+import '../../features/notifications/presentation/pages/notifications_page.dart';
+import '../../features/notifications/presentation/cubit/notifications_cubit.dart';
 
 import '../../features/auth/presentation/pages/login_page.dart';
 import '../../features/auth/presentation/pages/register_page.dart';
@@ -118,6 +120,15 @@ class AppRouter {
         path: '/home',
         name: 'home',
         builder: (context, state) => const HomePage(),
+      ),
+
+      GoRoute(
+        path: '/notifications',
+        name: 'notifications',
+        builder: (context, state) => BlocProvider(
+          create: (context) => sl<NotificationsCubit>(),
+          child: const NotificationsPage(),
+        ),
       ),
 
       // ── Profile ───────────────────────────────────────

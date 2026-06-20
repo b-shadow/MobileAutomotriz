@@ -77,8 +77,8 @@ class _WorkOrderPageState extends State<WorkOrderPage> {
             child: ListView.separated(
               padding: const EdgeInsets.all(16),
               itemCount: state.workOrders.length,
-              separatorBuilder: (_, __) => const SizedBox(height: 12),
-              itemBuilder: (_, i) => _WorkOrderCard(order: state.workOrders[i]),
+              separatorBuilder: (context, index) => const SizedBox(height: 12),
+              itemBuilder: (context, i) => _WorkOrderCard(order: state.workOrders[i]),
             ),
           );
         },

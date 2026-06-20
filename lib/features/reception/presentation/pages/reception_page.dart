@@ -157,8 +157,8 @@ class _PendientesTab extends StatelessWidget {
       child: ListView.separated(
         padding: const EdgeInsets.fromLTRB(16, 12, 16, 30),
         itemCount: citas.length,
-        separatorBuilder: (_, __) => const SizedBox(height: 10),
-        itemBuilder: (_, i) => _CitaPendienteCard(
+        separatorBuilder: (context, index) => const SizedBox(height: 10),
+        itemBuilder: (context, i) => _CitaPendienteCard(
           cita: citas[i],
           onRegistrar: () => onRegistrar(citas[i]),
         ),
@@ -279,8 +279,8 @@ class _RegistradasTab extends StatelessWidget {
       child: ListView.separated(
         padding: const EdgeInsets.fromLTRB(16, 12, 16, 30),
         itemCount: receptions.length,
-        separatorBuilder: (_, __) => const SizedBox(height: 10),
-        itemBuilder: (_, i) => _RecepcionCard(reception: receptions[i]),
+        separatorBuilder: (context, index) => const SizedBox(height: 10),
+        itemBuilder: (context, i) => _RecepcionCard(reception: receptions[i]),
       ),
     );
   }
@@ -499,7 +499,7 @@ class _RegistroRecepcionSheetState extends State<_RegistroRecepcionSheet> {
               ),
               const SizedBox(height: 20),
               // Kilometraje
-              _SectionLabel('Kilometraje de ingreso *'),
+              _sectionLabel('Kilometraje de ingreso *'),
               const SizedBox(height: 6),
               TextFormField(
                 controller: _kmCtrl,
@@ -520,7 +520,7 @@ class _RegistroRecepcionSheetState extends State<_RegistroRecepcionSheet> {
               ),
               const SizedBox(height: 16),
               // Nivel de combustible
-              _SectionLabel('Nivel de combustible *'),
+              _sectionLabel('Nivel de combustible *'),
               const SizedBox(height: 8),
               Wrap(
                 spacing: 8,
@@ -573,7 +573,7 @@ class _RegistroRecepcionSheetState extends State<_RegistroRecepcionSheet> {
               ),
               const SizedBox(height: 16),
               // Observaciones
-              _SectionLabel('Observaciones generales'),
+              _sectionLabel('Observaciones generales'),
               const SizedBox(height: 6),
               TextFormField(
                 controller: _obsCtrl,
@@ -590,7 +590,7 @@ class _RegistroRecepcionSheetState extends State<_RegistroRecepcionSheet> {
                   builder: (ctx, state) {
                     final loading = state is ReceptionLoading || _submitting;
                     return ElevatedButton.icon(
-                      onPressed: loading ? null : () => _submit(ctx),
+                      onPressed: loading ? null : _submit,
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppColors.success,
                         disabledBackgroundColor:
@@ -626,7 +626,7 @@ class _RegistroRecepcionSheetState extends State<_RegistroRecepcionSheet> {
     );
   }
 
-  Future<void> _submit(BuildContext context) async {
+  Future<void> _submit() async {
     if (!_formKey.currentState!.validate()) return;
     setState(() => _submitting = true);
     await context.read<ReceptionCubit>().createReception(
@@ -637,10 +637,11 @@ class _RegistroRecepcionSheetState extends State<_RegistroRecepcionSheet> {
               ? null
               : _obsCtrl.text.trim(),
         );
-    if (mounted) Navigator.of(context).pop();
+    if (!mounted) return;
+    Navigator.of(context).pop();
   }
 
-  Widget _SectionLabel(String text) => Text(
+  Widget _sectionLabel(String text) => Text(
         text,
         style: const TextStyle(
             color: Colors.white70,

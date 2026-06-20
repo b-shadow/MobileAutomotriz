@@ -98,8 +98,8 @@ class _StoreSalesPageState extends State<StoreSalesPage> {
                     child: ListView.separated(
                       padding: const EdgeInsets.fromLTRB(16, 8, 16, 80),
                       itemCount: filtered.length,
-                      separatorBuilder: (_, __) => const SizedBox(height: 10),
-                      itemBuilder: (_, i) => _SaleCard(sale: filtered[i]),
+                      separatorBuilder: (context, index) => const SizedBox(height: 10),
+                      itemBuilder: (context, i) => _SaleCard(sale: filtered[i]),
                     ),
                   );
                 },

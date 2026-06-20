@@ -316,7 +316,7 @@ class _AssignMechanicSheetState extends State<_AssignMechanicSheet> {
           else
             DropdownButtonFormField<String>(
               dropdownColor: AppColors.darkCard,
-              value: selectedMechanicId,
+              initialValue: selectedMechanicId,
               hint: const Text('Seleccione un mecánico',
                   style: TextStyle(color: Colors.white38)),
               items: widget.available
@@ -340,7 +340,7 @@ class _AssignMechanicSheetState extends State<_AssignMechanicSheet> {
                 style: TextStyle(color: Colors.white)),
             value: esPrincipal,
             onChanged: (val) => setState(() => esPrincipal = val),
-            activeColor: AppColors.info,
+            activeThumbColor: AppColors.info,
             contentPadding: EdgeInsets.zero,
           ),
           const SizedBox(height: 24),

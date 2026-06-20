@@ -1,3 +1,5 @@
+// ignore_for_file: prefer_const_constructors
+
 import 'package:mobile1_app/config/env/env_config.dart';
 import 'package:mobile1_app/core/constants/api_constants.dart';
 import 'package:mobile1_app/core/error/exceptions.dart';

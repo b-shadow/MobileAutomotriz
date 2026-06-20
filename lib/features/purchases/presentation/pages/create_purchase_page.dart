@@ -132,7 +132,7 @@ class _CreatePurchasePageState extends State<CreatePurchasePage> {
           const Text('Proveedor', style: TextStyle(color: Colors.white70, fontSize: 12)),
           const SizedBox(height: 4),
           DropdownButtonFormField<String>(
-            value: _selectedProveedorId,
+            initialValue: _selectedProveedorId,
             dropdownColor: AppColors.darkCard,
             style: const TextStyle(color: Colors.white, fontSize: 14),
             decoration: _inputDecoration(),

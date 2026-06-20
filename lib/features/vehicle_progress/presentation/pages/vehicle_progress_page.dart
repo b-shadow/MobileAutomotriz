@@ -47,12 +47,12 @@ class _VehicleProgressPageState extends State<VehicleProgressPage> {
           }
 
           if (appointments.isEmpty) {
-            return Center(
+            return const Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Icon(Icons.directions_car_outlined, size: 64, color: AppColors.darkTextTertiary),
-                  const SizedBox(height: 16),
+                  SizedBox(height: 16),
                   Text('No hay vehículos en atención', style: TextStyle(color: AppColors.darkTextSecondary, fontSize: 16)),
                 ],
               ),
@@ -95,12 +95,12 @@ class _VehicleProgressPageState extends State<VehicleProgressPage> {
                           const SizedBox(height: 8),
                           Row(
                             children: [
-                              Icon(Icons.person, size: 16, color: AppColors.darkTextTertiary),
+                              const Icon(Icons.person, size: 16, color: AppColors.darkTextTertiary),
                               const SizedBox(width: 4),
                               Expanded(
                                 child: Text(
                                   appointment.clienteNombres,
-                                  style: TextStyle(color: AppColors.darkTextSecondary),
+                                  style: const TextStyle(color: AppColors.darkTextSecondary),
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
                                 ),
@@ -111,12 +111,12 @@ class _VehicleProgressPageState extends State<VehicleProgressPage> {
                             const SizedBox(height: 4),
                             Row(
                               children: [
-                                Icon(Icons.support_agent, size: 16, color: AppColors.darkTextTertiary),
+                                const Icon(Icons.support_agent, size: 16, color: AppColors.darkTextTertiary),
                                 const SizedBox(width: 4),
                                 Expanded(
                                   child: Text(
                                     'Asesor: ${appointment.asesorNombres}',
-                                    style: TextStyle(color: AppColors.darkTextSecondary),
+                                    style: const TextStyle(color: AppColors.darkTextSecondary),
                                     maxLines: 1,
                                     overflow: TextOverflow.ellipsis,
                                   ),
@@ -132,7 +132,7 @@ class _VehicleProgressPageState extends State<VehicleProgressPage> {
                                 '${appointment.serviciosCount} servicios',
                                 style: const TextStyle(fontWeight: FontWeight.w600, color: AppColors.primary),
                               ),
-                              Icon(Icons.chevron_right, color: AppColors.darkTextTertiary),
+                              const Icon(Icons.chevron_right, color: AppColors.darkTextTertiary),
                             ],
                           ),
                         ],

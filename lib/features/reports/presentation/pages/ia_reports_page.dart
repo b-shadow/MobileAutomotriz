@@ -258,7 +258,7 @@ class _IaReportsPageState extends State<IaReportsPage> {
           // AI icon
           Container(
             margin: const EdgeInsets.only(left: 8),
-            child: Icon(
+            child: const Icon(
               Icons.smart_toy_rounded,
               color: AppColors.primary,
               size: 24,
@@ -475,7 +475,7 @@ class _IaReportsPageState extends State<IaReportsPage> {
           Expanded(
             child: Text(
               message,
-              style: TextStyle(color: AppColors.error, fontSize: 14, fontWeight: FontWeight.w500),
+              style: const TextStyle(color: AppColors.error, fontSize: 14, fontWeight: FontWeight.w500),
             ),
           ),
         ],
@@ -757,9 +757,9 @@ class _IaReportsPageState extends State<IaReportsPage> {
             strokeWidth: 1,
           ),
         ),
-        titlesData: FlTitlesData(
-          rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-          topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+        titlesData: const FlTitlesData(
+          rightTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+          topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
         ),
         borderData: FlBorderData(show: false),
         lineBarsData: [

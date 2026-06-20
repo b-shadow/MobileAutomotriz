@@ -270,7 +270,9 @@ class _ReportsPageState extends State<ReportsPage> {
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                 decoration: BoxDecoration(
-                  color: isActive ? AppColors.primary.withOpacity(0.2) : AppColors.darkCard,
+                  color: isActive
+                      ? AppColors.primary.withValues(alpha: 0.2)
+                      : AppColors.darkCard,
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(
                     color: isActive ? AppColors.primary : AppColors.darkCardBorder,
@@ -446,7 +448,7 @@ class _ReportsPageState extends State<ReportsPage> {
   Widget _buildDropdown(String hint, String value, List<String> items, ValueChanged<String?> onChanged) {
     return DropdownButtonFormField<String>(
       isExpanded: true,
-      value: value,
+      initialValue: value,
       dropdownColor: AppColors.darkCard,
       decoration: _inputDecoration(hint),
       style: const TextStyle(color: Colors.white),
@@ -675,7 +677,7 @@ class _ReportsPageState extends State<ReportsPage> {
     
     return LineChart(
       LineChartData(
-        gridData: FlGridData(show: true, drawVerticalLine: false, getDrawingHorizontalLine: (value) => FlLine(color: Colors.white.withOpacity(0.1), strokeWidth: 1)),
+        gridData: FlGridData(show: true, drawVerticalLine: false, getDrawingHorizontalLine: (value) => FlLine(color: Colors.white.withValues(alpha: 0.1), strokeWidth: 1)),
         titlesData: FlTitlesData(
           bottomTitles: AxisTitles(sideTitles: SideTitles(
             showTitles: true,
@@ -759,7 +761,7 @@ class _ReportsPageState extends State<ReportsPage> {
       BarChartData(
         alignment: BarChartAlignment.spaceAround,
         maxY: maxY * 1.2,
-        gridData: FlGridData(show: true, drawVerticalLine: false, getDrawingHorizontalLine: (value) => FlLine(color: Colors.white.withOpacity(0.1), strokeWidth: 1)),
+        gridData: FlGridData(show: true, drawVerticalLine: false, getDrawingHorizontalLine: (value) => FlLine(color: Colors.white.withValues(alpha: 0.1), strokeWidth: 1)),
         titlesData: FlTitlesData(
           bottomTitles: AxisTitles(sideTitles: SideTitles(
             showTitles: true,

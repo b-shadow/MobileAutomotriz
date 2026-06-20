@@ -183,7 +183,7 @@ class ReportExportService {
           crossAxisAlignment: pw.CrossAxisAlignment.start,
           children: [
             pw.Text(title,
-                style: pw.TextStyle(fontSize: 9, color: PdfColors.grey600)),
+                style: const pw.TextStyle(fontSize: 9, color: PdfColors.grey600)),
             pw.SizedBox(height: 4),
             pw.Text(value,
                 style: pw.TextStyle(

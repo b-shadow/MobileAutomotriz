@@ -128,8 +128,8 @@ class _HistorialTab extends StatelessWidget {
           child: ListView.separated(
             padding: const EdgeInsets.fromLTRB(16, 12, 16, 30),
             itemCount: state.budgets.length,
-            separatorBuilder: (_, __) => const SizedBox(height: 10),
-            itemBuilder: (_, i) => _BudgetCard(budget: state.budgets[i]),
+            separatorBuilder: (context, index) => const SizedBox(height: 10),
+            itemBuilder: (context, i) => _BudgetCard(budget: state.budgets[i]),
           ),
         );
       },
@@ -229,8 +229,8 @@ class _GenerarTab extends StatelessWidget {
           child: ListView.separated(
             padding: const EdgeInsets.fromLTRB(16, 12, 16, 30),
             itemCount: citas.length,
-            separatorBuilder: (_, __) => const SizedBox(height: 10),
-            itemBuilder: (_, i) => _CitaCard(cita: citas[i]),
+            separatorBuilder: (context, index) => const SizedBox(height: 10),
+            itemBuilder: (context, i) => _CitaCard(cita: citas[i]),
           ),
         );
       },

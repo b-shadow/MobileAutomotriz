@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "447057788953",
+    "project_id": "si2-taller-88be4",
+    "storage_bucket": "si2-taller-88be4.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:447057788953:android:0917422825a0f92f252a88",
+        "android_client_info": {
+          "package_name": "com.sistemasinfo.mobile1_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDNQNPQM6iToHBOREm2de8SrZ7kzgANse0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -1,5 +1,4 @@
 import 'package:mobile1_app/config/env/env_config.dart';
-import 'package:mobile1_app/core/constants/api_constants.dart';
 import 'package:mobile1_app/core/error/exceptions.dart';
 import 'package:mobile1_app/core/network/api_client.dart';
 import 'package:mobile1_app/core/storage/session_storage.dart';
