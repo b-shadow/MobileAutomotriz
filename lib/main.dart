@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -44,12 +46,8 @@ void main() async {
     // Initialize dependency injection
     await initDependencies(prefs);
 
-    // Initialize mobile push infrastructure if Firebase is configured.
-    await sl<PushNotificationService>().initialize();
-
     // Check auth session
     sl<AuthCubit>().checkAuthStatus();
-    await sl<PushNotificationService>().syncIfPermissionGranted();
 
   } catch (e, stackTrace) {
     debugPrint('====================== ERROR IN MAIN ======================');
@@ -59,5 +57,18 @@ void main() async {
   } finally {
     // Ensure runApp is always called so the app doesn't hang on the splash screen
     runApp(const App());
+    unawaited(_bootstrapPushServices());
+  }
+}
+
+Future<void> _bootstrapPushServices() async {
+  try {
+    await sl<PushNotificationService>().initialize();
+    await sl<PushNotificationService>().syncIfPermissionGranted();
+  } catch (e, stackTrace) {
+    debugPrint('==================== PUSH BOOTSTRAP ERROR ====================');
+    debugPrint('$e');
+    debugPrint('$stackTrace');
+    debugPrint('==============================================================');
   }
 }

@@ -15,9 +15,11 @@ Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
     return;
   }
 
-  await Firebase.initializeApp(
-    options: PushNotificationService.firebaseOptionsForCurrentPlatform,
-  );
+  if (Firebase.apps.isEmpty) {
+    await Firebase.initializeApp(
+      options: PushNotificationService.firebaseOptionsForCurrentPlatform,
+    );
+  }
 }
 
 class PushRegistrationResult {
@@ -39,10 +41,11 @@ class PushNotificationService {
 
   final ApiClient _apiClient;
   final SessionStorage _sessionStorage;
-  final FirebaseMessaging _messaging = FirebaseMessaging.instance;
   final FlutterLocalNotificationsPlugin _localNotifications =
       FlutterLocalNotificationsPlugin();
   final DeviceInfoPlugin _deviceInfo = DeviceInfoPlugin();
+
+  FirebaseMessaging get _messaging => FirebaseMessaging.instance;
 
   static const AndroidNotificationChannel _channel = AndroidNotificationChannel(
     'high_importance_channel',
@@ -108,9 +111,11 @@ class PushNotificationService {
       return;
     }
 
-    await Firebase.initializeApp(
-      options: firebaseOptionsForCurrentPlatform,
-    );
+    if (Firebase.apps.isEmpty) {
+      await Firebase.initializeApp(
+        options: firebaseOptionsForCurrentPlatform,
+      );
+    }
 
     FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
     await _initializeLocalNotifications();
@@ -150,6 +155,14 @@ class PushNotificationService {
       return const PushRegistrationResult(
         registered: false,
         message: 'No hay una sesión activa para registrar este dispositivo.',
+      );
+    }
+
+    if (kIsWeb) {
+      return const PushRegistrationResult(
+        registered: false,
+        message:
+            'El registro push nativo no estÃ¡ disponible cuando esta app mÃ³vil corre como Flutter web.',
       );
     }
 

@@ -256,7 +256,7 @@ Future<void> initDependencies(SharedPreferences prefs) async {
       sessionStorage: sl(),
       apiClient: sl(),
       networkInfo: sl(),
-      pushNotificationService: sl(),
+      pushNotificationService: () => sl<PushNotificationService>(),
     ),
   );
 

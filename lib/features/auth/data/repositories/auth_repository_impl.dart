@@ -17,7 +17,7 @@ class AuthRepositoryImpl implements AuthRepository {
   final SessionStorage sessionStorage;
   final ApiClient apiClient;
   final NetworkInfo networkInfo;
-  final PushNotificationService pushNotificationService;
+  final PushNotificationService Function() pushNotificationService;
 
   const AuthRepositoryImpl({
     required this.remoteDataSource,
@@ -64,7 +64,7 @@ class AuthRepositoryImpl implements AuthRepository {
         userData: userWithTenant.toJson(),
       );
 
-      await pushNotificationService.requestPermissionAndRegisterToken();
+      await _tryRegisterPushToken();
 
       return Success(AuthSession(
         token: response.accessToken,
@@ -113,7 +113,7 @@ class AuthRepositoryImpl implements AuthRepository {
         userData: fullUser.toJson(),
       );
 
-      await pushNotificationService.requestPermissionAndRegisterToken();
+      await _tryRegisterPushToken();
 
       return Success(AuthSession(
         token: response.accessToken,
@@ -149,6 +149,14 @@ class AuthRepositoryImpl implements AuthRepository {
     } catch (_) {
       // If fetching full profile fails, fallback to partial user data from login
       return null;
+    }
+  }
+
+  Future<void> _tryRegisterPushToken() async {
+    try {
+      await pushNotificationService().requestPermissionAndRegisterToken();
+    } catch (_) {
+      // Push registration must not break login/register.
     }
   }
 }
