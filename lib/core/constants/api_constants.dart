@@ -6,10 +6,10 @@ class ApiConstants {
   static const String baseUrl = 'https://backendautomotriz.onrender.com';
   static const String prodBaseUrl = 'https://backendautomotriz.onrender.com';
 
-  /// Timeouts
-  static const Duration connectTimeout = Duration(seconds: 15);
-  static const Duration receiveTimeout = Duration(seconds: 15);
-  static const Duration sendTimeout = Duration(seconds: 15);
+  /// Timeouts (Increased to 60s for Render free tier cold starts)
+  static const Duration connectTimeout = Duration(seconds: 60);
+  static const Duration receiveTimeout = Duration(seconds: 60);
+  static const Duration sendTimeout = Duration(seconds: 60);
 
   // ── Auth (Tenant-scoped) ────────────────────────────────
   static String login(String slug) => '/api/tenants/$slug/auth/login/';
@@ -197,6 +197,7 @@ class ApiConstants {
 
   // ── Reportes ────────────────────────────────────────────
   static String reportesVehiculo(String slug) => '/api/$slug/vehiculos-servicios/reportes/vehiculo/';
+  static String reportesExploradorDatos(String slug) => '/api/$slug/comunicacion-control/reportes/explorador_datos/';
   static String reportesIaAsk(String slug) => '/api/$slug/comunicacion-control/reportes-ia/ask/';
 
   // ── Inventario ───────────────────────────────────────────

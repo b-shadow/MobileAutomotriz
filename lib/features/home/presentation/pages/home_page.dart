@@ -6,6 +6,9 @@ import 'package:mobile1_app/core/theme/app_colors.dart';
 import 'package:mobile1_app/features/auth/domain/entities/user.dart';
 import 'package:mobile1_app/features/auth/presentation/cubit/auth_cubit.dart';
 import 'package:mobile1_app/features/auth/presentation/cubit/auth_state.dart';
+import 'package:mobile1_app/features/home/presentation/cubit/dashboard_kpi_cubit.dart';
+import 'package:mobile1_app/features/home/presentation/widgets/dashboard_kpi_section.dart';
+import 'package:mobile1_app/injection_container.dart';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Role-based visibility helpers  (mirror de roleHelper.js del frontend)
@@ -124,32 +127,35 @@ class _HomePageState extends State<HomePage> {
           context.go('/login');
         }
       },
-      child: Scaffold(
-        body: Container(
-          width: double.infinity,
-          height: double.infinity,
-          decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-              colors: [
-                AppColors.darkBackground,
-                AppColors.darkSurface,
-              ],
+      child: BlocProvider(
+        create: (_) => sl<DashboardKpiCubit>()..fetchDashboardKpis(),
+        child: Scaffold(
+          body: Container(
+            width: double.infinity,
+            height: double.infinity,
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [
+                  AppColors.darkBackground,
+                  AppColors.darkSurface,
+                ],
+              ),
             ),
-          ),
-          child: SafeArea(
-            child: BlocBuilder<AuthCubit, AuthState>(
-              builder: (context, state) {
-                if (state is! AuthAuthenticated) {
-                  return const Center(
-                    child: CircularProgressIndicator(color: Colors.white54),
-                  );
-                }
+            child: SafeArea(
+              child: BlocBuilder<AuthCubit, AuthState>(
+                builder: (context, state) {
+                  if (state is! AuthAuthenticated) {
+                    return const Center(
+                      child: CircularProgressIndicator(color: Colors.white54),
+                    );
+                  }
 
-                final user = state.user;
-                return _buildContent(context, user);
-              },
+                  final user = state.user;
+                  return _buildContent(context, user);
+                },
+              ),
             ),
           ),
         ),
@@ -170,13 +176,6 @@ class _HomePageState extends State<HomePage> {
             icon: Icons.edit_rounded,
             iconColor: AppColors.primary,
             route: '/profile',
-            visible: true,
-          ),
-          const _ModuleItem(
-            label: 'Centro de Notificaciones',
-            icon: Icons.notifications_active_rounded,
-            iconColor: Colors.lightBlueAccent,
-            route: '/notifications',
             visible: true,
           ),
           _ModuleItem(
@@ -305,6 +304,13 @@ class _HomePageState extends State<HomePage> {
             route: '/audit-management',
             visible: user.canViewBitacora,
           ),
+          const _ModuleItem(
+            label: 'Historial de Notificaciones',
+            icon: Icons.mail_rounded,
+            iconColor: Colors.lightBlueAccent,
+            route: '/notifications',
+            visible: true,
+          ),
         ],
       ),
       _ModuleSection(
@@ -370,167 +376,262 @@ class _HomePageState extends State<HomePage> {
     final sections =
         _buildSections(user).where((s) => s.hasVisibleItems).toList();
 
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(24),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // ── Header ──────────────────────────────────
-          Row(
-            children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      '¡Hola, ${user.nombres}!',
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: Theme.of(context)
-                          .textTheme
-                          .headlineSmall
-                          ?.copyWith(
-                            color: Colors.white,
-                            fontWeight: FontWeight.w700,
-                          ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      user.empresaNombre,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: Theme.of(context)
-                          .textTheme
-                          .bodyMedium
-                          ?.copyWith(color: Colors.white54),
-                    ),
-                  ],
-                ),
-              ),
-
-              // Logout button
-              Container(
-                decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.08),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: IconButton(
-                  onPressed: () => _showLogoutDialog(context),
-                  icon: const Icon(
-                    Icons.logout_rounded,
-                    color: Colors.white70,
-                  ),
-                  tooltip: 'Cerrar sesión',
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 24),
-
-          // ── User Info Card ──────────────────────────
-          _buildInfoCard(
-            context,
-            icon: Icons.person_rounded,
-            title: 'Información de Cuenta',
-            items: [
-              _InfoItem('Nombre', user.fullName),
-              _InfoItem('Email', user.email),
-              _InfoItem('Teléfono', user.telefono ?? 'No registrado'),
-              _InfoItem('Rol', user.rolNombre),
-            ],
-          ),
-          const SizedBox(height: 24),
-
-          // ── Section title ─────────────────────────────
-          Text(
-            'Módulos',
-            style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                  color: Colors.white,
-                  fontWeight: FontWeight.w700,
-                  letterSpacing: 0.5,
-                ),
-          ),
-          const SizedBox(height: 12),
-
-          // ── Collapsible Module Sections ────────────────
-          ...List.generate(sections.length, (index) {
-            final section = sections[index];
-            final isExpanded = _expandedSections[index] ?? false;
-
-            return Padding(
-              padding: const EdgeInsets.only(bottom: 12),
-              child: _buildSection(
-                context,
-                section: section,
-                isExpanded: isExpanded,
-                onToggle: () {
-                  setState(() {
-                    _expandedSections[index] =
-                        !(_expandedSections[index] ?? false);
-                  });
-                },
-              ),
-            );
-          }),
-
-          // ── Asistente IA (botón directo, no necesita sección) ──
-          Container(
-            decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.05),
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(
-                color: AppColors.accent.withValues(alpha: 0.3),
-              ),
-            ),
-            clipBehavior: Clip.antiAlias,
-            child: Material(
-              color: Colors.transparent,
-              child: InkWell(
-                onTap: () => context.push('/ai'),
-                child: Padding(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-                  child: Row(
+    return RefreshIndicator(
+      onRefresh: () async {
+        context.read<DashboardKpiCubit>().fetchDashboardKpis();
+        await Future.delayed(const Duration(milliseconds: 600));
+      },
+      color: AppColors.primary,
+      backgroundColor: AppColors.darkCard,
+      child: SingleChildScrollView(
+        physics: const AlwaysScrollableScrollPhysics(),
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // ── Header ──────────────────────────────────
+            Row(
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Container(
-                        width: 36,
-                        height: 36,
-                        decoration: BoxDecoration(
-                          color: AppColors.accent.withValues(alpha: 0.15),
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: const Icon(
-                          Icons.smart_toy_rounded,
-                          size: 20,
-                          color: AppColors.accent,
-                        ),
+                      Text(
+                        '¡Hola, ${user.nombres}!',
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: Theme.of(context)
+                            .textTheme
+                            .headlineSmall
+                            ?.copyWith(
+                              color: Colors.white,
+                              fontWeight: FontWeight.w700,
+                            ),
                       ),
-                      const SizedBox(width: 12),
-                      const Expanded(
-                        child: Text(
-                          'Asistente Virtual con IA',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 14,
-                            fontWeight: FontWeight.w600,
-                            letterSpacing: 0.3,
-                          ),
-                        ),
-                      ),
-                      Icon(
-                        Icons.chevron_right_rounded,
-                        size: 18,
-                        color: Colors.white.withValues(alpha: 0.3),
+                      const SizedBox(height: 4),
+                      Text(
+                        user.empresaNombre,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: Theme.of(context)
+                            .textTheme
+                            .bodyMedium
+                            ?.copyWith(color: Colors.white54),
                       ),
                     ],
                   ),
                 ),
+
+                // Logout button
+                Container(
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: 0.08),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: IconButton(
+                    onPressed: () => _showLogoutDialog(context),
+                    icon: const Icon(
+                      Icons.logout_rounded,
+                      color: Colors.white70,
+                    ),
+                    tooltip: 'Cerrar sesión',
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 24),
+
+            // ── Dashboard KPIs ──────────────────────────
+            BlocBuilder<DashboardKpiCubit, DashboardKpiState>(
+              builder: (context, kpiState) {
+                if (kpiState is DashboardKpiLoading) {
+                  return const Padding(
+                    padding: EdgeInsets.only(bottom: 24),
+                    child: DashboardKpiShimmer(),
+                  );
+                }
+
+                if (kpiState is DashboardKpiError) {
+                  return Padding(
+                    padding: const EdgeInsets.only(bottom: 24),
+                    child: Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: AppColors.errorLight,
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(
+                          color: AppColors.error.withValues(alpha: 0.3),
+                        ),
+                      ),
+                      child: Row(
+                        children: [
+                          const Icon(
+                            Icons.wifi_off_rounded,
+                            color: AppColors.error,
+                            size: 20,
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Text(
+                              'No se pudieron cargar los KPIs',
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: Colors.white.withValues(alpha: 0.7),
+                              ),
+                            ),
+                          ),
+                          GestureDetector(
+                            onTap: () => context
+                                .read<DashboardKpiCubit>()
+                                .fetchDashboardKpis(),
+                            child: const Icon(
+                              Icons.refresh_rounded,
+                              color: AppColors.error,
+                              size: 20,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                }
+
+                if (kpiState is DashboardKpiLoaded) {
+                  return Column(
+                    children: [
+                      // Summary KPIs
+                      if (kpiState.summary.isNotEmpty) ...[                        
+                        DashboardKpiSummaryGrid(
+                          kpis: kpiState.summary,
+                          rol: kpiState.rol,
+                        ),
+                        const SizedBox(height: 16),
+                      ],
+
+                      // Sections
+                      ...List.generate(kpiState.sections.length, (i) {
+                        return Padding(
+                          padding: const EdgeInsets.only(bottom: 12),
+                          child: DashboardSectionWidget(
+                            section: kpiState.sections[i],
+                            initiallyExpanded: i == 0,
+                          ),
+                        );
+                      }),
+                      const SizedBox(height: 8),
+                    ],
+                  );
+                }
+
+                return const SizedBox.shrink();
+              },
+            ),
+
+            // ── User Info Card ──────────────────────────
+            _buildInfoCard(
+              context,
+              icon: Icons.person_rounded,
+              title: 'Información de Cuenta',
+              items: [
+                _InfoItem('Nombre', user.fullName),
+                _InfoItem('Email', user.email),
+                _InfoItem('Teléfono', user.telefono ?? 'No registrado'),
+                _InfoItem('Rol', user.rolNombre),
+              ],
+            ),
+            const SizedBox(height: 24),
+
+            // ── Section title ─────────────────────────────
+            Text(
+              'Módulos',
+              style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w700,
+                    letterSpacing: 0.5,
+                  ),
+            ),
+            const SizedBox(height: 12),
+
+            // ── Collapsible Module Sections ────────────────
+            ...List.generate(sections.length, (index) {
+              final section = sections[index];
+              final isExpanded = _expandedSections[index] ?? false;
+
+              return Padding(
+                padding: const EdgeInsets.only(bottom: 12),
+                child: _buildSection(
+                  context,
+                  section: section,
+                  isExpanded: isExpanded,
+                  onToggle: () {
+                    setState(() {
+                      _expandedSections[index] =
+                          !(_expandedSections[index] ?? false);
+                    });
+                  },
+                ),
+              );
+            }),
+
+            // ── Asistente IA (botón directo, no necesita sección) ──
+            Container(
+              decoration: BoxDecoration(
+                color: Colors.white.withValues(alpha: 0.05),
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(
+                  color: AppColors.accent.withValues(alpha: 0.3),
+                ),
+              ),
+              clipBehavior: Clip.antiAlias,
+              child: Material(
+                color: Colors.transparent,
+                child: InkWell(
+                  onTap: () => context.push('/ai'),
+                  child: Padding(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                    child: Row(
+                      children: [
+                        Container(
+                          width: 36,
+                          height: 36,
+                          decoration: BoxDecoration(
+                            color: AppColors.accent.withValues(alpha: 0.15),
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: const Icon(
+                            Icons.smart_toy_rounded,
+                            size: 20,
+                            color: AppColors.accent,
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        const Expanded(
+                          child: Text(
+                            'Asistente Virtual con IA',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600,
+                              letterSpacing: 0.3,
+                            ),
+                          ),
+                        ),
+                        Icon(
+                          Icons.chevron_right_rounded,
+                          size: 18,
+                          color: Colors.white.withValues(alpha: 0.3),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
               ),
             ),
-          ),
 
-          const SizedBox(height: 16),
-        ],
+            const SizedBox(height: 16),
+          ],
+        ),
       ),
     );
   }

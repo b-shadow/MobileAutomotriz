@@ -29,6 +29,21 @@ class ReportsRepositoryImpl implements ReportsRepository {
   }
 
   @override
+  Future<Result<ReportData>> getExplorerData(String vista, List<String> columnas, Map<String, dynamic> filtros) async {
+    try {
+      final data = await remoteDataSource.getExplorerData(vista, columnas, filtros);
+      return Success(data);
+    } on DioException catch (e) {
+      final errorMsg = e.response?.data is Map
+          ? (e.response?.data['error'] ?? e.response?.data['detail'] ?? 'Error de servidor')
+          : 'Error de servidor';
+      return Err(ServerFailure(message: errorMsg.toString()));
+    } catch (e) {
+      return Err(ServerFailure(message: e.toString()));
+    }
+  }
+
+  @override
   Future<Result<IaReportResult>> askIaReport(String prompt) async {
     try {
       final result = await iaRemoteDataSource.askIaReport(prompt);
