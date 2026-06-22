@@ -4,6 +4,7 @@ import '../../domain/entities/report_data.dart';
 
 abstract class ReportsRemoteDataSource {
   Future<ReportData> getReportData(String endpoint, Map<String, dynamic> queryParams);
+  Future<ReportData> getExplorerData(String vista, List<String> columnas, Map<String, dynamic> filtros);
 }
 
 class ReportsRemoteDataSourceImpl implements ReportsRemoteDataSource {
@@ -46,6 +47,21 @@ class ReportsRemoteDataSourceImpl implements ReportsRemoteDataSource {
     final url = '/api/$slug/comunicacion-control/reportes/$endpoint/$queryString';
     final response = await apiClient.get(url);
     
+    return ReportData(response.data as Map<String, dynamic>);
+  }
+
+  @override
+  Future<ReportData> getExplorerData(String vista, List<String> columnas, Map<String, dynamic> filtros) async {
+    final slug = await _getTenantSlug();
+    final url = '/api/$slug/comunicacion-control/reportes/explorador_datos/';
+
+    final data = {
+      'vista': vista,
+      'columnas': columnas,
+      'filtros': filtros,
+    };
+
+    final response = await apiClient.post(url, data: data);
     return ReportData(response.data as Map<String, dynamic>);
   }
 }

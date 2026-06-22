@@ -163,9 +163,11 @@ import 'features/reports/data/datasources/ia_report_remote_data_source.dart';
 import 'features/reports/data/repositories/reports_repository_impl.dart';
 import 'features/reports/domain/repositories/reports_repository.dart';
 import 'features/reports/domain/usecases/get_report_data.dart';
+import 'features/reports/domain/usecases/get_explorer_data.dart';
 import 'features/reports/domain/usecases/ask_ia_report.dart';
 import 'features/reports/domain/usecases/transcribe_report_audio.dart';
 import 'features/reports/presentation/cubit/report_cubit.dart';
+import 'features/reports/presentation/cubit/explorer_cubit.dart';
 import 'features/reports/presentation/cubit/ia_report_cubit.dart';
 import 'features/home/presentation/cubit/dashboard_kpi_cubit.dart';
 
@@ -795,6 +797,9 @@ Future<void> initDependencies(SharedPreferences prefs) async {
   sl.registerFactory(() => ReportCubit(
         getReportData: sl(),
       ));
+  sl.registerFactory(() => ExplorerCubit(
+        getExplorerData: sl(),
+      ));
   sl.registerFactory(() => IaReportCubit(
         askIaReport: sl(),
         transcribeReportAudio: sl(),
@@ -805,6 +810,7 @@ Future<void> initDependencies(SharedPreferences prefs) async {
 
   // Use Cases
   sl.registerLazySingleton(() => GetReportData(sl()));
+  sl.registerLazySingleton(() => GetExplorerData(sl()));
   sl.registerLazySingleton(() => AskIaReport(sl()));
   sl.registerLazySingleton(() => TranscribeReportAudio(sl()));
 

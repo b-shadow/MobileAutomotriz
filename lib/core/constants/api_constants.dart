@@ -197,6 +197,7 @@ class ApiConstants {
 
   // ── Reportes ────────────────────────────────────────────
   static String reportesVehiculo(String slug) => '/api/$slug/vehiculos-servicios/reportes/vehiculo/';
+  static String reportesExploradorDatos(String slug) => '/api/$slug/comunicacion-control/reportes/explorador_datos/';
   static String reportesIaAsk(String slug) => '/api/$slug/comunicacion-control/reportes-ia/ask/';
 
   // ── Inventario ───────────────────────────────────────────
