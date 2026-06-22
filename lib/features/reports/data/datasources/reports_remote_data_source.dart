@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import '../../../../core/network/api_client.dart';
 import '../../../../core/storage/session_storage.dart';
 import '../../domain/entities/report_data.dart';
@@ -53,15 +55,25 @@ class ReportsRemoteDataSourceImpl implements ReportsRemoteDataSource {
   @override
   Future<ReportData> getExplorerData(String vista, List<String> columnas, Map<String, dynamic> filtros) async {
     final slug = await _getTenantSlug();
-    final url = '/api/$slug/comunicacion-control/reportes/explorador_datos/';
 
-    final data = {
+    final columnasStr = columnas.join(',');
+    final filtrosStr = jsonEncode(filtros);
+
+    final queryParams = {
       'vista': vista,
-      'columnas': columnas,
-      'filtros': filtros,
+      'columnas': columnasStr,
+      'filtros': filtrosStr,
     };
 
-    final response = await apiClient.post(url, data: data);
+    final List<String> paramsList = [];
+    queryParams.forEach((key, value) {
+      paramsList.add('$key=${Uri.encodeComponent(value)}');
+    });
+
+    final queryString = paramsList.isNotEmpty ? '?${paramsList.join('&')}' : '';
+    final url = '/api/$slug/comunicacion-control/reportes/explorador_datos/$queryString';
+
+    final response = await apiClient.get(url);
     return ReportData(response.data as Map<String, dynamic>);
   }
 }

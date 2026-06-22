@@ -12,7 +12,7 @@ class EnvConfig {
   /// Slug de la empresa para este prototipo.
   /// Cada build de la app va dirigido a una empresa específica.
   /// Cambia este valor según la empresa que usará la app.
-  static const String tenantSlug = 'centenario';
+  static const String tenantSlug = 'transformers';
 
   /// ─── STRIPE ─────────────────────────────────────────
   static const String stripePublishableKey =

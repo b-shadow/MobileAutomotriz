@@ -178,13 +178,6 @@ class _HomePageState extends State<HomePage> {
             route: '/profile',
             visible: true,
           ),
-          const _ModuleItem(
-            label: 'Centro de Notificaciones',
-            icon: Icons.notifications_active_rounded,
-            iconColor: Colors.lightBlueAccent,
-            route: '/notifications',
-            visible: true,
-          ),
           _ModuleItem(
             label: 'Gestionar Empresa',
             icon: Icons.business_rounded,
@@ -310,6 +303,13 @@ class _HomePageState extends State<HomePage> {
             iconColor: Colors.purpleAccent,
             route: '/audit-management',
             visible: user.canViewBitacora,
+          ),
+          const _ModuleItem(
+            label: 'Historial de Notificaciones',
+            icon: Icons.mail_rounded,
+            iconColor: Colors.lightBlueAccent,
+            route: '/notifications',
+            visible: true,
           ),
         ],
       ),

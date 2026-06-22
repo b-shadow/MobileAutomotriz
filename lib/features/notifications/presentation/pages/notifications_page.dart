@@ -40,7 +40,7 @@ class _NotificationsPageState extends State<NotificationsPage> {
           elevation: 0,
           iconTheme: const IconThemeData(color: Colors.white),
           title: const Text(
-            'Centro de Notificaciones',
+            'Historial de Notificaciones',
             style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
           ),
           actions: [
