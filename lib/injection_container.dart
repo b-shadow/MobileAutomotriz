@@ -167,6 +167,7 @@ import 'features/reports/domain/usecases/ask_ia_report.dart';
 import 'features/reports/domain/usecases/transcribe_report_audio.dart';
 import 'features/reports/presentation/cubit/report_cubit.dart';
 import 'features/reports/presentation/cubit/ia_report_cubit.dart';
+import 'features/home/presentation/cubit/dashboard_kpi_cubit.dart';
 
 import 'features/inventory/data/datasources/inventory_remote_data_source.dart';
 import 'features/inventory/data/repositories/inventory_repository_impl.dart';
@@ -797,6 +798,9 @@ Future<void> initDependencies(SharedPreferences prefs) async {
   sl.registerFactory(() => IaReportCubit(
         askIaReport: sl(),
         transcribeReportAudio: sl(),
+      ));
+  sl.registerFactory(() => DashboardKpiCubit(
+        reportsRemoteDataSource: sl(),
       ));
 
   // Use Cases
